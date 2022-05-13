@@ -88,20 +88,21 @@ model Product {
 model ProductsOnOrders {
     id        String   @id @default(auto()) @map("_id") @db.ObjectId
     productId String
+    amount    Int
     orderId   String
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
-    Product   Product  @relation(fields: [productId], references: [id])
-    Order     Order    @relation(fields: [orderId], references: [id])
+    product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+    order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }
 
 model Order {
     id           String             @id @default(auto()) @map("_id") @db.ObjectId
-    total        Int
-    tax          Int
+    total        Int?
+    tax          Int?
     notes        Json? // used to send game information (e.g nickname, id)
-    paymentUrl   String
-    paymentToken String
+    paymentUrl   String?
+    paymentToken String?
     products     ProductsOnOrders[]
     userId       String
     user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
