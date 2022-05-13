@@ -4,7 +4,7 @@ import Wrapper from '../components/Wrapper'
 const Home = () => {
   return (
     <Container>
-      <Wrapper>Umang ni bos</Wrapper>
+      <Wrapper></Wrapper>
     </Container>
   )
 }
