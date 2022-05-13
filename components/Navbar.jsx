@@ -6,7 +6,11 @@ const Navbar = () => {
     <nav>
       <Wrapper>
         <Link href="/" className="flex">
-          <img src="/rausky-logo.png" alt="rausky-logo" className="w-[40px]" />
+          <img
+            src="/images/rausky-logo.png"
+            alt="rausky-logo"
+            className="w-[40px]"
+          />
           Rausky
         </Link>
       </Wrapper>
