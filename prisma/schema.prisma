@@ -76,6 +76,7 @@ model Product {
     description String
     price       Int
     discount    Int?               @default(0)
+    stock       Int?               @default(0)
     category    Category?          @default(UNCATEGORIZE)
     orders      ProductsOnOrders[]
     userId      String
@@ -98,6 +99,7 @@ model Order {
     id           String             @id @default(auto()) @map("_id") @db.ObjectId
     total        Int
     tax          Int
+    notes        Json? // used to send game information (e.g nickname, id)
     paymentUrl   String
     paymentToken String
     products     ProductsOnOrders[]

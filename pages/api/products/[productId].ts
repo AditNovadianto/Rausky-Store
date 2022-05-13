@@ -4,17 +4,9 @@ import prisma from '../../../lib/prisma'
 export default apiHandler
   // edit product
   .put(checkAuth('ADMIN'), async (req, res) => {
-    const { title, description, price, discount, category } = req.body
-    if (!title && !description && !price && !discount && !category) {
-      throw {
-        status: 400,
-        message:
-          'Please provide title or description or price or discount or category',
-      }
-    }
     const product = await prisma.product.update({
       where: { id: req.query.productId as string },
-      data: { title, description, price, discount, category },
+      data: req.body,
     })
     res.status(200).json({ product })
   })

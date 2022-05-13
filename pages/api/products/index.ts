@@ -21,7 +21,7 @@ export default apiHandler
   })
   // create new product
   .post(checkAuth('ADMIN'), async (req, res) => {
-    const { title, description, price, discount, category } = req.body
+    const { title, description, price, discount, category, stock } = req.body
 
     if (!title || !description || !price) {
       throw { status: 400, message: 'Please provide title, description, price' }
@@ -34,6 +34,7 @@ export default apiHandler
         price,
         discount,
         category,
+        stock,
         userId: req.user.id,
       },
     })
