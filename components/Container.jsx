@@ -10,7 +10,7 @@ const Container = ({ title, children }) => {
     <main>
       <Head>
         <title>{title ? `${title} - ${head.title}` : head.title}</title>
-        <link rel="shortcut icon" href="/favicon.png" type="image/png" />
+        <link rel="shortcut icon" href="/images/favicon.png" type="image/png" />
         {/* TODO: tambahin meta: description, dll */}
       </Head>
       <Navbar />
