@@ -1,0 +1,50 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "mongodb"
+    url      = env("DATABASE_URL")
+}
+
+enum Category {
+    MOBILE_LEGEND
+    VALORANT
+}
+
+model Product {
+    id          String             @id @default(auto()) @map("_id") @db.ObjectId
+    title       String
+    description String
+    price       Int
+    discount    Int?               @default(0)
+    category    Category
+    orders      ProductsOnOrders[]
+    createdAt   DateTime           @default(now())
+    updatedAt   DateTime           @updatedAt
+}
+
+model ProductsOnOrders {
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    productId String
+    orderId   String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    Product   Product  @relation(fields: [productId], references: [id])
+    Order     Order    @relation(fields: [orderId], references: [id])
+}
+
+model Order {
+    id           String             @id @default(auto()) @map("_id") @db.ObjectId
+    total        Int
+    tax          Int
+    paymentUrl   String
+    paymentToken String
+    products     ProductsOnOrders[]
+    // TODO: tambahin foreign key userId
+    createdAt    DateTime           @default(now())
+    updatedAt    DateTime           @updatedAt
+}
