@@ -1,7 +1,24 @@
+import { Category } from '@prisma/client'
 import apiHandler, { checkAuth } from '../../../lib/apiHandler'
 import prisma from '../../../lib/prisma'
 
 export default apiHandler
+  // get all products
+  .get(async (req, res) => {
+    const { category, from, to, discount } = req.query
+    const products = await prisma.product.findMany({
+      where: {
+        category: {
+          equals: (category as string)
+            ?.toUpperCase()
+            .replace(/\s|-/g, '_') as Category,
+        },
+        price: { gte: from && +from, lte: to && +to },
+        discount: { gt: discount == 'true' ? 0 : undefined },
+      },
+    })
+    res.status(200).json({ products, length: products.length })
+  })
   // create new product
   .post(checkAuth('ADMIN'), async (req, res) => {
     const { title, description, price, discount, category } = req.body
