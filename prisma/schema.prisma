@@ -10,6 +10,54 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
+model Account {
+    id                String  @id @default(auto()) @map("_id") @db.ObjectId
+    userId            String
+    type              String
+    provider          String
+    providerAccountId String
+    refresh_token     String? @db.String
+    access_token      String? @db.String
+    expires_at        Int?
+    token_type        String?
+    scope             String?
+    id_token          String? @db.String
+    session_state     String?
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([provider, providerAccountId])
+}
+
+model Session {
+    id           String   @id @default(auto()) @map("_id") @db.ObjectId
+    sessionToken String   @unique
+    userId       String
+    expires      DateTime
+    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+    id         String   @id @default(auto()) @map("_id") @db.ObjectId
+    identifier String
+    token      String   @unique
+    expires    DateTime
+
+    @@unique([identifier, token])
+}
+
+model User {
+    id            String    @id @default(auto()) @map("_id") @db.ObjectId
+    name          String?
+    email         String?   @unique
+    emailVerified DateTime?
+    image         String?
+    accounts      Account[]
+    sessions      Session[]
+    orders        Order[]
+    Product       Product[]
+}
+
 enum Category {
     MOBILE_LEGEND
     VALORANT
@@ -23,6 +71,8 @@ model Product {
     discount    Int?               @default(0)
     category    Category
     orders      ProductsOnOrders[]
+    userId      String
+    user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
     createdAt   DateTime           @default(now())
     updatedAt   DateTime           @updatedAt
 }
@@ -44,7 +94,8 @@ model Order {
     paymentUrl   String
     paymentToken String
     products     ProductsOnOrders[]
-    // TODO: tambahin foreign key userId
+    userId       String
+    user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
     createdAt    DateTime           @default(now())
     updatedAt    DateTime           @updatedAt
 }
