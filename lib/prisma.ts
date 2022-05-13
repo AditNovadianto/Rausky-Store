@@ -15,6 +15,3 @@ const prisma =
 if (process.env.NODE_ENV !== 'production') global.prisma = prisma
 
 export default prisma
-
-// TODO: create apiHandler wrapper
-// TODO: setup next-auth (email password, google)

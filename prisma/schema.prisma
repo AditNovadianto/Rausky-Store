@@ -46,12 +46,18 @@ model VerificationToken {
     @@unique([identifier, token])
 }
 
+enum Role {
+    USER
+    ADMIN
+}
+
 model User {
     id            String    @id @default(auto()) @map("_id") @db.ObjectId
     name          String?
     email         String?   @unique
     emailVerified DateTime?
     image         String?
+    role          Role?     @default(USER)
     accounts      Account[]
     sessions      Session[]
     orders        Order[]
@@ -59,6 +65,7 @@ model User {
 }
 
 enum Category {
+    UNCATEGORIZE
     MOBILE_LEGEND
     VALORANT
 }
@@ -69,7 +76,7 @@ model Product {
     description String
     price       Int
     discount    Int?               @default(0)
-    category    Category
+    category    Category?          @default(UNCATEGORIZE)
     orders      ProductsOnOrders[]
     userId      String
     user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)

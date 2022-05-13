@@ -2,10 +2,16 @@ import nc, { Middleware } from 'next-connect'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { getSession } from 'next-auth/react'
 import { User } from 'next-auth'
+import { Role } from '@prisma/client'
+import prisma from './prisma'
 
 export default nc<NextApiRequest, NextApiResponse>({
   onError: (err, req, res, next) => {
     console.error(err)
+    if (err?.status == 401) {
+      res.redirect('/api/auth/signin') // TODO: ganti ke custom signin
+      return
+    }
     res.status(err.status || 500).end(err.message || 'Something broke!')
   },
   onNoMatch: (req, res) => {
@@ -18,11 +24,20 @@ interface ExtendedRequest extends NextApiRequest {
 }
 
 export const checkAuth =
-  (): Middleware<ExtendedRequest, NextApiResponse> =>
+  (role: Role = 'USER'): Middleware<ExtendedRequest, NextApiResponse> =>
   async (req, res, next) => {
     const session = await getSession({ req })
     if (!session?.user) {
       throw { status: 401, message: 'you are not logged in' }
+    }
+    // check if role = ADMIN
+    if (role == 'ADMIN') {
+      const user = await prisma.user.findUnique({
+        where: { id: session.user.id },
+      })
+      if (user.role !== 'ADMIN') {
+        throw { status: 403, message: 'forbidden' }
+      }
     }
     // @ts-ignore
     req.user = session.user

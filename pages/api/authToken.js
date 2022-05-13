@@ -5,7 +5,7 @@ import nookies from 'nookies'
 export default apiHandler.post((req, res) => {
   const { sessionToken, csrfToken } = req.body
   if (!sessionToken || !csrfToken) {
-    throw { status: 401, message: 'please provide sessionToken, csrfToken' }
+    throw { status: 400, message: 'please provide sessionToken, csrfToken' }
   }
   nookies.set({ res }, 'next-auth.session-token', sessionToken, {
     httpOnly: true,
