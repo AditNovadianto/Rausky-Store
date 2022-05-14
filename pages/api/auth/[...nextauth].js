@@ -27,7 +27,10 @@ export default NextAuth({
       return token
     },
     async session({ session, token, user }) {
-      session.user.id = user.id
+      //   set user information from db to session.user
+      const userData = await prisma.user.findUnique({ where: { id: user.id } })
+      session.user = userData
+
       return session
     },
   },

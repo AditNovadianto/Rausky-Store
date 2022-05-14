@@ -12,7 +12,7 @@ export default apiHandler
     const products = await prisma.product.findMany({
       where: {
         category: {
-          in: category.split(',') as Category[],
+          in: category?.split(',') as Category[],
         },
         price: { gte: from && +from, lte: to && +to },
         discount: { gt: discount == 'true' ? 0 : undefined },

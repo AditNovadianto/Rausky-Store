@@ -3,7 +3,6 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { getSession } from 'next-auth/react'
 import { User } from 'next-auth'
 import { Role } from '@prisma/client'
-import prisma from './prisma'
 
 export default nc<NextApiRequest, NextApiResponse>({
   onError: (err, req, res, next) => {
@@ -31,13 +30,8 @@ export const checkAuth =
       throw { status: 401, message: 'you are not logged in' }
     }
     // check if role = ADMIN
-    if (role == 'ADMIN') {
-      const user = await prisma.user.findUnique({
-        where: { id: session.user.id },
-      })
-      if (user.role !== 'ADMIN') {
-        throw { status: 403, message: 'forbidden' }
-      }
+    if (role == 'ADMIN' && session.user.role !== 'ADMIN') {
+      throw { status: 403, message: 'forbidden' }
     }
     // @ts-ignore
     req.user = session.user
