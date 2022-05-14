@@ -5,7 +5,7 @@ const head = {
   title: 'Rausky Store',
 }
 
-const Container = ({ title, children }) => {
+const Container = ({ title, children, noNavbar }) => {
   return (
     <main>
       <Head>
@@ -13,7 +13,7 @@ const Container = ({ title, children }) => {
         <link rel="shortcut icon" href="/images/favicon.png" type="image/png" />
         {/* TODO: tambahin meta: description, dll */}
       </Head>
-      <Navbar />
+      {!noNavbar && <Navbar />}
       {children}
     </main>
   )
