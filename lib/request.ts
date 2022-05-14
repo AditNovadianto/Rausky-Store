@@ -1,4 +1,5 @@
 import axios from 'axios'
+import Router from 'next/router'
 
 const request = axios.create({
   baseURL: '/api',
@@ -14,9 +15,9 @@ request.interceptors.response.use(
   function (error) {
     // redirect to /signin page if user is not logged in
     if (error.response.status == 401) {
-      window.location.href = '/signin'
+      Router.push('/signin')
     }
-    return Promise.reject(error)
+    return Promise.reject(error.response)
   }
 )
 

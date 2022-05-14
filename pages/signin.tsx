@@ -19,32 +19,30 @@ interface Props {
 }
 
 const providerLogo = {
-  google:
-    'https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/1200px-Google_%22G%22_Logo.svg.png',
-  discord:
-    'https://www.freepnglogos.com/uploads/discord-logo-png/discord-logo-logodownload-download-logotipos-1.png',
-  github: 'https://cdn-icons-png.flaticon.com/512/25/25231.png',
+  google: 'google.webp',
+  discord: 'discord.png',
+  github: 'github.png',
 }
 
 const SignIn = ({ providers }: Props) => {
   return (
     <Container title="SignIn" noNavbar>
-      <Wrapper className="mt-20 text-center flex flex-col items-center">
+      <Wrapper className="py-20 text-center flex flex-col items-center max-w-xs md:max-w-4xl">
         <Link href="/">
           <img src="/images/rausky-logo.png" alt="" />
         </Link>
         <h3 className="font-bold text-3xl">Sign In dulu bos</h3>
-        <div className="mt-10 space-y-5">
+        <div className="w-full mt-10 space-y-5 flex flex-col md:flex-row md:space-y-0 md:space-x-5">
           {Object.values(providers).map((provider) => {
             return (
               <button
                 key={provider.name}
-                className="w-full flex items-center font-medium p-4 border rounded-md transition-all hover:scale-105 active:scale-95"
+                className="w-full flex md:flex-col items-center justify-center font-medium p-4 md:p-8 border rounded-md transition-all hover:scale-105 active:scale-95 text-lg md:text-xl"
                 onClick={() => signIn(provider.id)}
               >
                 <img
-                  className="w-4 h-4 mr-5"
-                  src={providerLogo[provider.id]}
+                  className="w-6 md:w-10 h-6 md:h-10 mr-8 md:mr-0 md:mb-5"
+                  src={'/images/auth/' + providerLogo[provider.id]}
                   alt=""
                 />
                 Sign in with {provider.name}
