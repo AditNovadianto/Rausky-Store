@@ -1,10 +1,14 @@
 import Container from '../components/Container'
 import Wrapper from '../components/Wrapper'
+import { signOut } from 'next-auth/react'
 
 const Home = () => {
   return (
     <Container>
-      <Wrapper>Umang ni bos</Wrapper>
+      <Wrapper>
+        <p>Umang ni bos</p>
+        <button onClick={() => signOut()}>signout</button>
+      </Wrapper>
     </Container>
   )
 }
