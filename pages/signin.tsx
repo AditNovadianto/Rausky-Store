@@ -27,7 +27,6 @@ const providerLogo = {
 }
 
 const SignIn = ({ providers }: Props) => {
-  console.log(providers)
   return (
     <Container title="SignIn" noNavbar>
       <Wrapper className="mt-20 text-center flex flex-col items-center">
