@@ -7,14 +7,12 @@ import { Role } from '@prisma/client'
 export default nc<NextApiRequest, NextApiResponse>({
   onError: (err, req, res, next) => {
     console.error(err)
-    if (err?.status == 401) {
-      res.redirect('/api/auth/signin') // TODO: ganti ke custom signin
-      return
-    }
-    res.status(err.status || 500).end(err.message || 'Something broke!')
+    res
+      .status(err.status || 500)
+      .json({ message: err.message || 'Something broke!' })
   },
   onNoMatch: (req, res) => {
-    res.status(404).end(`${req.method} ${req.url} not found`)
+    res.status(404).json({ message: `${req.method} ${req.url} not found` })
   },
 })
 
