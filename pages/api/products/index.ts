@@ -5,13 +5,14 @@ import prisma from '../../../lib/prisma'
 export default apiHandler
   // get all products
   .get(async (req, res) => {
-    const { category, from, to, discount } = req.query
+    const { category, from, to, discount } = req.query as {
+      [key: string]: string
+    }
+
     const products = await prisma.product.findMany({
       where: {
         category: {
-          equals: (category as string)
-            ?.toUpperCase()
-            .replace(/\s|-/g, '_') as Category,
+          in: category?.split(',') as Category[],
         },
         price: { gte: from && +from, lte: to && +to },
         discount: { gt: discount == 'true' ? 0 : undefined },
