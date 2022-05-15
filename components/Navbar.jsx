@@ -1,6 +1,8 @@
 import Link from './Link'
 import Wrapper from './Wrapper'
 import { useState } from 'react'
+import { MenuIcon } from '@heroicons/react/outline'
+import useClickOutside from '../hooks/useClickOutside'
 
 const Navbar = () => {
   const [show, setShow] = useState(false)
@@ -14,96 +16,103 @@ const Navbar = () => {
     setSearch(!search)
   }
 
+  const menuRef = useClickOutside(() => {
+    setShow(false)
+  }, show)
+
   return (
     <nav>
-      <div className="w-full bg-white z-50 relative">
-        <Wrapper className="flex p-0 items-center w-full justify-between">
-          <Link href="/" className="flex font-bold items-center text-2xl">
+      <div className="w-full bg-white z-50 relative border-b">
+        <Wrapper className="flex items-center w-full justify-between lg:py-2">
+          <Link href="/" className="flex font-semibold items-center text-xl">
             <img
               src="/images/rausky-logo.png"
               alt="rausky-logo"
-              className="w-[100px]"
+              className="w-[60px]"
             />
-            <span className="-ml-10 w-max text-yellow-400">Rausky</span>
+            <span className="text-black hidden lg:block">Rausky</span>
+          </Link>
 
-            <button className="md:hidden ml-10" onClick={showSearch}>
+          <div className="items-center hidden md:flex">
+            <button className="hidden ml-10 flex-shrink-0" onClick={showSearch}>
               <img src="/images/Union.svg" alt="Union" />
             </button>
 
             <form className="md:block hidden px-5 w-full">
-              <label class="relative block w-full">
-                <span class="sr-only">Search</span>
-                <span class="absolute inset-y-0 left-0 flex items-center pl-2">
+              <label className="relative block w-full">
+                <span className="sr-only">Search</span>
+                <span className="absolute inset-y-0 left-0 flex items-center pl-2">
                   <img src="/images/Union.svg" alt="" />
                 </span>
                 <input
-                  class="placeholder:italic placeholder:text-slate-400 block bg-white w-full border border-slate-300 rounded-md py-2 pl-9 pr-3 shadow-sm focus:outline-none focus:border-sky-500 focus:ring-sky-500 focus:ring-1 sm:text-sm"
+                  className="placeholder:italic placeholder:text-slate-400 block bg-white w-full rounded-md py-2 pl-12 pr-3 focus:outline-none focus:ring-green-500 focus:ring focus:ring-opacity-50 sm:text-sm"
                   placeholder="Search for anything..."
                   type="text"
                   name="search"
                 />
               </label>
             </form>
-          </Link>
+          </div>
 
-          <div className="flex items-center w-max">
-            <a
-              className="lg:block hidden focus:text-green-600 focus:after:contents-[''] focus:after:block focus:after:w-full focus:after:h-[2px] focus:after:bg-black text-[17px] transition-all font-Circular font-semibold"
-              href="#"
-            >
-              Products
-            </a>
-            <a
-              className="lg:block hidden focus:text-green-600 ml-10 focus:after:contents-[''] focus:after:block focus:after:w-full focus:after:h-[2px] focus:after:bg-black text-[17px] transition-all font-Circular font-semibold"
-              href="#"
-            >
-              Story
-            </a>
-            <a
-              className="lg:block hidden focus:text-green-600 ml-10 focus:after:contents-[''] focus:after:block focus:after:w-full focus:after:h-[2px] focus:after:bg-black text-[17px] transition-all font-Circular font-semibold"
-              href="#"
-            >
-              Manufacturing
-            </a>
-            <a
-              className="lg:block hidden focus:text-green-600 ml-10 focus:after:contents-[''] focus:after:block focus:after:w-full focus:after:h-[2px] focus:after:bg-black text-[17px] transition-all font-Circular font-semibold"
-              href="#"
-            >
-              Packaging
-            </a>
+          <div className="flex items-center">
+            <div className="items-center hidden lg:flex space-x-10 mr-5">
+              <a
+                className="lg:block hidden focus:text-green-500 focus:after:contents-[''] focus:after:block focus:after:w-full focus:after:h-[2px] focus:after:bg-gray-500 focus:after:rounded-full text-[17px] transition-all font-medium text-gray-500 hover:text-green-500"
+                href="#"
+              >
+                Products
+              </a>
+              <a
+                className="lg:block hidden focus:text-green-500 focus:after:contents-[''] focus:after:block focus:after:w-full focus:after:h-[2px] focus:after:bg-gray-500 focus:after:rounded-full text-[17px] transition-all font-medium text-gray-500 hover:text-green-500"
+                href="#"
+              >
+                Story
+              </a>
+              <a
+                className="lg:block hidden focus:text-green-500 focus:after:contents-[''] focus:after:block focus:after:w-full focus:after:h-[2px] focus:after:bg-gray-500 focus:after:rounded-full text-[17px] transition-all font-medium text-gray-500 hover:text-green-500"
+                href="#"
+              >
+                Manufacturing
+              </a>
+              <a
+                className="lg:block hidden focus:text-green-500 focus:after:contents-[''] focus:after:block focus:after:w-full focus:after:h-[2px] focus:after:bg-gray-500 focus:after:rounded-full text-[17px] transition-all font-medium text-gray-500 hover:text-green-500"
+                href="#"
+              >
+                Packaging
+              </a>
+            </div>
 
-            <button className="ml-10 w-full">
+            <button
+              className="ml-10 flex-shrink-0 md:hidden"
+              onClick={showSearch}
+            >
+              <img src="/images/Union.svg" alt="Union" />
+            </button>
+
+            <button className="ml-4 flex-shrink-0">
               <img src="/images/Bag.svg" alt="Bag-icon" />
             </button>
 
-            <button className="ml-10 w-full">
-              <div className="flex flex-col items-center justify-center">
-                <img src="/images/head.svg" alt="head" />
-                <img src="/images/Body.svg" alt="body" />
-              </div>
+            <button className="ml-4 flex-shrink-0 hidden lg:block">
+              <img src="/images/person.svg" alt="person" />
             </button>
 
-            <button className="ml-10 w-full lg:hidden" onClick={navBar}>
-              <img
-                src={`${
-                  show ? '/images/icon-close.svg' : '/images/icon-hamburger.svg'
-                }`}
-                alt="hamburger-logo"
-              />
+            <button className="ml-4 lg:hidden flex-shrink-0" onClick={navBar}>
+              <MenuIcon className="w-6 h-6" />
             </button>
           </div>
         </Wrapper>
       </div>
 
       {search && (
-        <form className="md:hidden flex items-center mt-1 px-5 mb-5 justify-center w-full">
-          <label class="relative block w-full">
-            <span class="sr-only">Search</span>
-            <span class="absolute inset-y-0 left-0 flex items-center pl-2">
+        <form className="md:hidden flex items-center mt-5 px-5 mb-5 justify-center w-full">
+          <label className="relative block w-full">
+            <span className="sr-only">Search</span>
+            <span className="absolute inset-y-0 left-0 flex items-center pl-2">
               <img src="/images/Union.svg" alt="" />
             </span>
             <input
-              class="placeholder:italic placeholder:text-slate-400 block bg-white w-full border border-slate-300 rounded-md py-2 pl-9 pr-3 shadow-sm focus:outline-none focus:border-sky-500 focus:ring-sky-500 focus:ring-1 sm:text-sm"
+              className="placeholder:italic placeholder:text-slate-400 block border bg-white w-full rounded-md py-2 pl-12 pr-3 focus:outline-none focus:ring-green-500 focus:ring-1 sm:text-sm"
               placeholder="Search for anything..."
               type="text"
               name="search"
@@ -113,9 +122,10 @@ const Navbar = () => {
       )}
 
       <div
+        ref={menuRef}
         className={`${
           show ? 'translate-y-0' : '-translate-y-[400px]'
-        } w-[90%] lg:hidden m-auto flex items-center -z-50 justify-center flex-col bg-green-100 py-7 transition-all`}
+        } w-full absolute lg:hidden flex items-center justify-center flex-col bg-green-100 py-7 transition-all`}
       >
         <a
           className="focus:text-green-600 focus:after:contents-[''] focus:after:block focus:after:w-full focus:after:h-[2px] focus:after:bg-black text-[17px] transition-all font-Circular font-semibold"

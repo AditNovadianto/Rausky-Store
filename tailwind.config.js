@@ -6,7 +6,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        Circular: 'Circular Std',
+        sans: ["'Inter', sans-serif"],
       },
     },
   },

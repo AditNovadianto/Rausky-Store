@@ -11,7 +11,7 @@ interface Props
 
 const Wrapper: FC<Props> = ({ children, className, ...props }) => {
   return (
-    <div {...props} className={cn('mx-auto px-5', className)}>
+    <div {...props} className={cn('container mx-auto px-5', className)}>
       {children}
     </div>
   )
