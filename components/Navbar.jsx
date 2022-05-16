@@ -86,9 +86,9 @@ const Navbar = () => {
               <img src="/images/Union.svg" alt="Union" />
             </button>
 
-            <button className="ml-4 flex-shrink-0">
+            <Link href="/cart" className="ml-4 flex-shrink-0">
               <img src="/images/Bag.svg" alt="Bag-icon" />
-            </button>
+            </Link>
 
             <button className="ml-4 flex-shrink-0">
               <img src="/images/person.svg" alt="person" />
