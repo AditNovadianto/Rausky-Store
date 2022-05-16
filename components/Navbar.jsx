@@ -23,8 +23,8 @@ const Navbar = () => {
   }, show)
 
   return (
-    <nav className="sticky top-0">
-      <div className="w-full bg-white z-50 relative border-b">
+    <nav className="sticky top-0 z-50">
+      <div className="w-full bg-white relative border-b">
         <Wrapper className="flex items-center w-full justify-between py-2.5 lg:py-2">
           <Link
             href="/"
