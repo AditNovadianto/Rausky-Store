@@ -4,11 +4,13 @@ import { useState } from 'react'
 import { MenuIcon } from '@heroicons/react/outline'
 import useClickOutside from '../hooks/useClickOutside'
 
+const navLinks = ['Products', 'Story', 'Manufacturing', 'Packaging']
+
 const Navbar = () => {
   const [show, setShow] = useState(false)
   const [search, setSearch] = useState(false)
 
-  const navBar = () => {
+  const showMobileNav = () => {
     setShow(!show)
   }
 
@@ -23,12 +25,15 @@ const Navbar = () => {
   return (
     <nav>
       <div className="w-full bg-white z-50 relative border-b">
-        <Wrapper className="flex items-center w-full justify-between lg:py-2">
-          <Link href="/" className="flex font-semibold items-center text-xl">
+        <Wrapper className="flex items-center w-full justify-between py-2.5 lg:py-2">
+          <Link
+            href="/"
+            className="flex font-semibold items-center text-xl -ml-2"
+          >
             <img
               src="/images/rausky-logo.png"
               alt="rausky-logo"
-              className="w-[60px]"
+              className="w-[40px]"
             />
             <span className="text-black hidden lg:block">Rausky</span>
           </Link>
@@ -56,30 +61,14 @@ const Navbar = () => {
 
           <div className="flex items-center">
             <div className="items-center hidden lg:flex space-x-10 mr-5">
-              <a
-                className="lg:block hidden focus:text-green-500 focus:after:contents-[''] focus:after:block focus:after:w-full focus:after:h-[2px] focus:after:bg-gray-500 focus:after:rounded-full text-[17px] transition-all font-medium text-gray-500 hover:text-green-500"
-                href="#"
-              >
-                Products
-              </a>
-              <a
-                className="lg:block hidden focus:text-green-500 focus:after:contents-[''] focus:after:block focus:after:w-full focus:after:h-[2px] focus:after:bg-gray-500 focus:after:rounded-full text-[17px] transition-all font-medium text-gray-500 hover:text-green-500"
-                href="#"
-              >
-                Story
-              </a>
-              <a
-                className="lg:block hidden focus:text-green-500 focus:after:contents-[''] focus:after:block focus:after:w-full focus:after:h-[2px] focus:after:bg-gray-500 focus:after:rounded-full text-[17px] transition-all font-medium text-gray-500 hover:text-green-500"
-                href="#"
-              >
-                Manufacturing
-              </a>
-              <a
-                className="lg:block hidden focus:text-green-500 focus:after:contents-[''] focus:after:block focus:after:w-full focus:after:h-[2px] focus:after:bg-gray-500 focus:after:rounded-full text-[17px] transition-all font-medium text-gray-500 hover:text-green-500"
-                href="#"
-              >
-                Packaging
-              </a>
+              {navLinks.map((link) => (
+                <a
+                  href="#"
+                  className="lg:block hidden focus:text-green-500 after:contents-[''] after:block after:opacity-0 after:h-[2px] after:translate-y-4 focus:after:opacity-100 after:bg-green-500 after:rounded-full transition-all font-medium text-gray-500 hover:text-green-500"
+                >
+                  {link}
+                </a>
+              ))}
             </div>
 
             <button
@@ -97,7 +86,10 @@ const Navbar = () => {
               <img src="/images/person.svg" alt="person" />
             </button>
 
-            <button className="ml-4 lg:hidden flex-shrink-0" onClick={navBar}>
+            <button
+              className="ml-4 lg:hidden flex-shrink-0"
+              onClick={showMobileNav}
+            >
               <MenuIcon className="w-6 h-6" />
             </button>
           </div>
@@ -127,30 +119,14 @@ const Navbar = () => {
           show ? 'translate-y-0' : '-translate-y-[400px]'
         } w-full absolute lg:hidden flex items-center justify-center flex-col bg-green-100 py-7 transition-all`}
       >
-        <a
-          className="focus:text-green-600 focus:after:contents-[''] focus:after:block focus:after:w-full focus:after:h-[2px] focus:after:bg-black text-[17px] transition-all font-Circular font-semibold"
-          href="#"
-        >
-          Products
-        </a>
-        <a
-          className="focus:text-green-600 focus:after:contents-[''] focus:after:block focus:after:w-full focus:after:h-[2px] focus:after:bg-black text-[17px] transition-all mt-3 font-Circular font-semibold"
-          href="#"
-        >
-          Story
-        </a>
-        <a
-          className="focus:text-green-600 focus:after:contents-[''] focus:after:block focus:after:w-full focus:after:h-[2px] focus:after:bg-black text-[17px] transition-all mt-3 font-Circular font-semibold"
-          href="#"
-        >
-          Manufacturing
-        </a>
-        <a
-          className="focus:text-green-600 focus:after:contents-[''] focus:after:block focus:after:w-full focus:after:h-[2px] focus:after:bg-black text-[17px] transition-all mt-3 font-Circular font-semibold"
-          href="#"
-        >
-          Packaging
-        </a>
+        {navLinks.map((link) => (
+          <a
+            href="#"
+            className="focus:text-green-600 focus:after:contents-[''] focus:after:block focus:after:w-full focus:after:h-[2px] focus:after:bg-black text-[17px] transition-all font-Circular font-semibold"
+          >
+            {link}
+          </a>
+        ))}
       </div>
     </nav>
   )
