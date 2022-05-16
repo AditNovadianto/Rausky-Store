@@ -56,30 +56,30 @@ const Navbar = () => {
 
           <div className="flex items-center">
             <div className="items-center hidden lg:flex space-x-10 mr-5">
-              <a
+              <Link
                 className="lg:block hidden focus:text-green-500 focus:after:contents-[''] focus:after:block focus:after:w-full focus:after:h-[2px] focus:after:bg-gray-500 focus:after:rounded-full text-[17px] transition-all font-medium text-gray-500 hover:text-green-500"
-                href="#"
+                href="/Products"
               >
                 Products
-              </a>
-              <a
+              </Link>
+              <Link
                 className="lg:block hidden focus:text-green-500 focus:after:contents-[''] focus:after:block focus:after:w-full focus:after:h-[2px] focus:after:bg-gray-500 focus:after:rounded-full text-[17px] transition-all font-medium text-gray-500 hover:text-green-500"
-                href="#"
+                href="/Story"
               >
                 Story
-              </a>
-              <a
+              </Link>
+              <Link
                 className="lg:block hidden focus:text-green-500 focus:after:contents-[''] focus:after:block focus:after:w-full focus:after:h-[2px] focus:after:bg-gray-500 focus:after:rounded-full text-[17px] transition-all font-medium text-gray-500 hover:text-green-500"
-                href="#"
+                href="/Manufacturing"
               >
                 Manufacturing
-              </a>
-              <a
+              </Link>
+              <Link
                 className="lg:block hidden focus:text-green-500 focus:after:contents-[''] focus:after:block focus:after:w-full focus:after:h-[2px] focus:after:bg-gray-500 focus:after:rounded-full text-[17px] transition-all font-medium text-gray-500 hover:text-green-500"
-                href="#"
+                href="/Packaging"
               >
                 Packaging
-              </a>
+              </Link>
             </div>
 
             <button
@@ -125,32 +125,32 @@ const Navbar = () => {
         ref={menuRef}
         className={`${
           show ? 'translate-y-0' : '-translate-y-[400px]'
-        } w-full absolute lg:hidden flex items-center justify-center flex-col bg-green-100 py-7 transition-all`}
+        } w-full z-40 absolute lg:hidden flex items-center justify-center flex-col bg-green-100 py-7 transition-all`}
       >
-        <a
+        <Link
           className="focus:text-green-600 focus:after:contents-[''] focus:after:block focus:after:w-full focus:after:h-[2px] focus:after:bg-black text-[17px] transition-all font-Circular font-semibold"
-          href="#"
+          href="/Products"
         >
           Products
-        </a>
-        <a
+        </Link>
+        <Link
           className="focus:text-green-600 focus:after:contents-[''] focus:after:block focus:after:w-full focus:after:h-[2px] focus:after:bg-black text-[17px] transition-all mt-3 font-Circular font-semibold"
-          href="#"
+          href="/Story"
         >
           Story
-        </a>
-        <a
+        </Link>
+        <Link
           className="focus:text-green-600 focus:after:contents-[''] focus:after:block focus:after:w-full focus:after:h-[2px] focus:after:bg-black text-[17px] transition-all mt-3 font-Circular font-semibold"
-          href="#"
+          href="/Manufacturing"
         >
           Manufacturing
-        </a>
-        <a
+        </Link>
+        <Link
           className="focus:text-green-600 focus:after:contents-[''] focus:after:block focus:after:w-full focus:after:h-[2px] focus:after:bg-black text-[17px] transition-all mt-3 font-Circular font-semibold"
-          href="#"
+          href="/Packaging"
         >
           Packaging
-        </a>
+        </Link>
       </div>
     </nav>
   )
