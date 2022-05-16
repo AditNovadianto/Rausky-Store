@@ -13,7 +13,10 @@ const Container = ({ title, children, noNavbar }) => {
         {/* TODO: tambahin meta: description, dll */}
       </Head>
       {!noNavbar && <Navbar />}
+      <br />
       {children}
+      <br />
+      {/* TODO: bikin footer */}
     </main>
   )
 }

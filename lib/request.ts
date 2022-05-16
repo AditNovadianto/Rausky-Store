@@ -1,8 +1,10 @@
 import axios from 'axios'
 import Router from 'next/router'
 
+const baseUrl = process.env.BASE_URL || 'http://localhost:3000'
+
 const request = axios.create({
-  baseURL: '/api',
+  baseURL: `${baseUrl}/api`,
 })
 
 // before sending response to client

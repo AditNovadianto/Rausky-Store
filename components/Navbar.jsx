@@ -23,7 +23,7 @@ const Navbar = () => {
   }, show)
 
   return (
-    <nav>
+    <nav className="sticky top-0">
       <div className="w-full bg-white z-50 relative border-b">
         <Wrapper className="flex items-center w-full justify-between py-2.5 lg:py-2">
           <Link
@@ -63,6 +63,7 @@ const Navbar = () => {
             <div className="items-center hidden lg:flex space-x-10 mr-5">
               {navLinks.map((link) => (
                 <a
+                  key={link}
                   href="#"
                   className="lg:block hidden focus:text-green-500 after:contents-[''] after:block after:opacity-0 after:h-[2px] after:translate-y-4 focus:after:opacity-100 after:bg-green-500 after:rounded-full transition-all font-medium text-gray-500 hover:text-green-500"
                 >
@@ -122,6 +123,7 @@ const Navbar = () => {
       >
         {navLinks.map((link) => (
           <a
+            key={link}
             href="#"
             className="focus:text-green-600 focus:after:contents-[''] focus:after:block focus:after:w-full focus:after:h-[2px] focus:after:bg-black text-[17px] transition-all font-Circular font-semibold"
           >
