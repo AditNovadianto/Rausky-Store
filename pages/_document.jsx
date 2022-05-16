@@ -11,7 +11,6 @@ export default function Document() {
           href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap"
           rel="stylesheet"
         />
-        {/* TODO: add custom font here */}
       </Head>
       <body>
         <Main />
