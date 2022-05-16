@@ -66,8 +66,16 @@ model User {
 
 enum Category {
     UNCATEGORIZE
+
+    // TOPUP
     MOBILE_LEGEND
     VALORANT
+    FREE_FIRE
+    NETFLIX
+
+    // OTHERS
+    GAMING_GEAR
+    MERCHANDISE
 }
 
 model Product {
