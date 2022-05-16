@@ -1,6 +1,7 @@
 import Container from '../components/Container'
 import Wrapper from '../components/Wrapper'
 import { TrashIcon } from '@heroicons/react/outline'
+import { useEffect } from 'react'
 
 const cartData = [
   {
@@ -27,6 +28,45 @@ const cartData = [
 ]
 
 const Cart = () => {
+  useEffect(() => {
+    let scriptTag = document.createElement('script')
+    scriptTag.type = 'text/javascript'
+    scriptTag.src = 'https://app.sandbox.midtrans.com/snap/snap.js'
+
+    const myMidtransClientKey = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY
+    scriptTag.setAttribute('data-client-key', myMidtransClientKey)
+
+    document.body.appendChild(scriptTag)
+    return () => {
+      document.body.removeChild(scriptTag)
+    }
+  }, [])
+
+  //   TODO: bikin order ke backend, terus set payment token dari backend
+  const checkout = async () => {
+    window.snap.pay('7bdc35eb-74d4-4232-87ce-1fcb361e4b54', {
+      onSuccess: function (result) {
+        /* You may add your own implementation here */
+        alert('payment success!')
+        console.log(result)
+      },
+      onPending: function (result) {
+        /* You may add your own implementation here */
+        alert('wating your payment!')
+        console.log(result)
+      },
+      onError: function (result) {
+        /* You may add your own implementation here */
+        // alert('payment failed!')
+        console.log(result)
+      },
+      onClose: function () {
+        /* You may add your own implementation here */
+        // alert('you closed the popup without finishing the payment')
+      },
+    })
+  }
+
   return (
     <Container>
       <Wrapper className="flex flex-col lg:flex-row justify-between lg:space-x-20">
@@ -92,7 +132,10 @@ const Cart = () => {
               <p>Rp 500,000</p>
             </div>
           </div>
-          <button className="w-full py-4 bg-green-500 hover:bg-green-400 transition-all font-semibold text-white rounded-2xl my-8 shadow-xl shadow-green-300">
+          <button
+            onClick={checkout}
+            className="w-full py-4 bg-green-500 hover:bg-green-400 transition-all font-semibold text-white rounded-2xl my-8 shadow-xl shadow-green-300"
+          >
             Checkout (Rp 500,000)
           </button>
         </div>
