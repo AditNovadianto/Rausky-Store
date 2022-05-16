@@ -104,6 +104,7 @@ const Navbar = () => {
               <img src="/images/Union.svg" alt="" />
             </span>
             <input
+              autoFocus
               className="placeholder:italic placeholder:text-slate-400 block border bg-white w-full rounded-md py-2 pl-12 pr-3 focus:outline-none focus:ring-green-500 focus:ring-1 sm:text-sm"
               placeholder="Search for anything..."
               type="text"
