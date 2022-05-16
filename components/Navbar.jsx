@@ -95,22 +95,23 @@ const Navbar = () => {
             </button>
           </div>
         </Wrapper>
-
         {search && (
-          <form className="md:hidden flex items-center p-5 pt-0 justify-center w-full">
-            <label className="relative block w-full">
-              <span className="sr-only">Search</span>
-              <span className="absolute inset-y-0 left-0 flex items-center pl-2">
-                <img src="/images/Union.svg" alt="" />
-              </span>
-              <input
-                autoFocus
-                className="placeholder:italic placeholder:text-slate-400 block bg-white w-full rounded-md py-2 pl-12 pr-3 focus:outline-none focus:ring-2 focus:ring-opacity-50 focus:ring-green-400"
-                placeholder="Search for anything..."
-                type="text"
-                name="search"
-              />
-            </label>
+          <form className="md:hidden flex items-center pb-5 justify-center w-full">
+            <Wrapper>
+              <label className="relative block w-full">
+                <span className="sr-only">Search</span>
+                <span className="absolute inset-y-0 left-0 flex items-center pl-2">
+                  <img src="/images/Union.svg" alt="" />
+                </span>
+                <input
+                  autoFocus
+                  className="placeholder:italic placeholder:text-slate-400 block bg-white w-full rounded-md py-2 pl-12 pr-3 focus:outline-none focus:ring-2 focus:ring-opacity-50 focus:ring-green-400"
+                  placeholder="Search for anything..."
+                  type="text"
+                  name="search"
+                />
+              </label>
+            </Wrapper>
           </form>
         )}
       </nav>
