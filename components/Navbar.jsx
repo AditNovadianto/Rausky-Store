@@ -95,6 +95,7 @@ const Navbar = () => {
             </button>
           </div>
         </Wrapper>
+
         {search && (
           <form className="md:hidden flex items-center pb-5 justify-center w-full">
             <Wrapper>
