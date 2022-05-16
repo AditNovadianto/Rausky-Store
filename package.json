@@ -23,7 +23,8 @@
     "nookies": "^2.5.2",
     "nprogress": "^0.2.0",
     "react": "17.0.2",
-    "react-dom": "17.0.2"
+    "react-dom": "17.0.2",
+    "react-loading-skeleton": "^3.1.0"
   },
   "devDependencies": {
     "@types/react": "^17.0.2",

@@ -2,6 +2,7 @@ import { SessionProvider } from 'next-auth/react'
 import NextNProgress from 'nextjs-progressbar'
 import '../styles/globals.css'
 import { createStore, StateMachineProvider } from 'little-state-machine'
+import 'react-loading-skeleton/dist/skeleton.css'
 
 // TODO: bikin global state buat nyimpen cart
 createStore(
