@@ -1,7 +1,14 @@
+import { useState } from 'react'
 import Container from '../../components/Container'
 import Wrapper from '../../components/Wrapper'
 
 const topup = () => {
+  const [showDiamond, setShowDiamond] = useState(true)
+  const [showStarlight, setShowStarlight] = useState(false)
+  const [haveUserID, setHaveUserID] = useState(false)
+  const [haveZoneID, setHaveZoneID] = useState(false)
+  const [search, setSearch] = useState('')
+
   const Diamonds = [
     {
       logo: 'https://cdn1.codashop.com/S/content/common/images/denom-image/MLBB/100x100/50orless_MLBB_Diamonds.png',
@@ -99,10 +106,57 @@ const topup = () => {
     },
   ]
 
+  const Starlights = [
+    {
+      logo: '/images/Starlight.png',
+      title: 'Starlight Member',
+    },
+    {
+      logo: '/images/Starlight.png',
+      title: 'Starlight + 390 Diamonds',
+    },
+    {
+      logo: 'https://cdn1.codashop.com/S/content/common/images/denom-image/MLBB/100x100/TwilightPass_MLBB.png',
+      title: 'Twilight Pass',
+    },
+    {
+      logo: '/images/Starlight.png',
+      title: 'Starlight Member Plus',
+    },
+  ]
+
+  const diamond = () => {
+    setShowDiamond(!showDiamond)
+    setShowStarlight(false)
+  }
+
+  const starlight = () => {
+    setShowStarlight(!showStarlight)
+    setShowDiamond(false)
+  }
+
+  const getUserID = (e) => {
+    if (!e.target.value) {
+      setHaveUserID(true)
+    } else {
+      setHaveUserID(false)
+    }
+  }
+
+  const getZoneID = (e) => {
+    if (!e.target.value) {
+      setHaveZoneID(true)
+    } else {
+      setHaveZoneID(false)
+    }
+  }
+
+  console.log(search)
+
   return (
     <Container>
-      <div className="flex">
-        <div className="w-[40%]">
+      <div className="md:flex">
+        <div className="md:w-[40%] w-full">
           <img className="w-full" src="/images/ML.jpg" alt="ML" />
 
           <Wrapper>
@@ -139,7 +193,7 @@ const topup = () => {
           </Wrapper>
         </div>
 
-        <div className="w-[60%] px-5">
+        <div className="md:w-[60%] md:mt-0 mt-10 w-full px-5">
           <div className="bg-green-200 rounded-lg">
             <Wrapper className="flex">
               <div className="w-[40px] h-[40px] text-center -mt-5 leading-[32px] border-4 border-green-200 rounded-full bg-green-500">
@@ -148,15 +202,36 @@ const topup = () => {
               <h1 className="text-2xl ml-3 pt-2 font-bold">Masukkan User ID</h1>
             </Wrapper>
             <Wrapper>
-              <form className="mt-5 flex items-center">
-                <input
-                  className="px-5 py-3 text-center border-2 focus:outline-none focus:ring-2 focus:ring-green-600 rounded-lg border-green-400"
-                  placeholder="Masukkan User ID"
-                />
-                <input
-                  className="px-5 py-3 ml-3 text-center border-2 focus:outline-none focus:ring-2 focus:ring-green-600 rounded-lg border-green-400"
-                  placeholder="Zone ID"
-                />
+              <form className="mt-5 lg:flex-row flex-col flex items-center">
+                <div className="w-full">
+                  <input
+                    className="px-5 py-3 w-full text-center border-2 focus:outline-none focus:ring-2 focus:ring-green-600 z-50 relative rounded-lg border-green-400"
+                    placeholder="Masukkan User ID"
+                    onChange={getUserID}
+                  />
+                  <p
+                    className={`${
+                      haveUserID ? 'opacity-100 mt-0' : 'opacity-0 -mt-[20px]'
+                    } text-red-600 transition-all`}
+                  >
+                    Harus Diisi!!!
+                  </p>
+                </div>
+
+                <div className="w-full">
+                  <input
+                    className="px-5 py-3 w-full lg:ml-3 mt-3 lg:mt-0 text-center border-2 focus:outline-none focus:ring-2 z-50 relative focus:ring-green-600 rounded-lg border-green-400"
+                    placeholder="Zone ID"
+                    onChange={getZoneID}
+                  />
+                  <p
+                    className={`${
+                      haveZoneID ? 'opacity-100 mt-0' : 'opacity-0 -mt-[20px]'
+                    } text-red-600 transition-all lg:ml-3`}
+                  >
+                    Harus Diisi!!!
+                  </p>
+                </div>
               </form>
 
               <p className="mt-3 pb-2 text-gray-500">
@@ -180,18 +255,33 @@ const topup = () => {
               <div>
                 <p className="font-semibold mt-5">Pilih Kategori</p>
                 <div className="flex mt-3 items-center">
-                  <div className="flex flex-col border-2 focus:border-green-600 hover:bg-green-100 border-gray-400 cursor-pointer px-5 py-4 transition-all bg-white rounded-lg justify-center items-center w-[200px] h-[130px]">
+                  <button
+                    onClick={diamond}
+                    className={`${
+                      showDiamond
+                        ? 'border-green-600 bg-green-400'
+                        : 'border-gray-400 bg-white hover:bg-green-400'
+                    } flex flex-col border-2 cursor-pointer px-5 py-4 transition-all  rounded-lg justify-center items-center w-[200px] h-[130px]`}
+                  >
                     <img src="/images/Diamond.png" alt="Diamond" />
                     <p className="font-[500] mt-5">Diamond</p>
-                  </div>
+                  </button>
 
-                  <div className="flex flex-col ml-3 border-2 focus:border-green-600 hover:bg-green-100 transition-all border-gray-400 cursor-pointer px-5 py-4 bg-white rounded-lg justify-center items-center w-[200px] h-[130px]">
+                  <button
+                    onClick={starlight}
+                    className={`${
+                      showStarlight
+                        ? 'border-green-600 bg-green-400'
+                        : 'border-gray-400 bg-white hover:bg-green-400'
+                    } flex flex-col ml-3 border-2 transition-all cursor-pointer px-5 py-4 rounded-lg justify-center items-center w-[200px] h-[130px]`}
+                  >
                     <img
-                      src="https://cdn1.codashop.com/S/content/common/images/denom-category-image/MLBB/2_MLBB_StarlightandTwilight.png"
+                      className="w-[70px]"
+                      src="/images/Starlight.png"
                       alt="Starlight"
                     />
                     <p className="font-[500] mt-5">Starlight Member</p>
-                  </div>
+                  </button>
                 </div>
               </div>
             </Wrapper>
@@ -199,19 +289,35 @@ const topup = () => {
               <div>
                 <p className="font-semibold mt-10">Pilih Item</p>
                 <div className="flex flex-wrap gap-2 items-center justify-center w-full mt-3">
-                  {Diamonds.map((diamond, index) => (
-                    <div
-                      key={index}
-                      className="flex flex-col border-2 focus:border-green-600 hover:bg-green-100 border-gray-400 cursor-pointer px-5 py-4 transition-all bg-white rounded-lg justify-center text-center items-center h-[220px] w-[150px]"
-                    >
-                      <img src={diamond.logo} alt="Diamond" />
-                      <p className="font-[500] mt-5">
-                        {diamond.value}
-                        {diamond.title}
-                        {diamond.bonus}
-                      </p>
-                    </div>
-                  ))}
+                  {showDiamond &&
+                    Diamonds.map((diamond, index) => (
+                      <button
+                        key={index}
+                        className="flex flex-col border-2 focus:border-green-600 focus:bg-green-400 hover:bg-green-100 border-gray-400 cursor-pointer px-5 py-4 transition-all bg-white rounded-lg justify-center text-center items-center h-[220px] w-[150px]"
+                      >
+                        <img src={diamond.logo} alt="Diamond" />
+                        <p className="font-[500] mt-5">
+                          {diamond.value}
+                          {diamond.title}
+                          {diamond.bonus}
+                        </p>
+                      </button>
+                    ))}
+
+                  {showStarlight &&
+                    Starlights.map((starlight, index) => (
+                      <button
+                        key={index}
+                        className="flex flex-col border-2 focus:border-green-600 focus:bg-green-400 hover:bg-green-100 border-gray-400 cursor-pointer px-5 py-4 transition-all bg-white rounded-lg justify-center text-center items-center h-[220px] w-[150px]"
+                      >
+                        <img
+                          className="w-max"
+                          src={starlight.logo}
+                          alt="starlight"
+                        />
+                        <p className="font-[500] mt-5">{starlight.title}</p>
+                      </button>
+                    ))}
                 </div>
               </div>
             </Wrapper>
