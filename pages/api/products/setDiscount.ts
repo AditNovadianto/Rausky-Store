@@ -5,11 +5,24 @@ export default apiHandler
   // set discount to all products in category
   .post(checkAuth('ADMIN'), async (req, res) => {
     const { discount, category } = req.body
-    if (!discount) {
+    if (discount == undefined) {
       throw { status: 400, message: 'Please provide discount' }
     }
+
+    let categoryId
+
+    if (category) {
+      categoryId = (
+        await prisma.category.findUnique({
+          where: {
+            slug: category,
+          },
+        })
+      )?.id
+    }
+
     const products = await prisma.product.updateMany({
-      where: { category: { equals: category as Category } },
+      where: { categoryId },
       data: { discount },
     })
 

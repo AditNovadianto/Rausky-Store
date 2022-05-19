@@ -35,6 +35,7 @@ const Navbar = () => {
               <Link
                 className="font-light text-gray-500 hover:text-green-500"
                 href="#"
+                key={link}
               >
                 {link}
               </Link>
