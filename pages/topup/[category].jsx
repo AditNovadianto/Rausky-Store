@@ -1,129 +1,14 @@
 import { useState } from 'react'
 import Container from '../../components/Container'
 import Wrapper from '../../components/Wrapper'
+import Link from '../../components/Link'
+import MLSection from './MlSection'
 
 const topup = () => {
   const [showDiamond, setShowDiamond] = useState(true)
   const [showStarlight, setShowStarlight] = useState(false)
   const [haveUserID, setHaveUserID] = useState(false)
   const [haveZoneID, setHaveZoneID] = useState(false)
-  const [search, setSearch] = useState('')
-
-  const Diamonds = [
-    {
-      logo: 'https://cdn1.codashop.com/S/content/common/images/denom-image/MLBB/100x100/50orless_MLBB_Diamonds.png',
-      value: 3,
-      title: ' Diamonds',
-    },
-    {
-      logo: 'https://cdn1.codashop.com/S/content/common/images/denom-image/MLBB/100x100/50orless_MLBB_Diamonds.png',
-      value: 5,
-      title: ' Diamonds',
-    },
-    {
-      logo: 'https://cdn1.codashop.com/S/content/common/images/denom-image/MLBB/100x100/50orless_MLBB_Diamonds.png',
-      value: 11,
-      title: ' Diamonds',
-      bonus: ' + 1 Bonus',
-    },
-    {
-      logo: 'https://cdn1.codashop.com/S/content/common/images/denom-image/MLBB/100x100/50orless_MLBB_Diamonds.png',
-      value: 17,
-      title: ' Diamonds',
-      bonus: ' + 2 Bonus',
-    },
-    {
-      logo: 'https://cdn1.codashop.com/S/content/common/images/denom-image/MLBB/100x100/50orless_MLBB_Diamonds.png',
-      value: 25,
-      title: ' Diamonds',
-      bonus: ' + 3 Bonus',
-    },
-    {
-      logo: 'https://cdn1.codashop.com/S/content/common/images/denom-image/MLBB/100x100/50orless_MLBB_Diamonds.png',
-      value: 40,
-      title: ' Diamonds',
-      bonus: ' + 4 Bonus',
-    },
-    {
-      logo: 'https://cdn1.codashop.com/S/content/common/images/denom-image/MLBB/100x100/50ormore_MLBB_Diamonds.png',
-      value: 53,
-      title: ' Diamonds',
-      bonus: ' + 6 Bonus',
-    },
-    {
-      logo: 'https://cdn1.codashop.com/S/content/common/images/denom-image/MLBB/100x100/50ormore_MLBB_Diamonds.png',
-      value: 77,
-      title: ' Diamonds',
-      bonus: ' + 8 Bonus',
-    },
-    {
-      logo: 'https://cdn1.codashop.com/S/content/common/images/denom-image/MLBB/100x100/150orMore_MLBB_Diamonds.png',
-      value: 154,
-      title: ' Diamonds',
-      bonus: ' + 16 Bonus',
-    },
-    {
-      logo: 'https://cdn1.codashop.com/S/content/common/images/denom-image/MLBB/100x100/150orMore_MLBB_Diamonds.png',
-      value: 217,
-      title: ' Diamonds',
-      bonus: ' + 23 Bonus',
-    },
-    {
-      logo: 'https://cdn1.codashop.com/S/content/common/images/denom-image/MLBB/100x100/150orMore_MLBB_Diamonds.png',
-      value: 256,
-      title: ' Diamonds',
-      bonus: ' + 40 Bonus',
-    },
-    {
-      logo: 'https://cdn1.codashop.com/S/content/common/images/denom-image/MLBB/100x100/150orMore_MLBB_Diamonds.png',
-      value: 367,
-      title: ' Diamonds',
-      bonus: ' + 41 Bonus',
-    },
-    {
-      logo: 'https://cdn1.codashop.com/S/content/common/images/denom-image/MLBB/100x100/500orMore_MLBB_Diamonds.png',
-      value: 503,
-      title: ' Diamonds',
-      bonus: ' + 65 Bonus',
-    },
-    {
-      logo: 'https://cdn1.codashop.com/S/content/common/images/denom-image/MLBB/100x100/500orMore_MLBB_Diamonds.png',
-      value: 774,
-      title: ' Diamonds',
-      bonus: ' + 101 Bonus',
-    },
-    {
-      logo: 'https://cdn1.codashop.com/S/content/common/images/denom-image/MLBB/100x100/1500orMore_MLBB_Diamonds.png',
-      value: 1708,
-      title: ' Diamonds',
-      bonus: ' + 302 Bonus',
-    },
-    {
-      logo: '/images/Diamond.png',
-      value: 4003,
-      title: ' Diamonds',
-      bonus: ' + 827 Bonus',
-    },
-  ]
-
-  const Starlights = [
-    {
-      logo: '/images/Starlight.png',
-      title: 'Starlight Member',
-    },
-    {
-      logo: '/images/Starlight.png',
-      title: 'Starlight + 390 Diamonds',
-    },
-    {
-      logo: 'https://cdn1.codashop.com/S/content/common/images/denom-image/MLBB/100x100/TwilightPass_MLBB.png',
-      title: 'Twilight Pass',
-    },
-    {
-      logo: '/images/Starlight.png',
-      title: 'Starlight Member Plus',
-    },
-  ]
 
   const diamond = () => {
     setShowDiamond(!showDiamond)
@@ -150,8 +35,6 @@ const topup = () => {
       setHaveZoneID(false)
     }
   }
-
-  console.log(search)
 
   return (
     <Container>
@@ -289,39 +172,24 @@ const topup = () => {
               <div>
                 <p className="font-semibold mt-10">Pilih Item</p>
                 <div className="flex flex-wrap gap-2 items-center justify-center w-full mt-3">
-                  {showDiamond &&
-                    Diamonds.map((diamond, index) => (
-                      <button
-                        key={index}
-                        className="flex flex-col border-2 focus:border-green-600 focus:bg-green-400 hover:bg-green-100 border-gray-400 cursor-pointer px-5 py-4 transition-all bg-white rounded-lg justify-center text-center items-center h-[220px] w-[150px]"
-                      >
-                        <img src={diamond.logo} alt="Diamond" />
-                        <p className="font-[500] mt-5">
-                          {diamond.value}
-                          {diamond.title}
-                          {diamond.bonus}
-                        </p>
-                      </button>
-                    ))}
-
-                  {showStarlight &&
-                    Starlights.map((starlight, index) => (
-                      <button
-                        key={index}
-                        className="flex flex-col border-2 focus:border-green-600 focus:bg-green-400 hover:bg-green-100 border-gray-400 cursor-pointer px-5 py-4 transition-all bg-white rounded-lg justify-center text-center items-center h-[220px] w-[150px]"
-                      >
-                        <img
-                          className="w-max"
-                          src={starlight.logo}
-                          alt="starlight"
-                        />
-                        <p className="font-[500] mt-5">{starlight.title}</p>
-                      </button>
-                    ))}
+                  <MLSection
+                    showDiamond={showDiamond}
+                    showStarlight={showStarlight}
+                  />
                 </div>
               </div>
             </Wrapper>
           </div>
+          <Link
+            href="/cart"
+            className="flex mb-20 hover:scale-[1.03] shadow-lg shadow-green-300 hover:-translate-y-2 transition-all items-center w-full justify-center bg-green-200 py-3 mt-5 rounded-lg"
+          >
+            <Wrapper>
+              <p className="text-center hover:text-gray-500 transition-all font-semibold">
+                Continue to payment
+              </p>
+            </Wrapper>
+          </Link>
         </div>
       </div>
     </Container>
