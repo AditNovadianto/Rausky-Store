@@ -4,11 +4,11 @@ import prisma from '../../../lib/prisma'
 export default apiHandler
   // get all categories
   .get(async (req, res) => {
-    const { name, select } = req.query as {
+    const { select } = req.query as {
       [key: string]: string
     }
 
-    const selectFields = {}
+    let selectFields
     if (select) {
       select.split(',').forEach((field) => {
         selectFields[field] = true
@@ -16,9 +16,6 @@ export default apiHandler
     }
 
     const categories = await prisma.category.findMany({
-      where: {
-        slug: name,
-      },
       select: selectFields,
     })
     res.status(200).json({ categories, length: categories.length })
