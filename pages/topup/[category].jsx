@@ -1,13 +1,16 @@
 import { useState } from 'react'
 import Container from '../../components/Container'
 import Wrapper from '../../components/Wrapper'
+import request from '../../lib/request'
+import { parseData } from '../../lib/utils'
 
-const topup = () => {
+const topup = ({ category }) => {
   const [showDiamond, setShowDiamond] = useState(true)
   const [showStarlight, setShowStarlight] = useState(false)
   const [haveUserID, setHaveUserID] = useState(false)
   const [haveZoneID, setHaveZoneID] = useState(false)
-  const [search, setSearch] = useState('')
+
+  console.log(category)
 
   const Diamonds = [
     {
@@ -150,8 +153,6 @@ const topup = () => {
       setHaveZoneID(false)
     }
   }
-
-  console.log(search)
 
   return (
     <Container>
@@ -329,3 +330,11 @@ const topup = () => {
 }
 
 export default topup
+
+export const getServerSideProps = async ({ params }) => {
+  const { data } = await request.get(`/categories/${params.category}`)
+  const { category } = data
+  return {
+    props: parseData({ category }),
+  }
+}

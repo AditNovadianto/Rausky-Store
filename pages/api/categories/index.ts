@@ -10,6 +10,7 @@ export default apiHandler
 
     let selectFields
     if (select) {
+      selectFields = {}
       select.split(',').forEach((field) => {
         selectFields[field] = true
       })
