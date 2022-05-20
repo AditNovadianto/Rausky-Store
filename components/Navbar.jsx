@@ -18,8 +18,9 @@ const Navbar = () => {
     <>
       <div className="bg-gray-50 py-1.5">
         <Wrapper className="flex justify-between text-sm">
-          {status == 'loading' && <Skeleton width={90} />}
-          {session ? (
+          {status == 'loading' ? (
+            <Skeleton width={90} />
+          ) : session ? (
             <p className="font-medium">Halo {session.user.name} 👋</p>
           ) : (
             <button
