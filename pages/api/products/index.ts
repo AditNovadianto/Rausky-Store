@@ -8,23 +8,11 @@ export default apiHandler
       [key: string]: string
     }
 
-    let categoryId
-
-    if (category) {
-      categoryId = (
-        await prisma.category.findUnique({
-          where: {
-            slug: category,
-          },
-        })
-      )?.id
-    }
-
     const products = await prisma.product.findMany({
       where: {
         price: { gte: from && +from, lte: to && +to },
         discount: { gt: discount == 'true' ? 0 : undefined },
-        categoryId,
+        category: { slug: category },
       },
     })
     res.status(200).json({ products, length: products.length })
