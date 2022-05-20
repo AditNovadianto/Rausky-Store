@@ -26,6 +26,7 @@ const providerLogo = {
 
 const SignIn = ({ providers }: Props) => {
   return (
+    //   @ts-ignore
     <Container title="SignIn" noNavbar>
       <Wrapper className="py-20 text-center flex flex-col items-center max-w-xs md:max-w-4xl">
         <Link href="/">

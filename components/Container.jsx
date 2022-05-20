@@ -5,7 +5,7 @@ const head = {
   title: 'Rausky Store',
 }
 
-const Container = ({ title, children, noNavbar }) => {
+const Container = ({ title, children, noNavbar, noTopMargin }) => {
   return (
     <main>
       <Head>
@@ -13,7 +13,7 @@ const Container = ({ title, children, noNavbar }) => {
         {/* TODO: tambahin meta: description, dll */}
       </Head>
       {!noNavbar && <Navbar />}
-      <br />
+      {!noTopMargin && <br />}
       {children}
       <br />
       {/* TODO: bikin footer */}

@@ -7,7 +7,7 @@ import request from '../../lib/request'
 import { parseData } from '../../lib/utils'
 
 // TODO: benerin halaman topup
-const topup = ({ category }) => {
+const Topup = ({ category }) => {
   const [showDiamond, setShowDiamond] = useState(true)
   const [showStarlight, setShowStarlight] = useState(false)
   const [haveUserID, setHaveUserID] = useState(false)
@@ -42,43 +42,33 @@ const topup = ({ category }) => {
   }
 
   return (
-    <Container>
-      <div className="md:flex">
-        <div className="md:w-[40%] w-full">
-          <img className="w-full" src="/images/ML.jpg" alt="ML" />
-
-          <Wrapper>
-            <div className="flex items-center mt-5">
-              <img
-                className="w-[80px] rounded-xl"
-                src="/images/ML2.png"
-                alt="ML"
-              />
-              <div className="ml-5">
-                <p className="font-semibold">Mobile Legends: Bang Bang</p>
-                <p className="font-semibold text-gray-500">
-                  Shanghai Moonton Technology Co., Ltd.
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-3">
-              <p>
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                Quaerat velit hic autem est sit totam expedita doloremque
-                inventore optio veritatis, perspiciatis eveniet, officia rerum
-                accusamus iusto labore tempore ex nobis?
-              </p>
-              <p className="mt-3">
-                Lorem ipsum dolor sit, amet consectetur adipisicing elit. Porro
-                a consectetur sit labore ut, ipsa atque optio temporibus iste ad
-                modi eos mollitia quod cupiditate magni, veniam expedita quam
-                impedit quaerat reiciendis odit. Nulla expedita suscipit
-                mollitia dolores eligendi, blanditiis similique! Nesciunt et
-                sint ad ut sit suscipit ducimus modi?
+    <Container noTopMargin>
+      <br className="hidden md:block" />
+      <img
+        className="w-full md:hidden"
+        src={category.bannerImg}
+        alt={category.slug}
+      />
+      <Wrapper className="md:flex">
+        <div className="md:w-[40%] w-full md:sticky md:top-[80px] md:self-start">
+          <img
+            className="hidden md:block w-full rounded-2xl"
+            src={category.bannerImg}
+            alt={category.slug}
+          />
+          <div className="flex items-center mt-5">
+            <img
+              className="w-[80px] rounded-xl"
+              src={category.logoImg}
+              alt="ML"
+            />
+            <div className="ml-5">
+              <p className="font-semibold">{category.name}</p>
+              <p className="font-semibold text-gray-500">
+                Shanghai Moonton Technology Co., Ltd.
               </p>
             </div>
-          </Wrapper>
+          </div>
         </div>
 
         <div className="md:w-[60%] md:mt-0 mt-10 w-full px-5">
@@ -196,16 +186,23 @@ const topup = ({ category }) => {
             </Wrapper>
           </Link>
         </div>
-      </div>
+      </Wrapper>
     </Container>
   )
 }
 
-export default topup
+export default Topup
 
 export const getServerSideProps = async ({ params }) => {
+  console.log(params)
   const { data } = await request.get(`/categories/${params.category}`)
   const { category } = data
+  if (!category) {
+    return {
+      notFound: true,
+    }
+  }
+
   return {
     props: parseData({ category }),
   }
