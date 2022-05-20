@@ -2,21 +2,12 @@ import Container from '../components/Container'
 import Link from '../components/Link'
 import Wrapper from '../components/Wrapper'
 import request from '../lib/request'
-
-const otherCategories = [
-  {
-    label: 'Gaming Gear',
-    img: 'https://images.unsplash.com/photo-1604846887565-640d2f52d564?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1031&q=80',
-    slug: 'gaming-gear',
-  },
-  {
-    label: 'Merchandise',
-    img: 'https://images.unsplash.com/photo-1603319444400-216c0718d03c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80',
-    slug: 'merchandise',
-  },
-]
+import { parseData } from '../lib/utils'
 
 const Home = ({ categories }) => {
+  const topupCategories = categories.filter((category) => category.isTopup)
+  const otherCategories = categories.filter((category) => !category.isTopup)
+
   return (
     <Container>
       <Wrapper className="flex flex-col lg:flex-row min-h-screen space-y-8 lg:space-y-0">
@@ -27,13 +18,13 @@ const Home = ({ categories }) => {
           <h2 className="text-2xl font-bold mb-4">Top Up</h2>
           <div className="flex flex-col space-y-2">
             {/* TODO: kasih logo tiap topup */}
-            {categories.map((category) => (
+            {topupCategories.map((category) => (
               <Link
-                key={category.slug}
+                key={category.id}
                 className="font-medium"
                 href={`/topup/${category.slug}`}
               >
-                👉 {category.label}
+                👉 {category.name}
               </Link>
             ))}
           </div>
@@ -64,10 +55,10 @@ const Home = ({ categories }) => {
                   href={`/products/${category.slug}`}
                   className="block relative rounded-2xl overflow-hidden"
                 >
-                  <img src={category.img} alt={category.slug} />
+                  <img src={category.bannerImg} alt={category.slug} />
                   <div className="absolute inset-0 flex items-end p-4 bg-gradient-to-t from-black via-transparent">
                     <span className="font-medium text-xl text-white">
-                      {category.label} &rarr;
+                      {category.name} &rarr;
                     </span>
                   </div>
                 </Link>
@@ -112,14 +103,14 @@ const Home = ({ categories }) => {
 export default Home
 
 export const getStaticProps = async () => {
-  const { data } = await request.get('/products/topupCategories')
+  const { data } = await request.get(
+    '/categories?select=name,id,slug,bannerImg,isTopup'
+  )
   const { categories } = data
   return {
-    props: JSON.parse(
-      JSON.stringify({
-        categories,
-      })
-    ),
+    props: parseData({
+      categories,
+    }),
     revalidate: 10,
   }
 }
