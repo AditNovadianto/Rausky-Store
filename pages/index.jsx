@@ -2,6 +2,7 @@ import Container from '../components/Container'
 import Link from '../components/Link'
 import Wrapper from '../components/Wrapper'
 import request from '../lib/request'
+import { parseData } from '../lib/utils'
 
 const Home = ({ categories }) => {
   const topupCategories = categories.filter((category) => category.isTopup)
@@ -107,11 +108,9 @@ export const getStaticProps = async () => {
   )
   const { categories } = data
   return {
-    props: JSON.parse(
-      JSON.stringify({
-        categories,
-      })
-    ),
+    props: parseData({
+      categories,
+    }),
     revalidate: 10,
   }
 }
