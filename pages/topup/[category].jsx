@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import Container from '../../components/Container'
 import Wrapper from '../../components/Wrapper'
+import Link from '../../components/Link'
+import MLSection from './MlSection'
 import request from '../../lib/request'
 import { parseData } from '../../lib/utils'
 
@@ -290,39 +292,24 @@ const topup = ({ category }) => {
               <div>
                 <p className="font-semibold mt-10">Pilih Item</p>
                 <div className="flex flex-wrap gap-2 items-center justify-center w-full mt-3">
-                  {showDiamond &&
-                    Diamonds.map((diamond, index) => (
-                      <button
-                        key={index}
-                        className="flex flex-col border-2 focus:border-green-600 focus:bg-green-400 hover:bg-green-100 border-gray-400 cursor-pointer px-5 py-4 transition-all bg-white rounded-lg justify-center text-center items-center h-[220px] w-[150px]"
-                      >
-                        <img src={diamond.logo} alt="Diamond" />
-                        <p className="font-[500] mt-5">
-                          {diamond.value}
-                          {diamond.title}
-                          {diamond.bonus}
-                        </p>
-                      </button>
-                    ))}
-
-                  {showStarlight &&
-                    Starlights.map((starlight, index) => (
-                      <button
-                        key={index}
-                        className="flex flex-col border-2 focus:border-green-600 focus:bg-green-400 hover:bg-green-100 border-gray-400 cursor-pointer px-5 py-4 transition-all bg-white rounded-lg justify-center text-center items-center h-[220px] w-[150px]"
-                      >
-                        <img
-                          className="w-max"
-                          src={starlight.logo}
-                          alt="starlight"
-                        />
-                        <p className="font-[500] mt-5">{starlight.title}</p>
-                      </button>
-                    ))}
+                  <MLSection
+                    showDiamond={showDiamond}
+                    showStarlight={showStarlight}
+                  />
                 </div>
               </div>
             </Wrapper>
           </div>
+          <Link
+            href="/cart"
+            className="flex mb-20 hover:scale-[1.03] shadow-lg shadow-green-300 hover:-translate-y-2 transition-all items-center w-full justify-center bg-green-200 py-3 mt-5 rounded-lg"
+          >
+            <Wrapper>
+              <p className="text-center hover:text-gray-500 transition-all font-semibold">
+                Continue to payment
+              </p>
+            </Wrapper>
+          </Link>
         </div>
       </div>
     </Container>
