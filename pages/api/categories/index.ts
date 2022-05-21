@@ -1,14 +1,18 @@
 import apiHandler, { checkAuth } from '../../../lib/apiHandler'
 import prisma from '../../../lib/prisma'
 
-export const getAllCategories = async ({ select }) => {
-  let selectFields = select?.split(',').reduce((acc, field) => {
+export const getAllCategories = async (
+  { select }: { select?: string } = null
+) => {
+  let selectFields: any = select?.split(',').reduce((acc, field) => {
     acc[field] = true
     return acc
   }, {})
 
-  const categories = await prisma.category.findMany({
-    select: selectFields,
+  let categories = await prisma.category.findMany({
+    select: {
+      ...selectFields,
+    },
   })
 
   return categories

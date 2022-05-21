@@ -13,7 +13,6 @@ const filterProductsBySubCategory = (subCategory, products) => {
     : products
 }
 
-// TODO: benerin halaman topup
 const Topup = ({ category }) => {
   const [haveUserID, setHaveUserID] = useState(false)
   const [haveZoneID, setHaveZoneID] = useState(false)

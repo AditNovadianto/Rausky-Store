@@ -16,15 +16,21 @@ const Home = ({ categories }) => {
         {/* TOP UP */}
         <section className="lg:sticky lg:self-start lg:top-[80px] lg:flex-[1]">
           <h2 className="text-2xl font-bold mb-4">Top Up</h2>
-          <div className="flex flex-col space-y-2">
-            {/* TODO: kasih logo tiap topup */}
+          <div className="flex flex-col space-y-4">
             {topupCategories.map((category) => (
               <Link
+                className="flex items-center group border p-3 rounded-xl hover:border-green-400"
                 key={category.id}
-                className="font-medium"
                 href={`/topup/${category.slug}`}
               >
-                👉 {category.name}
+                <img
+                  className="w-8 h-8 rounded-lg object-cover"
+                  src={category.logoImg}
+                  alt={category.slug}
+                />
+                <span className="font-medium ml-2 truncate">
+                  {category.name}
+                </span>
               </Link>
             ))}
           </div>
@@ -105,6 +111,7 @@ export default Home
 export const getStaticProps = async () => {
   const categories = await getAllCategories({
     select: 'isTopup,id,slug,name,bannerImg,logoImg',
+    hasProducts: true,
   })
   return {
     props: parseData({
