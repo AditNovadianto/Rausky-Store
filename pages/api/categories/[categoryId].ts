@@ -14,6 +14,11 @@ export const getSpecificCategory = async ({ categorySlug }) => {
         },
       },
       subCategories: true,
+      requirement: {
+        include: {
+          fields: true,
+        },
+      },
     },
   })
   return category

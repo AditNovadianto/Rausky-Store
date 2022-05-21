@@ -14,9 +14,6 @@ const filterProductsBySubCategory = (subCategory, products) => {
 }
 
 const Topup = ({ category }) => {
-  const [haveUserID, setHaveUserID] = useState(false)
-  const [haveZoneID, setHaveZoneID] = useState(false)
-
   const [currentSubCategory, setCurrentSubCategory] = useState(
     category.subCategories[0]?.slug
   )
@@ -24,22 +21,6 @@ const Topup = ({ category }) => {
   const [selectedProducts, setSelectedProducts] = useState([])
 
   console.log(category)
-
-  const getUserID = (e) => {
-    if (!e.target.value) {
-      setHaveUserID(true)
-    } else {
-      setHaveUserID(false)
-    }
-  }
-
-  const getZoneID = (e) => {
-    if (!e.target.value) {
-      setHaveZoneID(true)
-    } else {
-      setHaveZoneID(false)
-    }
-  }
 
   const products = filterProductsBySubCategory(
     currentSubCategory,
@@ -73,60 +54,57 @@ const Topup = ({ category }) => {
               {/* <p className="font-semibold text-gray-500">Developer</p> */}
             </div>
           </div>
+          <p className="mt-5 text-gray-500">{category.description}</p>
         </div>
 
         {/* CHOOSE ITEMS */}
         <div className="md:w-[60%] md:mt-0 mt-10 w-full md:ml-5 space-y-8 mb-8">
           {/* REQUIREMENT */}
-          <div className="border rounded-2xl px-5 pb-5 w-full">
-            <div className="w-[40px] h-[40px] text-center -mt-5 leading-[32px] border-4 border-green-100 rounded-full bg-green-500 text-white font-bold">
-              1
-            </div>
-            <h1 className="text-2xl font-bold mt-2">Masukkan User ID</h1>
+          {category.requirement && (
+            <div className="border rounded-2xl px-5 pb-5 w-full">
+              <div className="w-[40px] h-[40px] text-center -mt-5 leading-[32px] border-4 border-green-100 rounded-full bg-green-500 text-white font-bold">
+                1
+              </div>
+              <h1 className="text-2xl font-bold mt-2">
+                {category.requirement.title}
+              </h1>
 
-            <form className="mt-5 lg:flex-row flex-col flex space-x-0 lg:space-x-3 space-y-3 lg:space-y-0">
-              <div className="w-full">
-                <input
-                  className="block w-full px-5 py-3 rounded-xl border border-gray-300 focus:outline-none focus:border-green-400"
-                  placeholder="Masukkan User ID"
-                  onChange={getUserID}
-                />
-                <p
+              <form className="mt-5 lg:flex-row flex-col flex space-x-0 lg:space-x-3 space-y-3 lg:space-y-0">
+                {category.requirement.fields.map((field) => (
+                  <div className="w-full">
+                    <input
+                      className="block w-full px-5 py-3 rounded-xl border border-gray-300 focus:outline-none focus:border-green-400"
+                      placeholder={field.placeholder}
+                      type={field.type}
+                    />
+                    {/* <p
                   className={`${
                     haveUserID ? 'opacity-100 mt-0' : 'opacity-0 -mt-[20px]'
                   } text-red-600 transition-all`}
                 >
                   Harus Diisi!!!
-                </p>
-              </div>
-
-              <div className="w-full">
-                <input
-                  className="block w-full px-5 py-3 rounded-xl border border-gray-300 focus:outline-none focus:border-green-400"
-                  placeholder="Zone ID"
-                  onChange={getZoneID}
+                </p> */}
+                  </div>
+                ))}
+              </form>
+              <div className="mt-4">
+                {/* TODO: bikin modal di mobile buat liat full img */}
+                <img
+                  className="rounded-xl"
+                  src={category.requirement.img}
+                  alt={category.requirement.title}
                 />
-                <p
-                  className={`${
-                    haveZoneID ? 'opacity-100 mt-0' : 'opacity-0 -mt-[20px]'
-                  } text-red-600 transition-all lg:ml-3`}
-                >
-                  Harus Diisi!!!
+                <p className="mt-3 pb-2 text-gray-500">
+                  {category.requirement.description}
                 </p>
               </div>
-            </form>
-
-            <p className="mt-3 pb-2 text-gray-500">
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Eveniet
-              omnis sed asperiores veniam iste assumenda hic odit quidem
-              exercitationem ratione?
-            </p>
-          </div>
+            </div>
+          )}
 
           {/* CHOOSE */}
           <div className="border rounded-2xl px-5 pb-5 w-full">
             <div className="w-[40px] h-[40px] text-center -mt-5 leading-[32px] border-4 border-green-100 rounded-full bg-green-500 text-white font-bold">
-              2
+              {category.requirement ? 2 : 1}
             </div>
             <h1 className="text-2xl font-bold mt-2">Pilih Nominal Topup</h1>
 
