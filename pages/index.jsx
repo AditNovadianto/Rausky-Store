@@ -1,8 +1,8 @@
 import Container from '../components/Container'
 import Link from '../components/Link'
 import Wrapper from '../components/Wrapper'
-import request from '../lib/request'
 import { parseData } from '../lib/utils'
+import { getAllCategories } from './api/categories'
 
 const Home = ({ categories }) => {
   const topupCategories = categories.filter((category) => category.isTopup)
@@ -16,15 +16,21 @@ const Home = ({ categories }) => {
         {/* TOP UP */}
         <section className="lg:sticky lg:self-start lg:top-[80px] lg:flex-[1]">
           <h2 className="text-2xl font-bold mb-4">Top Up</h2>
-          <div className="flex flex-col space-y-2">
-            {/* TODO: kasih logo tiap topup */}
+          <div className="flex flex-col space-y-4">
             {topupCategories.map((category) => (
               <Link
+                className="flex items-center group border p-3 rounded-xl hover:border-green-400"
                 key={category.id}
-                className="font-medium"
                 href={`/topup/${category.slug}`}
               >
-                👉 {category.name}
+                <img
+                  className="w-8 h-8 rounded-lg object-cover"
+                  src={category.logoImg}
+                  alt={category.slug}
+                />
+                <span className="font-medium ml-2 truncate">
+                  {category.name}
+                </span>
               </Link>
             ))}
           </div>
@@ -103,10 +109,10 @@ const Home = ({ categories }) => {
 export default Home
 
 export const getStaticProps = async () => {
-  const { data } = await request.get(
-    '/categories?select=name,id,slug,bannerImg,isTopup'
-  )
-  const { categories } = data
+  const categories = await getAllCategories({
+    select: 'isTopup,id,slug,name,bannerImg,logoImg',
+    hasProducts: true,
+  })
   return {
     props: parseData({
       categories,

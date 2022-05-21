@@ -21,6 +21,7 @@ export default apiHandler
     const order = await prisma.order.create({
       data: {
         userId: req.user.id,
+        // @ts-ignore
         notes,
         products: {
           create: products.map((product) => ({
@@ -50,6 +51,7 @@ export default apiHandler
 
     // calculate subtotal
     let subtotal = 0
+    // @ts-ignore
     for (const item of order.products) {
       let discount = (item.product.discount / 100) * item.product.price
       subtotal += item.product.price * item.amount - discount
@@ -68,6 +70,7 @@ export default apiHandler
         secure: true,
       },
       item_details: [
+        //   @ts-ignore
         ...order.products.map((item) => ({
           id: item.product.id,
           price: item.product.price,

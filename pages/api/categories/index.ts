@@ -1,6 +1,23 @@
 import apiHandler, { checkAuth } from '../../../lib/apiHandler'
 import prisma from '../../../lib/prisma'
 
+export const getAllCategories = async (
+  { select }: { select?: string } = null
+) => {
+  let selectFields: any = select?.split(',').reduce((acc, field) => {
+    acc[field] = true
+    return acc
+  }, {})
+
+  let categories = await prisma.category.findMany({
+    select: {
+      ...selectFields,
+    },
+  })
+
+  return categories
+}
+
 export default apiHandler
   // get all categories
   .get(async (req, res) => {
@@ -8,17 +25,7 @@ export default apiHandler
       [key: string]: string
     }
 
-    let selectFields
-    if (select) {
-      selectFields = {}
-      select.split(',').forEach((field) => {
-        selectFields[field] = true
-      })
-    }
-
-    const categories = await prisma.category.findMany({
-      select: selectFields,
-    })
+    const categories = await getAllCategories({ select })
     res.status(200).json({ categories, length: categories.length })
   })
   // create new category
