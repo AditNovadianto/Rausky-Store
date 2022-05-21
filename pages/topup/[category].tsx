@@ -95,7 +95,7 @@ const Topup = ({ category }) => {
         src={category.bannerImg}
         alt={category.slug}
       />
-      <Wrapper className="md:flex pb-20">
+      <Wrapper className={cn('md:flex', totalItemsInCart > 0 && 'pb-20')}>
         {/* TOPUP INFO */}
         <div className="md:w-[40%] w-full md:sticky md:top-[80px] md:self-start">
           <img
