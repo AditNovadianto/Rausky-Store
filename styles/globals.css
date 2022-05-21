@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+::-webkit-scrollbar {
+    width: 0.4em;
+    height: 0.4em;
+}
+  
+::-webkit-scrollbar-thumb {
+    @apply bg-gray-400 hover:bg-green-500;
+    border-radius: 100vw;
+}
+  
