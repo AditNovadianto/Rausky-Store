@@ -151,7 +151,7 @@ const Topup = ({ category }) => {
               <div className="mt-4">
                 {/* TODO: bikin modal di mobile buat liat full img */}
                 <img
-                  className="rounded-xl"
+                  className="rounded-xl hover:scale-[1.5] hover:-translate-x-[35%] transition-all"
                   src={category.requirement.img}
                   alt={category.requirement.title}
                 />
