@@ -179,9 +179,16 @@ const Topup = ({ category }) => {
                       selectedProducts.includes(product) && 'border-green-400'
                     )}
                   >
-                    {product.img && (
-                      <img src={product.img} className="w-10 h-10" />
-                    )}
+                    <div className="flex items-center">
+                      {product.img && (
+                        <img src={product.img} className="w-10 h-10" />
+                      )}
+                      {selectedProducts.includes(product) && (
+                        <button className="block md:hidden p-1.5 bg-gray-200 hover:bg-red-500 text-gray-500 hover:text-gray-100 rounded-xl ml-auto">
+                          <TrashIcon className="w-5 h-5 text-current" />
+                        </button>
+                      )}
+                    </div>
                     <div>
                       <p className="font-semibold">{product.title}</p>
                       <p className="text-gray-500">
@@ -189,7 +196,7 @@ const Topup = ({ category }) => {
                       </p>
                       {selectedProducts.includes(product) && (
                         <div className="flex items-center mt-3">
-                          <div className="flex items-center text-gray-500">
+                          <div className="flex items-center flex-grow md:flex-grow-0 justify-between text-gray-500">
                             <button className="w-8 h-8 rounded-xl font-medium border hover:bg-gray-800 hover:text-gray-100">
                               {' '}
                               -{' '}
@@ -200,7 +207,7 @@ const Topup = ({ category }) => {
                               +{' '}
                             </button>
                           </div>
-                          <button className="p-1.5 bg-gray-200 hover:bg-red-500 text-gray-500 hover:text-gray-100 rounded-xl lg:ml-5">
+                          <button className="hidden md:block p-1.5 bg-gray-200 hover:bg-red-500 text-gray-500 hover:text-gray-100 rounded-xl ml-auto">
                             <TrashIcon className="w-5 h-5 text-current" />
                           </button>
                         </div>
