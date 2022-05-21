@@ -14,6 +14,7 @@
     "@prisma/client": "^3.14.0",
     "axios": "^0.27.2",
     "classnames": "^2.3.1",
+    "framer-motion": "^6.3.3",
     "little-state-machine": "^4.3.2",
     "midtrans-client": "^1.3.1",
     "next": "^12.1.6",
