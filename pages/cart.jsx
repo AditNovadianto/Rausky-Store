@@ -2,6 +2,7 @@ import Container from '../components/Container'
 import Wrapper from '../components/Wrapper'
 import { TrashIcon } from '@heroicons/react/outline'
 import { useEffect } from 'react'
+import { useStateMachine } from 'little-state-machine'
 
 const cartData = [
   {
@@ -28,6 +29,11 @@ const cartData = [
 ]
 
 const Cart = () => {
+  const { state } = useStateMachine()
+  const { cart } = state
+
+  console.log(cart)
+
   useEffect(() => {
     let scriptTag = document.createElement('script')
     scriptTag.type = 'text/javascript'
@@ -73,15 +79,15 @@ const Cart = () => {
         <div className="lg:flex-grow">
           <h2 className="text-2xl font-bold">My Cart</h2>
           <div className="space-y-8 mt-8">
-            {cartData.map((item) => (
+            {cart.map((item) => (
               <div key={item.id} className="flex">
                 <img
                   className="w-[80px] h-[80px] object-cover rounded-2xl"
                   src={item.img}
-                  alt={item.name}
+                  alt={item.title}
                 />
                 <div className="ml-4 flex-grow">
-                  <h3 className="font-semibold text-lg">{item.name}</h3>
+                  <h3 className="font-semibold text-lg">{item.title}</h3>
                   <p className="text-gray-500 font-semibold">
                     Rp {item.price.toLocaleString()}
                   </p>
@@ -93,7 +99,7 @@ const Cart = () => {
                         {' '}
                         -{' '}
                       </button>
-                      <div className="px-5">{item.quantity}</div>
+                      <div className="px-5">{item.amount}</div>
                       <button className="w-8 h-8 rounded-xl font-medium border hover:bg-gray-800 hover:text-gray-100">
                         {' '}
                         +{' '}

@@ -25,9 +25,8 @@ const Topup = ({ category }) => {
   const { state, actions } = useStateMachine({
     addToCart: (state, payload) => {
       const product = {
-        id: payload.id,
+        ...payload,
         amount: 1,
-        price: payload.price,
       }
 
       const newCart = [...state.cart]
