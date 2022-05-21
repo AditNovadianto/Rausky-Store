@@ -1,8 +1,8 @@
 import Container from '../components/Container'
 import Link from '../components/Link'
 import Wrapper from '../components/Wrapper'
-import request from '../lib/request'
 import { parseData } from '../lib/utils'
+import { getAllCategories } from './api/categories'
 
 const Home = ({ categories }) => {
   const topupCategories = categories.filter((category) => category.isTopup)
@@ -103,10 +103,9 @@ const Home = ({ categories }) => {
 export default Home
 
 export const getStaticProps = async () => {
-  const { data } = await request.get(
-    '/categories?select=name,id,slug,bannerImg,isTopup'
-  )
-  const { categories } = data
+  const categories = await getAllCategories({
+    select: 'isTopup,id,slug,name,bannerImg,logoImg',
+  })
   return {
     props: parseData({
       categories,

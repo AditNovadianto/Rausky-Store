@@ -3,8 +3,8 @@ import Container from '../../components/Container'
 import Wrapper from '../../components/Wrapper'
 import Link from '../../components/Link'
 import MLSection from '../../components/topup/MLSection'
-import request from '../../lib/request'
 import { parseData } from '../../lib/utils'
+import { getSpecificCategory } from '../api/categories/[categoryId]'
 
 // TODO: benerin halaman topup
 const Topup = ({ category }) => {
@@ -194,9 +194,8 @@ const Topup = ({ category }) => {
 export default Topup
 
 export const getServerSideProps = async ({ params }) => {
-  console.log(params)
-  const { data } = await request.get(`/categories/${params.category}`)
-  const { category } = data
+  const category = await getSpecificCategory({ categorySlug: params.category })
+
   if (!category) {
     return {
       notFound: true,
