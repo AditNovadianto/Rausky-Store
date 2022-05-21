@@ -3,16 +3,22 @@ import Wrapper from './Wrapper'
 import { useState } from 'react'
 import { signIn, useSession } from 'next-auth/react'
 import Skeleton from 'react-loading-skeleton'
+import { useStateMachine } from 'little-state-machine'
+import Badge from './Badge'
 
 const navLinks = ['Tentang Rausky', 'Manufacturing', 'Packaging']
 
 const Navbar = () => {
   const [search, setSearch] = useState(false)
   const { data: session, status } = useSession()
+  const { state } = useStateMachine()
+  const { cart } = state
 
   const showSearch = () => {
     setSearch(!search)
   }
+
+  const totalItemsInCart = cart.length
 
   return (
     <>
@@ -88,7 +94,10 @@ const Navbar = () => {
               <img src="/images/Union.svg" alt="Union" />
             </button>
 
-            <Link href="/cart" className="ml-4 flex-shrink-0">
+            <Link href="/cart" className="relative ml-4 flex-shrink-0">
+              {/* TODO: bikin badge */}
+              {totalItemsInCart > 0 && <Badge>{totalItemsInCart}</Badge>}
+
               <img src="/images/Bag.svg" alt="Bag-icon" />
             </Link>
 

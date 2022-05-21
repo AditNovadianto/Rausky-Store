@@ -6,7 +6,9 @@ import 'react-loading-skeleton/dist/skeleton.css'
 
 // TODO: bikin global state buat nyimpen cart
 createStore(
-  {},
+  {
+    cart: [],
+  },
   {
     name: 'state',
     persist: process.env.NODE_ENV === 'production' ? 'onAction' : 'none',

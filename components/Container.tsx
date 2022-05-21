@@ -1,11 +1,18 @@
 import Head from 'next/head'
+import { FC } from 'react'
 import Navbar from './Navbar'
+
+interface Props {
+  title?: string
+  noNavbar?: boolean
+  noTopMargin?: boolean
+}
 
 const head = {
   title: 'Rausky Store',
 }
 
-const Container = ({ title, children, noNavbar, noTopMargin }) => {
+const Container: FC<Props> = ({ title, children, noNavbar, noTopMargin }) => {
   return (
     <main>
       <Head>
