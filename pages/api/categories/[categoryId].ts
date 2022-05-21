@@ -4,7 +4,15 @@ import prisma from '../../../lib/prisma'
 export const getSpecificCategory = async ({ categorySlug }) => {
   const category = await prisma.category.findUnique({
     where: { slug: categorySlug },
-    include: { products: { orderBy: { price: 'asc' } } },
+    include: {
+      products: {
+        orderBy: { price: 'asc' },
+        include: {
+          subCategory: { select: { name: true, slug: true } },
+        },
+      },
+      subCategories: { select: { name: true, slug: true } },
+    },
   })
   return category
 }

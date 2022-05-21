@@ -19,7 +19,7 @@ export default apiHandler
   })
   // create new product
   .post(checkAuth('ADMIN'), async (req, res) => {
-    const { title, description, price, discount, category, stock } = req.body
+    const { title, price, category, subCategory } = req.body
 
     if (!title || !price) {
       throw { status: 400, message: 'Please provide title, price' }
@@ -27,11 +27,8 @@ export default apiHandler
 
     const product = await prisma.product.create({
       data: {
-        title,
-        description,
-        price,
-        discount,
-        stock,
+        ...req.body,
+        subCategory: { connect: { slug: subCategory } },
         category: { connect: { slug: category } },
         user: { connect: { id: req.user.id } },
       },

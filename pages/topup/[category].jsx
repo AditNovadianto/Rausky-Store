@@ -63,10 +63,8 @@ const Topup = ({ category }) => {
               alt="ML"
             />
             <div className="ml-5">
-              <p className="font-semibold">{category.name}</p>
-              <p className="font-semibold text-gray-500">
-                Shanghai Moonton Technology Co., Ltd.
-              </p>
+              <p className="font-semibold text-xl">{category.name}</p>
+              {/* <p className="font-semibold text-gray-500">Developer</p> */}
             </div>
           </div>
         </div>

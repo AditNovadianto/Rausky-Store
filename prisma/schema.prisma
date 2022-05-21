@@ -64,56 +64,59 @@ model User {
     Product       Product[]
 }
 
-// enum Category {
-//     UNCATEGORIZE
-
-//     // TOPUP
-//     MOBILE_LEGEND
-//     VALORANT
-//     FREE_FIRE
-//     NETFLIX
-
-//     // OTHERS
-//     GAMING_GEAR
-//     MERCHANDISE
-// }
-
 model Category {
+    id            String        @id @default(auto()) @map("_id") @db.ObjectId
+    name          String        @unique
+    slug          String        @unique
+    description   String?
+    moreInfo      Json?
+    bannerImg     String?
+    logoImg       String?
+    isTopup       Boolean?      @default(false)
+    requirement   String[]
+    products      Product[]
+    subCategories SubCategory[]
+    createdAt     DateTime      @default(now())
+    updatedAt     DateTime      @updatedAt
+}
+
+model SubCategory {
     id          String    @id @default(auto()) @map("_id") @db.ObjectId
     name        String    @unique
     slug        String    @unique
     description String?
-    bannerImg   String?
+    moreInfo    Json?
     logoImg     String?
-    isTopup     Boolean?  @default(false)
-    requirement String[]
+    categoryId  String?   @db.ObjectId
+    category    Category? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
     products    Product[]
-    createdAt   DateTime  @default(now())
-    updatedAt   DateTime  @updatedAt
 }
 
 model Product {
-    id          String             @id @default(auto()) @map("_id") @db.ObjectId
-    title       String
-    description String?
-    img         String?
-    price       Int
-    discount    Int?               @default(0)
-    stock       Int?               @default(0)
-    categoryId  String?
-    category    Category?          @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-    orders      ProductsOnOrders[]
-    userId      String
-    user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-    createdAt   DateTime           @default(now())
-    updatedAt   DateTime           @updatedAt
+    id            String             @id @default(auto()) @map("_id") @db.ObjectId
+    title         String
+    description   String?
+    img           String?
+    price         Int
+    discount      Int?               @default(0)
+    stock         Int?               @default(0)
+    categoryId    String?            @db.ObjectId
+    moreInfo      Json?
+    userId        String             @db.ObjectId
+    subCategoryId String?            @db.ObjectId
+    orders        ProductsOnOrders[]
+    category      Category?          @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+    user          User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+    subCategory   SubCategory?       @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
+    createdAt     DateTime           @default(now())
+    updatedAt     DateTime           @updatedAt
 }
 
 model ProductsOnOrders {
     id        String   @id @default(auto()) @map("_id") @db.ObjectId
-    productId String
+    productId String   @db.ObjectId
     amount    Int
-    orderId   String
+    orderId   String   @db.ObjectId
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
     product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
@@ -128,7 +131,7 @@ model Order {
     paymentUrl   String?
     paymentToken String?
     products     ProductsOnOrders[]
-    userId       String
+    userId       String             @db.ObjectId
     user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
     createdAt    DateTime           @default(now())
     updatedAt    DateTime           @updatedAt
