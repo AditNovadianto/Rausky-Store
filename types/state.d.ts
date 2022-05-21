@@ -5,6 +5,7 @@ declare module 'little-state-machine' {
     cart: {
       id: string
       amount: number
+      price: number
     }[]
   }
 }

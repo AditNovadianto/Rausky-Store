@@ -27,6 +27,7 @@ const Topup = ({ category }) => {
       const product = {
         id: payload.id,
         amount: 1,
+        price: payload.price,
       }
 
       const newCart = [...state.cart]
@@ -80,6 +81,12 @@ const Topup = ({ category }) => {
     category.products
   )
 
+  const totalItemsInCart = cart.length
+  const currentSubtotal = cart.reduce((total, item) => {
+    total += item.amount * item.price
+    return total
+  }, 0)
+
   return (
     <Container noTopMargin title={category.name}>
       <br className="hidden md:block" />
@@ -88,7 +95,7 @@ const Topup = ({ category }) => {
         src={category.bannerImg}
         alt={category.slug}
       />
-      <Wrapper className="md:flex">
+      <Wrapper className="md:flex pb-20">
         {/* TOPUP INFO */}
         <div className="md:w-[40%] w-full md:sticky md:top-[80px] md:self-start">
           <img
@@ -111,7 +118,7 @@ const Topup = ({ category }) => {
         </div>
 
         {/* CHOOSE ITEMS */}
-        <div className="md:w-[60%] md:mt-0 mt-10 w-full md:ml-5 space-y-8 mb-8">
+        <div className="md:w-[60%] md:mt-0 mt-10 w-full md:ml-5 space-y-8">
           {/* REQUIREMENT */}
           {category.requirement && (
             <div className="border rounded-2xl px-5 pb-5 w-full">
@@ -266,13 +273,19 @@ const Topup = ({ category }) => {
             </div>
           </div>
 
-          {/* TODO: munculin kalo user udah milih product (kayak di gofood) */}
-          <Link
-            href="/cart"
-            className="block w-full py-4 text-center bg-green-500 hover:bg-green-400 transition-all font-semibold text-white rounded-2xl shadow-xl shadow-green-300"
-          >
-            Continue to payment
-          </Link>
+          {/* TODO: kasih animation pas muncul dan ngilang pake framer motion */}
+          {totalItemsInCart > 0 && (
+            <div className="fixed bottom-0 left-0 w-full pb-8 bg-white md:bg-transparent">
+              <Wrapper className="max-w-md">
+                <Link
+                  href="/cart"
+                  className="block w-full -mt-4 py-4 text-center bg-green-500 hover:bg-green-400 transition-all font-semibold text-white rounded-2xl shadow-xl shadow-green-300"
+                >
+                  Continue to payment (Rp {currentSubtotal.toLocaleString()})
+                </Link>
+              </Wrapper>
+            </div>
+          )}
         </div>
       </Wrapper>
     </Container>
