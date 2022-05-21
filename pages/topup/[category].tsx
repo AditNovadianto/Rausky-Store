@@ -7,6 +7,7 @@ import { getSpecificCategory } from '../api/categories/[categoryId]'
 import cn from 'classnames'
 import { TrashIcon } from '@heroicons/react/outline'
 import { useStateMachine } from 'little-state-machine'
+import { AnimatePresence, motion } from 'framer-motion'
 
 const filterProductsBySubCategory = (subCategory, products) => {
   return subCategory
@@ -271,20 +272,34 @@ const Topup = ({ category }) => {
               </div>
             </div>
           </div>
-
-          {/* TODO: kasih animation pas muncul dan ngilang pake framer motion */}
-          {totalItemsInCart > 0 && (
-            <div className="fixed bottom-0 left-0 w-full pb-8 bg-white md:bg-transparent">
-              <Wrapper className="max-w-md">
-                <Link
-                  href="/cart"
-                  className="block w-full -mt-4 py-4 text-center bg-green-500 hover:bg-green-400 transition-all font-semibold text-white rounded-2xl shadow-xl shadow-green-300"
-                >
-                  Continue to payment (Rp {currentSubtotal.toLocaleString()})
-                </Link>
-              </Wrapper>
-            </div>
-          )}
+          <AnimatePresence>
+            {totalItemsInCart > 0 && (
+              <motion.div
+                className="fixed bottom-0 left-0 w-full pb-8 bg-white md:bg-transparent"
+                initial={{
+                  y: '100%',
+                  opacity: 0,
+                }}
+                animate={{
+                  y: '0%',
+                  opacity: 1,
+                }}
+                exit={{
+                  y: '100%',
+                  opacity: 0,
+                }}
+              >
+                <Wrapper className="max-w-md">
+                  <Link
+                    href="/cart"
+                    className="block w-full -mt-4 py-4 text-center bg-green-500 hover:bg-green-400 transition-all font-semibold text-white rounded-2xl shadow-xl shadow-green-300"
+                  >
+                    Continue to payment (Rp {currentSubtotal.toLocaleString()})
+                  </Link>
+                </Wrapper>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </Wrapper>
     </Container>
