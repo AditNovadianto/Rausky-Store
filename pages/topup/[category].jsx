@@ -2,28 +2,29 @@ import { useState } from 'react'
 import Container from '../../components/Container'
 import Wrapper from '../../components/Wrapper'
 import Link from '../../components/Link'
-import MLSection from '../../components/topup/MLSection'
 import { parseData } from '../../lib/utils'
 import { getSpecificCategory } from '../api/categories/[categoryId]'
+import cn from 'classnames'
+import { TrashIcon } from '@heroicons/react/outline'
+
+const filterProductsBySubCategory = (subCategory, products) => {
+  return subCategory
+    ? products.filter((product) => product.subCategory.slug == subCategory)
+    : products
+}
 
 // TODO: benerin halaman topup
 const Topup = ({ category }) => {
-  const [showDiamond, setShowDiamond] = useState(true)
-  const [showStarlight, setShowStarlight] = useState(false)
   const [haveUserID, setHaveUserID] = useState(false)
   const [haveZoneID, setHaveZoneID] = useState(false)
 
+  const [currentSubCategory, setCurrentSubCategory] = useState(
+    category.subCategories[0]?.slug
+  )
+
+  const [selectedProducts, setSelectedProducts] = useState([])
+
   console.log(category)
-
-  const diamond = () => {
-    setShowDiamond(!showDiamond)
-    setShowStarlight(false)
-  }
-
-  const starlight = () => {
-    setShowStarlight(!showStarlight)
-    setShowDiamond(false)
-  }
 
   const getUserID = (e) => {
     if (!e.target.value) {
@@ -41,6 +42,11 @@ const Topup = ({ category }) => {
     }
   }
 
+  const products = filterProductsBySubCategory(
+    currentSubCategory,
+    category.products
+  )
+
   return (
     <Container noTopMargin>
       <br className="hidden md:block" />
@@ -50,6 +56,7 @@ const Topup = ({ category }) => {
         alt={category.slug}
       />
       <Wrapper className="md:flex">
+        {/* TOPUP INFO */}
         <div className="md:w-[40%] w-full md:sticky md:top-[80px] md:self-start">
           <img
             className="hidden md:block w-full rounded-2xl"
@@ -69,119 +76,147 @@ const Topup = ({ category }) => {
           </div>
         </div>
 
-        <div className="md:w-[60%] md:mt-0 mt-10 w-full px-5">
-          <div className="bg-green-200 rounded-lg">
-            <Wrapper className="flex">
-              <div className="w-[40px] h-[40px] text-center -mt-5 leading-[32px] border-4 border-green-200 rounded-full bg-green-500">
-                1
+        {/* CHOOSE ITEMS */}
+        <div className="md:w-[60%] md:mt-0 mt-10 w-full md:ml-5 space-y-8 mb-8">
+          {/* REQUIREMENT */}
+          <div className="border rounded-2xl px-5 pb-5 w-full">
+            <div className="w-[40px] h-[40px] text-center -mt-5 leading-[32px] border-4 border-green-100 rounded-full bg-green-500 text-white font-bold">
+              1
+            </div>
+            <h1 className="text-2xl font-bold mt-2">Masukkan User ID</h1>
+
+            <form className="mt-5 lg:flex-row flex-col flex space-x-0 lg:space-x-3 space-y-3 lg:space-y-0">
+              <div className="w-full">
+                <input
+                  className="block w-full px-5 py-3 rounded-xl border border-gray-300 focus:outline-none focus:border-green-400"
+                  placeholder="Masukkan User ID"
+                  onChange={getUserID}
+                />
+                <p
+                  className={`${
+                    haveUserID ? 'opacity-100 mt-0' : 'opacity-0 -mt-[20px]'
+                  } text-red-600 transition-all`}
+                >
+                  Harus Diisi!!!
+                </p>
               </div>
-              <h1 className="text-2xl ml-3 pt-2 font-bold">Masukkan User ID</h1>
-            </Wrapper>
-            <Wrapper>
-              <form className="mt-5 lg:flex-row flex-col flex items-center">
-                <div className="w-full">
-                  <input
-                    className="px-5 py-3 w-full text-center border-2 focus:outline-none focus:ring-2 focus:ring-green-600 z-50 relative rounded-lg border-green-400"
-                    placeholder="Masukkan User ID"
-                    onChange={getUserID}
-                  />
-                  <p
-                    className={`${
-                      haveUserID ? 'opacity-100 mt-0' : 'opacity-0 -mt-[20px]'
-                    } text-red-600 transition-all`}
-                  >
-                    Harus Diisi!!!
-                  </p>
-                </div>
 
-                <div className="w-full">
-                  <input
-                    className="px-5 py-3 w-full lg:ml-3 mt-3 lg:mt-0 text-center border-2 focus:outline-none focus:ring-2 z-50 relative focus:ring-green-600 rounded-lg border-green-400"
-                    placeholder="Zone ID"
-                    onChange={getZoneID}
-                  />
-                  <p
-                    className={`${
-                      haveZoneID ? 'opacity-100 mt-0' : 'opacity-0 -mt-[20px]'
-                    } text-red-600 transition-all lg:ml-3`}
-                  >
-                    Harus Diisi!!!
-                  </p>
-                </div>
-              </form>
+              <div className="w-full">
+                <input
+                  className="block w-full px-5 py-3 rounded-xl border border-gray-300 focus:outline-none focus:border-green-400"
+                  placeholder="Zone ID"
+                  onChange={getZoneID}
+                />
+                <p
+                  className={`${
+                    haveZoneID ? 'opacity-100 mt-0' : 'opacity-0 -mt-[20px]'
+                  } text-red-600 transition-all lg:ml-3`}
+                >
+                  Harus Diisi!!!
+                </p>
+              </div>
+            </form>
 
-              <p className="mt-3 pb-2 text-gray-500">
-                Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-                Eveniet omnis sed asperiores veniam iste assumenda hic odit
-                quidem exercitationem ratione?
-              </p>
-            </Wrapper>
+            <p className="mt-3 pb-2 text-gray-500">
+              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Eveniet
+              omnis sed asperiores veniam iste assumenda hic odit quidem
+              exercitationem ratione?
+            </p>
           </div>
 
-          <div className="bg-green-200 pb-5 mt-10 rounded-lg">
-            <Wrapper className="flex">
-              <div className="w-[40px] h-[40px] text-center -mt-5 leading-[32px] border-4 border-green-200 rounded-full bg-green-500">
-                2
-              </div>
-              <h1 className="text-2xl ml-3 pt-2 font-bold">
-                Pilih Nominal Top Up
-              </h1>
-            </Wrapper>
-            <Wrapper>
-              <div>
-                <p className="font-semibold mt-5">Pilih Kategori</p>
-                <div className="flex mt-3 items-center">
-                  <button
-                    onClick={diamond}
-                    className={`${
-                      showDiamond
-                        ? 'border-green-600 bg-green-400'
-                        : 'border-gray-400 bg-white hover:bg-green-400'
-                    } flex flex-col border-2 cursor-pointer px-5 py-4 transition-all  rounded-lg justify-center items-center w-[200px] h-[130px]`}
-                  >
-                    <img src="/images/Diamond.png" alt="Diamond" />
-                    <p className="font-[500] mt-5">Diamond</p>
-                  </button>
+          {/* CHOOSE */}
+          <div className="border rounded-2xl px-5 pb-5 w-full">
+            <div className="w-[40px] h-[40px] text-center -mt-5 leading-[32px] border-4 border-green-100 rounded-full bg-green-500 text-white font-bold">
+              2
+            </div>
+            <h1 className="text-2xl font-bold mt-2">Pilih Nominal Topup</h1>
 
-                  <button
-                    onClick={starlight}
-                    className={`${
-                      showStarlight
-                        ? 'border-green-600 bg-green-400'
-                        : 'border-gray-400 bg-white hover:bg-green-400'
-                    } flex flex-col ml-3 border-2 transition-all cursor-pointer px-5 py-4 rounded-lg justify-center items-center w-[200px] h-[130px]`}
+            {/* SUB CATEGORY */}
+            {category.subCategories.length > 0 && (
+              <div className="mt-5">
+                <p className="font-semibold text-lg">Pilih Kategori</p>
+                <div className="flex flex-col md:flex-row space-y-4 mt-4 md:space-y-0 md:space-x-4">
+                  {category.subCategories.map((subCategory) => (
+                    <button
+                      key={subCategory.id}
+                      onClick={() => setCurrentSubCategory(subCategory.slug)}
+                      className={cn(
+                        'w-full flex items-center px-2 py-3 border rounded-xl hover:border-green-400',
+                        currentSubCategory == subCategory.slug &&
+                          'border-green-400 bg-green-100'
+                      )}
+                    >
+                      <img
+                        className="w-6 h-6"
+                        src={subCategory.logoImg}
+                        alt={subCategory.slug}
+                      />
+                      <span className="font-semibold ml-2">
+                        {subCategory.name}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* ITEMS */}
+            <div className="mt-5">
+              <p className="font-semibold text-lg">Pilih Item</p>
+              <div className="mt-4 grid md:grid-cols-2 gap-4">
+                {products.map((product) => (
+                  <div
+                    role={
+                      selectedProducts.includes(product) ? undefined : 'button'
+                    }
+                    key={product.id}
+                    onClick={() => {
+                      if (selectedProducts.includes(product)) return
+                      setSelectedProducts((current) => [...current, product])
+                    }}
+                    className={cn(
+                      'px-4 py-3 border rounded-xl hover:border-green-400',
+                      selectedProducts.includes(product) && 'border-green-400'
+                    )}
                   >
-                    <img
-                      className="w-[70px]"
-                      src="/images/Starlight.png"
-                      alt="Starlight"
-                    />
-                    <p className="font-[500] mt-5">Starlight Member</p>
-                  </button>
-                </div>
+                    {product.img && (
+                      <img src={product.img} className="w-10 h-10" />
+                    )}
+                    <div>
+                      <p className="font-semibold">{product.title}</p>
+                      <p className="text-gray-500">
+                        Rp {product.price.toLocaleString()}
+                      </p>
+                      {selectedProducts.includes(product) && (
+                        <div className="flex items-center mt-3">
+                          <div className="flex items-center text-gray-500">
+                            <button className="w-8 h-8 rounded-xl font-medium border hover:bg-gray-800 hover:text-gray-100">
+                              {' '}
+                              -{' '}
+                            </button>
+                            <div className="px-5">1</div>
+                            <button className="w-8 h-8 rounded-xl font-medium border hover:bg-gray-800 hover:text-gray-100">
+                              {' '}
+                              +{' '}
+                            </button>
+                          </div>
+                          <button className="p-1.5 bg-gray-200 hover:bg-red-500 text-gray-500 hover:text-gray-100 rounded-xl lg:ml-5">
+                            <TrashIcon className="w-5 h-5 text-current" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
-            </Wrapper>
-            <Wrapper>
-              <div>
-                <p className="font-semibold mt-10">Pilih Item</p>
-                <div className="flex flex-wrap gap-2 items-center justify-center w-full mt-3">
-                  <MLSection
-                    showDiamond={showDiamond}
-                    showStarlight={showStarlight}
-                  />
-                </div>
-              </div>
-            </Wrapper>
+            </div>
           </div>
+
           <Link
             href="/cart"
-            className="flex mb-20 hover:scale-[1.03] shadow-lg shadow-green-300 hover:-translate-y-2 transition-all items-center w-full justify-center bg-green-200 py-3 mt-5 rounded-lg"
+            className="block w-full py-4 text-center bg-green-500 hover:bg-green-400 transition-all font-semibold text-white rounded-2xl shadow-xl shadow-green-300"
           >
-            <Wrapper>
-              <p className="text-center hover:text-gray-500 transition-all font-semibold">
-                Continue to payment
-              </p>
-            </Wrapper>
+            Continue to payment
           </Link>
         </div>
       </Wrapper>

@@ -11,7 +11,7 @@ export const getSpecificCategory = async ({ categorySlug }) => {
           subCategory: { select: { name: true, slug: true } },
         },
       },
-      subCategories: { select: { name: true, slug: true } },
+      subCategories: true,
     },
   })
   return category
