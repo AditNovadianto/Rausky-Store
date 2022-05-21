@@ -155,6 +155,7 @@ const Topup = ({ category }) => {
                   src={category.requirement.img}
                   alt={category.requirement.title}
                 />
+
                 <p className="mt-3 pb-2 text-gray-500">
                   {category.requirement.description}
                 </p>
