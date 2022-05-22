@@ -86,7 +86,7 @@ const Cart = () => {
                 href="/"
                 className="text-green-500 hover:underline font-medium"
               >
-                Browse more &rarr;
+                Browse more
               </Link>
             </div>
             <div className="space-y-8 mt-8">

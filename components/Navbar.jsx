@@ -5,6 +5,8 @@ import { signIn, useSession } from 'next-auth/react'
 import Skeleton from 'react-loading-skeleton'
 import { useStateMachine } from 'little-state-machine'
 import Badge from './Badge'
+import { useRouter } from 'next/router'
+import { ArrowLeftIcon } from '@heroicons/react/outline'
 
 const navLinks = ['Tentang Rausky', 'Manufacturing', 'Packaging']
 
@@ -13,12 +15,15 @@ const Navbar = () => {
   const { data: session, status } = useSession()
   const { state } = useStateMachine()
   const { cart } = state
+  const router = useRouter()
 
   const showSearch = () => {
     setSearch(!search)
   }
 
   const totalItemsInCart = cart.length
+
+  console.log(router)
 
   return (
     <>
@@ -53,17 +58,27 @@ const Navbar = () => {
 
       <nav className="sticky top-0 z-[5000] bg-white border-b">
         <Wrapper className="flex items-center w-full justify-between py-2.5 lg:py-2">
-          <Link
-            href="/"
-            className="flex font-semibold items-center text-xl -ml-2"
-          >
-            <img
-              src="/images/rausky-logo.png"
-              alt="rausky-logo"
-              className="w-[40px]"
-            />
-            <span className="text-black hidden lg:block">Rausky</span>
-          </Link>
+          {router.route == '/' ? (
+            <Link
+              href="/"
+              className="flex font-semibold items-center text-xl -ml-2"
+            >
+              <img
+                src="/images/rausky-logo.png"
+                alt="rausky-logo"
+                className="w-[40px]"
+              />
+              <span className="text-black hidden lg:block">Rausky</span>
+            </Link>
+          ) : (
+            <button
+              onClick={router.back}
+              className="flex items-center space-x-2"
+            >
+              <ArrowLeftIcon className="w-5 h-5" />
+              <span className="font-medium hidden md:block">Back</span>
+            </button>
+          )}
 
           <div className="items-center hidden md:flex">
             <button className="hidden ml-10 flex-shrink-0" onClick={showSearch}>
