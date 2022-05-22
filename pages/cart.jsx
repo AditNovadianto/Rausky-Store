@@ -4,10 +4,15 @@ import { TrashIcon } from '@heroicons/react/outline'
 import { useEffect } from 'react'
 import { useStateMachine } from 'little-state-machine'
 import Link from '../components/Link'
+import { addToCart, removeFromCart, decrementAmount } from '../lib/cartHandler'
 
 const Cart = () => {
-  const { state } = useStateMachine()
-  const { cart } = state
+  const { state, actions } = useStateMachine({
+    addToCart,
+    removeFromCart,
+    decrementAmount,
+  })
+  const { cart, order } = state
 
   console.log(cart)
 
@@ -63,7 +68,7 @@ const Cart = () => {
               alt="empty cart"
             />
             <h2 className="font-bold text-3xl mt-1">
-              Keranjang masih kosong ni gan...
+              Keranjang kosong ni gan...
             </h2>
             <Link
               href="/"
@@ -109,19 +114,28 @@ const Cart = () => {
                     <div className="flex justify-between lg:justify-start items-center mt-4">
                       {/* SET QUANTITY */}
                       <div className="flex items-center text-gray-500">
-                        <button className="w-8 h-8 rounded-xl font-medium border hover:bg-gray-800 hover:text-gray-100">
+                        <button
+                          onClick={() => actions.decrementAmount(item)}
+                          className="w-8 h-8 rounded-xl font-medium border hover:bg-gray-800 hover:text-gray-100"
+                        >
                           {' '}
                           -{' '}
                         </button>
                         <div className="px-5">{item.amount}</div>
-                        <button className="w-8 h-8 rounded-xl font-medium border hover:bg-gray-800 hover:text-gray-100">
+                        <button
+                          onClick={() => actions.addToCart(item)}
+                          className="w-8 h-8 rounded-xl font-medium border hover:bg-gray-800 hover:text-gray-100"
+                        >
                           {' '}
                           +{' '}
                         </button>
                       </div>
 
                       {/* DELETE */}
-                      <button className="p-1.5 bg-gray-200 hover:bg-red-500 text-gray-500 hover:text-gray-100 rounded-xl lg:ml-5">
+                      <button
+                        onClick={() => actions.removeFromCart(item)}
+                        className="p-1.5 bg-gray-200 hover:bg-red-500 text-gray-500 hover:text-gray-100 rounded-xl lg:ml-5"
+                      >
                         <TrashIcon className="w-5 h-5 text-current" />
                       </button>
                     </div>
@@ -137,26 +151,30 @@ const Cart = () => {
             <div className="space-y-2 mt-6">
               <div className="flex justify-between text-gray-500">
                 <p>Subtotal</p>
-                <p>Rp 600,000</p>
+                <p>Rp {order.subtotal.toLocaleString()}</p>
               </div>
-              <div className="flex justify-between text-gray-500">
-                <p>Pajak</p>
-                <p>Rp 0</p>
-              </div>
-              <div className="flex justify-between text-gray-500">
-                <p>Diskon Developer</p>
-                <p>Rp 100,000</p>
-              </div>
+              {order.tax > 0 && (
+                <div className="flex justify-between text-gray-500">
+                  <p>Pajak</p>
+                  <p>Rp {order.tax.toLocaleString()}</p>
+                </div>
+              )}
+              {order.discount > 0 && (
+                <div className="flex justify-between text-gray-500">
+                  <p>Diskon</p>
+                  <p>Rp {order.discount.toLocaleString()}</p>
+                </div>
+              )}
               <div className="flex justify-between text-xl font-semibold">
                 <p className="">Total</p>
-                <p>Rp 500,000</p>
+                <p>Rp {order.total.toLocaleString()}</p>
               </div>
             </div>
             <button
               onClick={checkout}
               className="w-full py-4 bg-green-500 hover:bg-green-400 transition-all font-semibold text-white rounded-2xl my-8 shadow-xl shadow-green-300"
             >
-              Checkout (Rp 500,000)
+              Checkout (Rp {order.total.toLocaleString()})
             </button>
           </div>
         </Wrapper>

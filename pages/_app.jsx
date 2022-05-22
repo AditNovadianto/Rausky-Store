@@ -10,6 +10,12 @@ import { useRouter } from 'next/router'
 createStore(
   {
     cart: [],
+    order: {
+      subtotal: 0,
+      tax: 0,
+      discount: 0,
+      total: 0,
+    },
   },
   {
     name: 'state',

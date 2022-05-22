@@ -5,13 +5,9 @@ import Wrapper from './Wrapper'
 
 const ContinuePayBtn = () => {
   const { state } = useStateMachine()
-  const { cart } = state
+  const { cart, order } = state
 
   const totalItemsInCart = cart.length
-  const currentSubtotal = cart.reduce((total, item) => {
-    total += item.amount * item.price
-    return total
-  }, 0)
 
   return (
     <AnimatePresence>
@@ -38,7 +34,7 @@ const ContinuePayBtn = () => {
                 href="/cart"
                 className="block w-full -mt-4 py-4 text-center bg-green-500 hover:bg-green-400 transition-all font-semibold text-white rounded-2xl shadow-xl shadow-green-300"
               >
-                Continue to payment (Rp {currentSubtotal.toLocaleString()})
+                Continue to payment (Rp {order.subtotal.toLocaleString()})
               </Link>
             </Wrapper>
           </motion.div>

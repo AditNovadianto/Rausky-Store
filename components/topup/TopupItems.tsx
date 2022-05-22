@@ -2,9 +2,12 @@ import { useStateMachine } from 'little-state-machine'
 import { useState } from 'react'
 import cn from 'classnames'
 import { TrashIcon } from '@heroicons/react/outline'
-import { AnimatePresence, motion } from 'framer-motion'
-import Link from '../Link'
-import Wrapper from '../Wrapper'
+import {
+  addToCart,
+  decrementAmount,
+  getProductInCart,
+  removeFromCart,
+} from '../../lib/cartHandler'
 
 const filterProductsBySubCategory = (subCategory, products) => {
   return subCategory
@@ -12,58 +15,11 @@ const filterProductsBySubCategory = (subCategory, products) => {
     : products
 }
 
-const getProductInCart = (product, cart) => {
-  const idx = cart.findIndex((item) => item.id == product.id)
-  const isProductInCart = idx >= 0
-  const productInCart = cart[idx]
-  return { isProductInCart, idx, productInCart }
-}
-
 const TopupItems = ({ category }) => {
   const { state, actions } = useStateMachine({
-    addToCart: (state, payload) => {
-      const product = {
-        ...payload,
-        amount: 1,
-      }
-
-      const newCart = [...state.cart]
-
-      const { isProductInCart, idx } = getProductInCart(product, state.cart)
-      if (isProductInCart) {
-        newCart.splice(idx, 1, {
-          ...product,
-          amount: state.cart[idx].amount + 1,
-        })
-      } else {
-        newCart.push(product)
-      }
-
-      return {
-        ...state,
-        cart: newCart,
-      }
-    },
-    decrementAmount: (state, payload) => {
-      const newCart = [...state.cart]
-      const { idx, productInCart } = getProductInCart(payload, state.cart)
-      const newAmount = productInCart.amount - 1
-      if (newAmount <= 0) {
-        newCart.splice(idx, 1)
-      } else {
-        newCart.splice(idx, 1, {
-          ...productInCart,
-          amount: newAmount,
-        })
-      }
-      return { ...state, cart: newCart }
-    },
-    removeFromCart: (state, payload) => {
-      const newCart = [...state.cart]
-      const { idx } = getProductInCart(payload, state.cart)
-      newCart.splice(idx, 1)
-      return { ...state, cart: newCart }
-    },
+    addToCart,
+    decrementAmount,
+    removeFromCart,
   })
   const { cart } = state
 

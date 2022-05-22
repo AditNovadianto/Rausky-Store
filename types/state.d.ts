@@ -1,11 +1,17 @@
 import 'little-state-machine'
+import { Category, Product } from '@prisma/client'
 
 declare module 'little-state-machine' {
   interface GlobalState {
-    cart: {
-      id: string
+    cart: (Product & {
       amount: number
-      price: number
-    }[]
+      category: Category
+    })[]
+    order: {
+      subtotal: number
+      tax: number
+      discount: number
+      total: number
+    }
   }
 }
