@@ -116,16 +116,19 @@ const TopupItems = ({ category }) => {
             ))}
           </form>
           <div className="mt-4">
-            {/* TODO: bikin modal di mobile buat liat full img */}
-            <img
-              className="rounded-xl lg:hover:scale-[1.5] hover:scale-[1.2] lg:hover:-translate-x-[35%] transition-all"
-              src={category.requirement.img}
-              alt={category.requirement.title}
-            />
+            {category.requirement.img && (
+              <img
+                className="rounded-xl lg:hover:scale-[1.5] hover:scale-[1.2] lg:hover:-translate-x-[35%] transition-all"
+                src={category.requirement.img}
+                alt={category.requirement.title}
+              />
+            )}
 
-            <p className="mt-3 pb-2 text-gray-500">
-              {category.requirement.description}
-            </p>
+            {category.requirement.description && (
+              <p className="mt-3 pb-2 text-gray-500">
+                {category.requirement.description}
+              </p>
+            )}
           </div>
         </div>
       )}
@@ -188,7 +191,10 @@ const TopupItems = ({ category }) => {
                 >
                   <div className="flex items-center">
                     {product.img && (
-                      <img src={product.img} className="w-10 h-10" />
+                      <img
+                        src={product.img}
+                        className="w-10 h-10 object-cover rounded-lg mb-1.5"
+                      />
                     )}
                     {isProductInCart && (
                       <button
