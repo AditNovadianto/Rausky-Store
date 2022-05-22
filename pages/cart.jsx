@@ -4,30 +4,6 @@ import { TrashIcon } from '@heroicons/react/outline'
 import { useEffect } from 'react'
 import { useStateMachine } from 'little-state-machine'
 
-const cartData = [
-  {
-    id: 1,
-    img: 'https://play-lh.googleusercontent.com/Fmvkyn_ZNm2VTcporUnvmVWDd4nJEqs6La4wX_qGcUPPb3CHpoyb3nSu7usYagIyOEI',
-    name: '200 Diamonds Mobile Legend',
-    price: 200000,
-    quantity: 1,
-  },
-  {
-    id: 2,
-    img: 'https://freight.cargo.site/w/3840/q/75/i/a17dfc0b27e50cb1c75dcd8fcd13a2d11783729f60265d9a00d184bc5a8d9296/VALORANT_1.png',
-    name: '100 Points Valorant',
-    price: 200000,
-    quantity: 1,
-  },
-  {
-    id: 3,
-    img: 'https://play-lh.googleusercontent.com/TBRwjS_qfJCSj1m7zZB93FnpJM5fSpMA_wUlFDLxWAb45T9RmwBvQd5cWR5viJJOhkI',
-    name: 'Netflix 1 abad',
-    price: 200000,
-    quantity: 1,
-  },
-]
-
 const Cart = () => {
   const { state } = useStateMachine()
   const { cart } = state

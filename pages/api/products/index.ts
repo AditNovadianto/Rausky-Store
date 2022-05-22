@@ -25,10 +25,13 @@ export default apiHandler
       throw { status: 400, message: 'Please provide title, price' }
     }
 
+    if (subCategory) {
+      req.body.subCategory = { connect: { slug: subCategory } }
+    }
+
     const product = await prisma.product.create({
       data: {
         ...req.body,
-        subCategory: { connect: { slug: subCategory } },
         category: { connect: { slug: category } },
         user: { connect: { id: req.user.id } },
       },
