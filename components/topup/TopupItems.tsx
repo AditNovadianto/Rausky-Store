@@ -78,12 +78,6 @@ const TopupItems = ({ category }) => {
     category.products
   )
 
-  const totalItemsInCart = cart.length
-  const currentSubtotal = cart.reduce((total, item) => {
-    total += item.amount * item.price
-    return total
-  }, 0)
-
   return (
     <div className="md:w-[60%] md:mt-0 mt-10 w-full md:ml-5 space-y-8">
       {/* REQUIREMENT */}
@@ -244,34 +238,6 @@ const TopupItems = ({ category }) => {
           </div>
         </div>
       </div>
-      <AnimatePresence>
-        {totalItemsInCart > 0 && (
-          <motion.div
-            className="fixed bottom-0 left-0 w-full pb-8 bg-white md:bg-transparent"
-            initial={{
-              y: '100%',
-              opacity: 0,
-            }}
-            animate={{
-              y: '0%',
-              opacity: 1,
-            }}
-            exit={{
-              y: '100%',
-              opacity: 0,
-            }}
-          >
-            <Wrapper className="max-w-md">
-              <Link
-                href="/cart"
-                className="block w-full -mt-4 py-4 text-center bg-green-500 hover:bg-green-400 transition-all font-semibold text-white rounded-2xl shadow-xl shadow-green-300"
-              >
-                Continue to payment (Rp {currentSubtotal.toLocaleString()})
-              </Link>
-            </Wrapper>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   )
 }

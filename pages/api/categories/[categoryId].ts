@@ -11,6 +11,7 @@ export const getSpecificCategory = async ({ categorySlug }) => {
         orderBy: { price: 'asc' },
         include: {
           subCategory: { select: { name: true, slug: true } },
+          category: { select: { name: true, slug: true, logoImg: true } },
         },
       },
       subCategories: true,
