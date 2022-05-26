@@ -12,6 +12,7 @@ import {
   decrementAmount,
   getProductInCart,
   removeFromCart,
+  editRequirementState,
 } from '../../lib/cartHandler'
 import request from '../../lib/request'
 import { signIn } from 'next-auth/react'
@@ -30,42 +31,12 @@ const getFieldState = ({ fieldValues, field }) => {
   return fieldValues.find((f) => f.name == field.value)
 }
 
-// TODO: refactor
 const TopupItems = ({ category, user }) => {
   const { state, actions } = useStateMachine({
     addToCart,
     decrementAmount,
     removeFromCart,
-    editRequirement: (state, payload) => {
-      const newRequirements = [...state.order.requirements]
-
-      const idx = newRequirements.findIndex((f) => f.name == payload.fieldName)
-      let field = newRequirements[idx]
-
-      if (!payload.fieldValue) {
-        newRequirements.splice(idx, 1)
-      } else if (!field) {
-        field = {
-          name: payload.fieldName,
-          value: payload.fieldValue,
-          categorySlug: payload.categorySlug,
-        }
-        newRequirements.push(field)
-      } else {
-        newRequirements.splice(idx, 1, {
-          ...field,
-          value: payload.fieldValue,
-        })
-      }
-
-      return {
-        ...state,
-        order: {
-          ...state.order,
-          requirements: newRequirements,
-        },
-      }
-    },
+    editRequirementState,
   })
   const { cart, order } = state
 
@@ -74,19 +45,10 @@ const TopupItems = ({ category, user }) => {
   )
   const [updatingDB, setUpdatingDB] = useState(false)
   const [updatedDB, setUpdatedDB] = useState(false)
-
-  console.log(category)
-
-  const products = filterProductsBySubCategory(
-    currentSubCategory,
-    category.products
-  )
-  const fieldValues = getFieldValues({ order, category })
-
   const debounce = useRef<NodeJS.Timeout>()
 
   const editRequirement = (e, { fieldState, field }) => {
-    actions.editRequirement({
+    actions.editRequirementState({
       fieldName: fieldState?.fieldName ?? field.value,
       fieldValue: e.target.value,
       categorySlug: category.slug,
@@ -111,6 +73,13 @@ const TopupItems = ({ category, user }) => {
       }
     }, 500)
   }
+
+  const products = filterProductsBySubCategory(
+    currentSubCategory,
+    category.products
+  )
+  const fieldValues = getFieldValues({ order, category })
+  console.log(category)
 
   return (
     <div className="md:w-[60%] md:mt-0 mt-10 w-full md:ml-5 space-y-8">
@@ -163,25 +132,33 @@ const TopupItems = ({ category, user }) => {
                     value={fieldState?.value ?? ''}
                     onChange={(e) => editRequirement(e, { fieldState, field })}
                   />
+                  {/* TODO: bikin input validation */}
                 </div>
               )
             })}
           </form>
-          <div className="mt-4">
-            {category.requirement.img && (
-              <img
-                className="rounded-xl lg:hover:scale-[1.5] hover:scale-[1.2] lg:hover:-translate-x-[35%] transition-all"
-                src={category.requirement.img}
-                alt={category.requirement.title}
-              />
-            )}
+          {(category.requirement.img || category.requirement.description) && (
+            <details className="mt-4">
+              <summary className="cursor-pointer text-gray-500">
+                Details
+              </summary>
+              <div className="mt-4">
+                {category.requirement.img && (
+                  <img
+                    className="rounded-xl lg:hover:scale-[1.5] hover:scale-[1.2] lg:hover:-translate-x-[35%] transition-all"
+                    src={category.requirement.img}
+                    alt={category.requirement.title}
+                  />
+                )}
 
-            {category.requirement.description && (
-              <p className="mt-3 pb-2 text-gray-500">
-                {category.requirement.description}
-              </p>
-            )}
-          </div>
+                {category.requirement.description && (
+                  <p className="mt-3 pb-2 text-gray-500">
+                    {category.requirement.description}
+                  </p>
+                )}
+              </div>
+            </details>
+          )}
         </div>
       )}
 

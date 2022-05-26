@@ -90,3 +90,34 @@ export const removeFromCart = (state, payload) => {
     },
   }
 }
+
+export const editRequirementState = (state, payload) => {
+  const newRequirements = [...state.order.requirements]
+
+  const idx = newRequirements.findIndex((f) => f.name == payload.fieldName)
+  let field = newRequirements[idx]
+
+  if (!payload.fieldValue) {
+    newRequirements.splice(idx, 1)
+  } else if (!field) {
+    field = {
+      name: payload.fieldName,
+      value: payload.fieldValue,
+      categorySlug: payload.categorySlug,
+    }
+    newRequirements.push(field)
+  } else {
+    newRequirements.splice(idx, 1, {
+      ...field,
+      value: payload.fieldValue,
+    })
+  }
+
+  return {
+    ...state,
+    order: {
+      ...state.order,
+      requirements: newRequirements,
+    },
+  }
+}
