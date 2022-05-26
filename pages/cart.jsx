@@ -32,7 +32,7 @@ const Cart = () => {
 
   //   TODO: bikin order ke backend, terus set payment token dari backend
   const checkout = async () => {
-    window.snap.pay('7bdc35eb-74d4-4232-87ce-1fcb361e4b54', {
+    window.snap.pay('633418e0-98a1-461f-9f71-47038b7bc979', {
       onSuccess: function (result) {
         /* You may add your own implementation here */
         alert('payment success!')

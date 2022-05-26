@@ -4,8 +4,10 @@ import { parseData } from '../../lib/utils'
 import { getSpecificCategory } from '../api/categories/[categoryId]'
 import TopupInfo from '../../components/topup/TopupInfo'
 import TopupItems from '../../components/topup/TopupItems'
+import { getSession } from 'next-auth/react'
+import { GetServerSideProps } from 'next'
 
-const Topup = ({ category }) => {
+const Topup = ({ category, user }) => {
   return (
     <Container noTopMargin title={category.name}>
       <br className="hidden md:block" />
@@ -17,7 +19,7 @@ const Topup = ({ category }) => {
       />
       <Wrapper className="md:flex">
         <TopupInfo category={category} />
-        <TopupItems category={category} />
+        <TopupItems category={category} user={user} />
       </Wrapper>
     </Container>
   )
@@ -25,8 +27,15 @@ const Topup = ({ category }) => {
 
 export default Topup
 
-export const getServerSideProps = async ({ params }) => {
-  const category = await getSpecificCategory({ categorySlug: params.category })
+export const getServerSideProps: GetServerSideProps = async ({
+  params,
+  req,
+}) => {
+  const session = await getSession({ req })
+  const category = await getSpecificCategory({
+    categorySlug: params.category as string,
+    userId: session?.user.id,
+  })
 
   if (!category) {
     return {
@@ -35,6 +44,6 @@ export const getServerSideProps = async ({ params }) => {
   }
 
   return {
-    props: parseData({ category }),
+    props: parseData({ category, user: session?.user }),
   }
 }

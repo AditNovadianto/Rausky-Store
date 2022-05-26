@@ -6,11 +6,11 @@ import ContinuePayBtn from '../components/ContinuePayBtn'
 import 'react-loading-skeleton/dist/skeleton.css'
 import { useRouter } from 'next/router'
 
-// TODO: bikin global state buat nyimpen cart
 createStore(
   {
     cart: [],
     order: {
+      requirements: [],
       subtotal: 0,
       tax: 0,
       discount: 0,
@@ -19,7 +19,7 @@ createStore(
   },
   {
     name: 'state',
-    persist: process.env.NODE_ENV === 'production' ? 'onAction' : 'none',
+    persist: process.env.NODE_ENV === 'production' ? 'beforeUnload' : 'none',
   }
 )
 

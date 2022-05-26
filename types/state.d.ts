@@ -8,6 +8,11 @@ declare module 'little-state-machine' {
       category: Category
     })[]
     order: {
+      requirements: {
+        fieldName: string
+        fieldValue: string
+        category: string
+      }[]
       subtotal: number
       tax: number
       discount: number

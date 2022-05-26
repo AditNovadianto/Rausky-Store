@@ -1,13 +1,20 @@
 import { useStateMachine } from 'little-state-machine'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import cn from 'classnames'
-import { TrashIcon } from '@heroicons/react/outline'
+import {
+  CheckIcon,
+  CloudUploadIcon,
+  InformationCircleIcon,
+  TrashIcon,
+} from '@heroicons/react/outline'
 import {
   addToCart,
   decrementAmount,
   getProductInCart,
   removeFromCart,
 } from '../../lib/cartHandler'
+import request from '../../lib/request'
+import { signIn } from 'next-auth/react'
 
 const filterProductsBySubCategory = (subCategory, products) => {
   return subCategory
@@ -15,24 +22,112 @@ const filterProductsBySubCategory = (subCategory, products) => {
     : products
 }
 
-const TopupItems = ({ category }) => {
+const getFieldValues = ({ order, category }) => {
+  return order.requirements.filter((f) => f.category == category.slug)
+}
+
+const getFieldState = ({ fieldValues, field }) => {
+  return fieldValues.find((f) => f.fieldName == field.value)
+}
+
+const TopupItems = ({ category, user }) => {
   const { state, actions } = useStateMachine({
     addToCart,
     decrementAmount,
     removeFromCart,
+    setRequirements: (state, payload) => {
+      const newRequirements = payload.requirement.fields.map((field) => ({
+        fieldName: field.value,
+        fieldValue: field.fieldValue ?? '',
+        category: payload.slug,
+      }))
+      return {
+        ...state,
+        order: {
+          ...state.order,
+          requirements: newRequirements,
+        },
+      }
+    },
+    editRequirement: (state, payload) => {
+      console.log('edit')
+      const newRequirements = [...state.order.requirements]
+      const idx = newRequirements.findIndex(
+        (f) => f.fieldName == payload.fieldName
+      )
+      let field = newRequirements[idx]
+      if (!field) {
+        field = {
+          fieldName: payload.fieldName,
+          fieldValue: payload.fieldValue ?? '',
+          category: payload.category,
+        }
+        newRequirements.push(field)
+      } else {
+        newRequirements.splice(idx, 1, {
+          ...field,
+          fieldValue: payload.fieldValue,
+        })
+      }
+      return {
+        ...state,
+        order: {
+          ...state.order,
+          requirements: newRequirements,
+        },
+      }
+    },
   })
-  const { cart } = state
+  const { cart, order } = state
 
   const [currentSubCategory, setCurrentSubCategory] = useState(
     category.subCategories[0]?.slug
   )
+  const [updatingDB, setUpdatingDB] = useState(false)
+  const [updatedDB, setUpdatedDB] = useState(false)
 
   console.log(category)
+
+  useEffect(() => {
+    if (user && category.requirement) {
+      actions.setRequirements(category)
+    }
+  }, [])
 
   const products = filterProductsBySubCategory(
     currentSubCategory,
     category.products
   )
+  const fieldValues = getFieldValues({ order, category })
+
+  const debounce = useRef<NodeJS.Timeout>()
+
+  const editRequirement = (e, { fieldState, field }) => {
+    actions.editRequirement({
+      fieldName: fieldState?.fieldName ?? field.value,
+      fieldValue: e.target.value,
+      category: category.slug,
+    })
+
+    if (!user) return
+
+    setUpdatingDB(true)
+    setUpdatedDB(false)
+
+    clearTimeout(debounce.current)
+    debounce.current = setTimeout(async () => {
+      try {
+        await request.put(`/requirements/${fieldState?.fieldName}`, {
+          fieldValue: e.target.value,
+        })
+      } catch (err) {
+        console.log(err)
+      } finally {
+        setUpdatingDB(false)
+        setUpdatedDB(true)
+      }
+    }, 500)
+  }
 
   return (
     <div className="md:w-[60%] md:mt-0 mt-10 w-full md:ml-5 space-y-8">
@@ -42,28 +137,53 @@ const TopupItems = ({ category }) => {
           <div className="w-[40px] h-[40px] text-center -mt-5 leading-[32px] border-4 border-green-100 rounded-full bg-green-500 text-white font-bold">
             1
           </div>
-          <h1 className="text-2xl font-bold mt-2">
-            {category.requirement.title}
+          <h1 className="text-2xl font-bold mt-2 flex justify-between">
+            {category.requirement.title}{' '}
+            {updatingDB && (
+              <div className="flex text-xs items-center font-normal text-green-500">
+                <CloudUploadIcon className="w-4 h-4 mr-1" /> saving
+              </div>
+            )}
+            {updatedDB && (
+              <div className="flex text-xs items-center font-normal text-green-500">
+                <CheckIcon className="w-4 h-4 mr-1" /> saved
+              </div>
+            )}
           </h1>
+          {!user && (
+            <p className="text-gray-500 text-sm flex items-center">
+              <InformationCircleIcon className="w-4 h-4 mr-1" />
+              <span>
+                <button
+                  onClick={() => signIn()}
+                  className="text-green-500 hover:underline"
+                >
+                  Sign In
+                </button>{' '}
+                <span>biar kesimpen di akunmu</span>
+              </span>
+            </p>
+          )}
 
           <form className="mt-5 lg:flex-row flex-col flex space-x-0 lg:space-x-3 space-y-3 lg:space-y-0">
-            {category.requirement.fields.map((field) => (
-              <div className="w-full" key={field.id}>
-                {/* TODO: bikin input validation */}
-                <input
-                  className="block w-full px-5 py-3 rounded-xl border border-gray-300 focus:outline-none focus:border-green-400"
-                  placeholder={field.placeholder}
-                  type={field.type}
-                />
-                {/* <p
-            className={`${
-              haveUserID ? 'opacity-100 mt-0' : 'opacity-0 -mt-[20px]'
-            } text-red-600 transition-all`}
-          >
-            Harus Diisi!!!
-          </p> */}
-              </div>
-            ))}
+            {category.requirement.fields.map((field) => {
+              const fieldState = getFieldState({
+                fieldValues,
+                field,
+              })
+              return (
+                <div className="w-full" key={field.id}>
+                  {/* TODO: bikin input validation */}
+                  <input
+                    className="block w-full px-5 py-3 rounded-xl border border-gray-300 focus:outline-none focus:border-green-400"
+                    placeholder={field.placeholder}
+                    type={field.type}
+                    value={fieldState?.fieldValue ?? ''}
+                    onChange={(e) => editRequirement(e, { fieldState, field })}
+                  />
+                </div>
+              )
+            })}
           </form>
           <div className="mt-4">
             {category.requirement.img && (

@@ -23,8 +23,6 @@ const Navbar = () => {
 
   const totalItemsInCart = cart.length
 
-  console.log(router)
-
   return (
     <>
       <div className="bg-gray-50 py-1.5">

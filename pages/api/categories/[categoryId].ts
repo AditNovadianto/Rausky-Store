@@ -1,8 +1,22 @@
+import { Prisma } from '@prisma/client'
+import { getSession } from 'next-auth/react'
 import apiHandler, { checkAuth } from '../../../lib/apiHandler'
 import prisma from '../../../lib/prisma'
 
-export const getSpecificCategory = async ({ categorySlug }) => {
-  const category = await prisma.category.findUnique({
+export const getSpecificCategory = async ({
+  categorySlug,
+  userId,
+}: {
+  categorySlug: string
+  userId?: string
+}) => {
+  console.log('userId', userId)
+  const query: {
+    select?: Prisma.CategorySelect
+    include?: Prisma.CategoryInclude
+    rejectOnNotFound?: Prisma.RejectOnNotFound
+    where: Prisma.CategoryWhereUniqueInput
+  } = {
     where: {
       slug: categorySlug,
     },
@@ -21,7 +35,32 @@ export const getSpecificCategory = async ({ categorySlug }) => {
         },
       },
     },
-  })
+  }
+  if (userId) {
+    query.include.requirement = {
+      include: {
+        fields: {
+          include: {
+            users: {
+              where: { userId },
+              select: { value: true },
+            },
+          },
+        },
+      },
+    }
+  }
+
+  const category = await prisma.category.findUnique(query)
+
+  //   @ts-ignore
+  if (userId && category.requirement) {
+    //   @ts-ignore
+    category.requirement.fields = category.requirement.fields.map((field) => {
+      const { users, ...fieldProps } = field
+      return { ...fieldProps, fieldValue: users[0]?.value ?? '' }
+    })
+  }
   return category
 }
 
@@ -31,7 +70,11 @@ export default apiHandler
     const { categoryId: categorySlug } = req.query as {
       [key: string]: string
     }
-    const category = await getSpecificCategory({ categorySlug })
+    const session = await getSession({ req })
+    const category = await getSpecificCategory({
+      categorySlug,
+      userId: session?.user.id,
+    })
     res.status(200).json({ category })
   })
   // edit category
