@@ -1,5 +1,5 @@
 import { useStateMachine } from 'little-state-machine'
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import cn from 'classnames'
 import {
   CheckIcon,
@@ -23,52 +23,41 @@ const filterProductsBySubCategory = (subCategory, products) => {
 }
 
 const getFieldValues = ({ order, category }) => {
-  return order.requirements.filter((f) => f.category == category.slug)
+  return order.requirements.filter((f) => f.categorySlug == category.slug)
 }
 
 const getFieldState = ({ fieldValues, field }) => {
-  return fieldValues.find((f) => f.fieldName == field.value)
+  return fieldValues.find((f) => f.name == field.value)
 }
 
+// TODO: refactor
 const TopupItems = ({ category, user }) => {
   const { state, actions } = useStateMachine({
     addToCart,
     decrementAmount,
     removeFromCart,
-    setRequirements: (state, payload) => {
-      const newRequirements = payload.requirement.fields.map((field) => ({
-        fieldName: field.value,
-        fieldValue: field.fieldValue ?? '',
-        category: payload.slug,
-      }))
-      return {
-        ...state,
-        order: {
-          ...state.order,
-          requirements: newRequirements,
-        },
-      }
-    },
     editRequirement: (state, payload) => {
-      console.log('edit')
       const newRequirements = [...state.order.requirements]
-      const idx = newRequirements.findIndex(
-        (f) => f.fieldName == payload.fieldName
-      )
+
+      const idx = newRequirements.findIndex((f) => f.name == payload.fieldName)
       let field = newRequirements[idx]
-      if (!field) {
+
+      if (!payload.fieldValue) {
+        newRequirements.splice(idx, 1)
+      } else if (!field) {
         field = {
-          fieldName: payload.fieldName,
-          fieldValue: payload.fieldValue ?? '',
-          category: payload.category,
+          name: payload.fieldName,
+          value: payload.fieldValue,
+          categorySlug: payload.categorySlug,
         }
         newRequirements.push(field)
       } else {
         newRequirements.splice(idx, 1, {
           ...field,
-          fieldValue: payload.fieldValue,
+          value: payload.fieldValue,
         })
       }
+
       return {
         ...state,
         order: {
@@ -88,12 +77,6 @@ const TopupItems = ({ category, user }) => {
 
   console.log(category)
 
-  useEffect(() => {
-    if (user && category.requirement) {
-      actions.setRequirements(category)
-    }
-  }, [])
-
   const products = filterProductsBySubCategory(
     currentSubCategory,
     category.products
@@ -106,7 +89,7 @@ const TopupItems = ({ category, user }) => {
     actions.editRequirement({
       fieldName: fieldState?.fieldName ?? field.value,
       fieldValue: e.target.value,
-      category: category.slug,
+      categorySlug: category.slug,
     })
 
     if (!user) return
@@ -117,7 +100,7 @@ const TopupItems = ({ category, user }) => {
     clearTimeout(debounce.current)
     debounce.current = setTimeout(async () => {
       try {
-        await request.put(`/requirements/${fieldState?.fieldName}`, {
+        await request.put(`/requirements/${fieldState?.name}`, {
           fieldValue: e.target.value,
         })
       } catch (err) {
@@ -173,12 +156,11 @@ const TopupItems = ({ category, user }) => {
               })
               return (
                 <div className="w-full" key={field.id}>
-                  {/* TODO: bikin input validation */}
                   <input
                     className="block w-full px-5 py-3 rounded-xl border border-gray-300 focus:outline-none focus:border-green-400"
                     placeholder={field.placeholder}
                     type={field.type}
-                    value={fieldState?.fieldValue ?? ''}
+                    value={fieldState?.value ?? ''}
                     onChange={(e) => editRequirement(e, { fieldState, field })}
                   />
                 </div>

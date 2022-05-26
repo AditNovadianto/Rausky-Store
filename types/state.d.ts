@@ -9,9 +9,9 @@ declare module 'little-state-machine' {
     })[]
     order: {
       requirements: {
-        fieldName: string
-        fieldValue: string
-        category: string
+        name: string
+        value: string
+        categorySlug: string
       }[]
       subtotal: number
       tax: number

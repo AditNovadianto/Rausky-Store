@@ -34,7 +34,6 @@ export const getServerSideProps: GetServerSideProps = async ({
   const session = await getSession({ req })
   const category = await getSpecificCategory({
     categorySlug: params.category as string,
-    userId: session?.user.id,
   })
 
   if (!category) {
