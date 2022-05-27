@@ -91,26 +91,19 @@ export const removeFromCart = (state, payload) => {
   }
 }
 
-export const editRequirementState = (state, payload) => {
-  const newRequirements = [...state.order.requirements]
+export const editRequirement = (
+  state: GlobalState,
+  payload: {
+    categorySlug: string
+    fieldName: string
+    fieldValue: string
+  }
+) => {
+  const newRequirements = { ...state.order.requirements }
 
-  const idx = newRequirements.findIndex((f) => f.name == payload.fieldName)
-  let field = newRequirements[idx]
-
-  if (!payload.fieldValue) {
-    newRequirements.splice(idx, 1)
-  } else if (!field) {
-    field = {
-      name: payload.fieldName,
-      value: payload.fieldValue,
-      categorySlug: payload.categorySlug,
-    }
-    newRequirements.push(field)
-  } else {
-    newRequirements.splice(idx, 1, {
-      ...field,
-      value: payload.fieldValue,
-    })
+  newRequirements[payload.categorySlug] = {
+    ...newRequirements[payload.categorySlug],
+    [payload.fieldName]: payload.fieldValue,
   }
 
   return {
@@ -118,6 +111,16 @@ export const editRequirementState = (state, payload) => {
     order: {
       ...state.order,
       requirements: newRequirements,
+    },
+  }
+}
+
+export const setRequirements = (state, payload) => {
+  return {
+    ...state,
+    order: {
+      ...state.order,
+      requirements: payload,
     },
   }
 }

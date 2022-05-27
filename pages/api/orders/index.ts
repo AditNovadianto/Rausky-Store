@@ -7,10 +7,11 @@ let snap = new midtransClient.Snap({
   serverKey: process.env.MIDTRANS_SERVER_KEY,
 })
 
+// TODO: cek requirementnya disini
 export default apiHandler
   // create new order
   .post(checkAuth(), async (req, res) => {
-    const { products, notes } = req.body
+    const { products } = req.body
     if (!products || products.length == 0) {
       throw {
         status: 400,

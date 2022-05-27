@@ -11,11 +11,13 @@ import 'react-loading-skeleton/dist/skeleton.css'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import request from '../lib/request'
+import { setRequirements } from '../lib/cartHandler'
+
 createStore(
   {
     cart: [],
     order: {
-      requirements: [],
+      requirements: {},
       subtotal: 0,
       tax: 0,
       discount: 0,
@@ -43,23 +45,15 @@ export default MyApp
 const MyComponent = ({ Component, pageProps }) => {
   const router = useRouter()
   const { actions } = useStateMachine({
-    setRequirements: (state, payload) => {
-      return {
-        ...state,
-        order: {
-          ...state.order,
-          requirements: payload,
-        },
-      }
-    },
+    setRequirements,
   })
 
   useEffect(() => {
     const setMyRequirements = async () => {
       try {
         const { data } = await request.get('/requirements')
-        const { usersFields } = data
-        actions.setRequirements(usersFields)
+        const { requirements } = data
+        actions.setRequirements(requirements)
       } catch (err) {}
     }
     setMyRequirements()

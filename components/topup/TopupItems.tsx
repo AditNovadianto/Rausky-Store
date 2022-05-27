@@ -12,7 +12,7 @@ import {
   decrementAmount,
   getProductInCart,
   removeFromCart,
-  editRequirementState,
+  editRequirement,
 } from '../../lib/cartHandler'
 import request from '../../lib/request'
 import { signIn } from 'next-auth/react'
@@ -23,20 +23,12 @@ const filterProductsBySubCategory = (subCategory, products) => {
     : products
 }
 
-const getFieldValues = ({ order, category }) => {
-  return order.requirements.filter((f) => f.categorySlug == category.slug)
-}
-
-const getFieldState = ({ fieldValues, field }) => {
-  return fieldValues.find((f) => f.name == field.value)
-}
-
 const TopupItems = ({ category, user }) => {
   const { state, actions } = useStateMachine({
     addToCart,
     decrementAmount,
     removeFromCart,
-    editRequirementState,
+    editRequirement,
   })
   const { cart, order } = state
 
@@ -47,9 +39,10 @@ const TopupItems = ({ category, user }) => {
   const [updatedDB, setUpdatedDB] = useState(false)
   const debounce = useRef<NodeJS.Timeout>()
 
-  const editRequirement = (e, { fieldState, field }) => {
-    actions.editRequirementState({
-      fieldName: fieldState?.fieldName ?? field.value,
+  const handleRequirement = (e, field) => {
+    const { value: fieldName } = field
+    actions.editRequirement({
+      fieldName,
       fieldValue: e.target.value,
       categorySlug: category.slug,
     })
@@ -62,7 +55,7 @@ const TopupItems = ({ category, user }) => {
     clearTimeout(debounce.current)
     debounce.current = setTimeout(async () => {
       try {
-        await request.put(`/requirements/${fieldState?.name}`, {
+        await request.put(`/requirements/${fieldName}`, {
           fieldValue: e.target.value,
         })
       } catch (err) {
@@ -78,8 +71,8 @@ const TopupItems = ({ category, user }) => {
     currentSubCategory,
     category.products
   )
-  const fieldValues = getFieldValues({ order, category })
-  console.log(category)
+
+  const requirement = order.requirements?.[category.slug]
 
   return (
     <div className="md:w-[60%] md:mt-0 mt-10 w-full md:ml-5 space-y-8">
@@ -118,24 +111,18 @@ const TopupItems = ({ category, user }) => {
           )}
 
           <form className="mt-5 lg:flex-row flex-col flex space-x-0 lg:space-x-3 space-y-3 lg:space-y-0">
-            {category.requirement.fields.map((field) => {
-              const fieldState = getFieldState({
-                fieldValues,
-                field,
-              })
-              return (
-                <div className="w-full" key={field.id}>
-                  <input
-                    className="block w-full px-5 py-3 rounded-xl border border-gray-300 focus:outline-none focus:border-green-400"
-                    placeholder={field.placeholder}
-                    type={field.type}
-                    value={fieldState?.value ?? ''}
-                    onChange={(e) => editRequirement(e, { fieldState, field })}
-                  />
-                  {/* TODO: bikin input validation */}
-                </div>
-              )
-            })}
+            {category.requirement.fields.map((field) => (
+              <div className="w-full" key={field.id}>
+                <input
+                  className="block w-full px-5 py-3 rounded-xl border border-gray-300 focus:outline-none focus:border-green-400"
+                  placeholder={field.placeholder}
+                  type={field.type}
+                  value={requirement?.[field.value] ?? ''}
+                  onChange={(e) => handleRequirement(e, field)}
+                />
+                {/* TODO: bikin input validation */}
+              </div>
+            ))}
           </form>
           {(category.requirement.img || category.requirement.description) && (
             <details className="mt-4">
