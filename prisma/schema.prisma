@@ -161,8 +161,8 @@ model Order {
     paymentUrl   String?
     paymentToken String?
     products     ProductsOnOrders[]
-    userId       String             @db.ObjectId
-    user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId       String?            @db.ObjectId
+    user         User?              @relation(fields: [userId], references: [id], onDelete: Cascade)
     createdAt    DateTime           @default(now())
     updatedAt    DateTime           @updatedAt
 }

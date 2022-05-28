@@ -1,5 +1,6 @@
 import apiHandler, { checkAuth } from '../../../lib/apiHandler'
 import midtransClient from 'midtrans-client'
+import { getSession } from 'next-auth/react'
 
 let snap = new midtransClient.Snap({
   // Set to true if you want Production Environment (accept real transaction).
@@ -9,8 +10,8 @@ let snap = new midtransClient.Snap({
 
 export default apiHandler
   // create new order
-  .post(checkAuth(), async (req, res) => {
-    const { products, requirements } = req.body
+  .post(async (req, res) => {
+    const { products, requirements, user: reqUser } = req.body
     if (!products || products.length == 0 || !requirements) {
       throw {
         status: 400,
@@ -19,9 +20,12 @@ export default apiHandler
       }
     }
 
+    const session = await getSession({ req })
+    const user = session?.user
+
     const order = await prisma.order.create({
       data: {
-        userId: req.user.id,
+        userId: user?.id,
         products: {
           create: products.map((product) => ({
             productId: product.id,
@@ -106,7 +110,10 @@ export default apiHandler
     }
 
     // create payment url and token
-    let parameter = {
+    const userName = user?.name ?? reqUser?.name
+    const userEmail = user?.email ?? reqUser?.email
+
+    let paymentData: CustomObject = {
       transaction_details: {
         order_id: order.id,
         gross_amount: total,
@@ -128,13 +135,15 @@ export default apiHandler
           name: 'Pajak bos',
         },
       ],
-      customer_details: {
-        first_name: req.user.name,
-        email: req.user.email,
-      },
     }
 
-    const { token, redirect_url } = await snap.createTransaction(parameter)
+    if (userName || userEmail) {
+      paymentData.customer_details = {}
+      if (userName) paymentData.customer_details.first_name = userName
+      if (userEmail) paymentData.customer_details.email = userEmail
+    }
+
+    const { token, redirect_url } = await snap.createTransaction(paymentData)
 
     const fullOrder = await prisma.order.update({
       where: { id: order.id },
