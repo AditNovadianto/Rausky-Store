@@ -1,4 +1,4 @@
-import apiHandler, { checkAuth } from '../../../lib/apiHandler'
+import apiHandler from '../../../lib/apiHandler'
 import midtransClient from 'midtrans-client'
 import { getSession } from 'next-auth/react'
 
@@ -12,11 +12,10 @@ export default apiHandler
   // create new order
   .post(async (req, res) => {
     const { products, requirements, user: reqUser } = req.body
-    if (!products || products.length == 0 || !requirements) {
+    if (!products || products.length == 0) {
       throw {
         status: 400,
-        message:
-          'please provide valid products ([] of { id, amount, categorySlug }), requirements',
+        message: 'please provide valid products ([] of { id, amount })',
       }
     }
 
@@ -85,17 +84,25 @@ export default apiHandler
         },
       })
 
+      //   skip if category doesn't has any requirement
+      if (!category.requirement) continue
+
+      if (!requirements?.[categorySlug]) {
+        invalidRequirements.push(categorySlug)
+        continue
+      }
+
       const requiredFields = category.requirement.fields.map(
         (field) => field.value
       )
 
       const isRequirementExist = requiredFields.every((requiredField) => {
         return (
-          requirements[categorySlug] &&
           requiredField in requirements[categorySlug] &&
           requirements[categorySlug][requiredField]
         )
       })
+
       if (!isRequirementExist) {
         invalidRequirements.push(categorySlug)
       }
