@@ -162,6 +162,9 @@ export default apiHandler
         paymentToken: token,
         paymentUrl: redirect_url,
       },
+      include: {
+        user: true,
+      },
     })
 
     res.status(201).json({ order: fullOrder })
