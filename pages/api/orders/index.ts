@@ -7,15 +7,15 @@ let snap = new midtransClient.Snap({
   serverKey: process.env.MIDTRANS_SERVER_KEY,
 })
 
-// TODO: cek requirementnya disini
 export default apiHandler
   // create new order
   .post(checkAuth(), async (req, res) => {
-    const { products } = req.body
-    if (!products || products.length == 0) {
+    const { products, requirements } = req.body
+    if (!products || products.length == 0 || !requirements) {
       throw {
         status: 400,
-        message: 'please provide valid products ([] of { id, amount })',
+        message:
+          'please provide valid products ([] of { id, amount, categorySlug }), requirements',
       }
     }
 
@@ -48,15 +48,62 @@ export default apiHandler
       },
     })
 
+    let distinctCategories = []
+
     // calculate subtotal
     let subtotal = 0
     for (const item of order.products) {
       let discount = (item.product.discount / 100) * item.product.price
       subtotal += item.product.price * item.amount - discount
+      const categorySlug = item.product.category.slug
+      if (!distinctCategories.includes(categorySlug)) {
+        distinctCategories.push(categorySlug)
+      }
     }
+
     // calculate total
     let tax = 0
     let total = subtotal + tax
+
+    // check requirements from req.body
+    let invalidRequirements = []
+    for (const categorySlug of distinctCategories) {
+      const category = await prisma.category.findUnique({
+        where: { slug: categorySlug },
+        select: {
+          requirement: {
+            select: {
+              fields: {
+                select: { value: true },
+              },
+            },
+          },
+        },
+      })
+
+      const requiredFields = category.requirement.fields.map(
+        (field) => field.value
+      )
+
+      const isRequirementExist = requiredFields.every((requiredField) => {
+        return (
+          requirements[categorySlug] &&
+          requiredField in requirements[categorySlug] &&
+          requirements[categorySlug][requiredField]
+        )
+      })
+      if (!isRequirementExist) {
+        invalidRequirements.push(categorySlug)
+      }
+    }
+
+    if (invalidRequirements.length > 0) {
+      throw {
+        status: 400,
+        message: 'Please provide valid requirements',
+        invalidRequirements,
+      }
+    }
 
     // create payment url and token
     let parameter = {

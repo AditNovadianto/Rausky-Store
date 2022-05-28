@@ -51,7 +51,6 @@ enum Role {
     ADMIN
 }
 
-// TODO: bikin biar user bisa nyimpen requirement di dalam akun
 model User {
     id                String        @id @default(auto()) @map("_id") @db.ObjectId
     name              String?
@@ -159,7 +158,6 @@ model Order {
     id           String             @id @default(auto()) @map("_id") @db.ObjectId
     total        Int?
     tax          Int?
-    requirement  Json? // used to send game information (e.g nickname, id)
     paymentUrl   String?
     paymentToken String?
     products     ProductsOnOrders[]
