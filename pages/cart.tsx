@@ -1,6 +1,6 @@
 import Container from '../components/Container'
 import Wrapper from '../components/Wrapper'
-import { TrashIcon } from '@heroicons/react/outline'
+import { CheckIcon, CloudUploadIcon, TrashIcon } from '@heroicons/react/outline'
 import { useEffect } from 'react'
 import { useStateMachine } from 'little-state-machine'
 import Link from '../components/Link'
@@ -19,7 +19,7 @@ const Cart = () => {
     removeFromCart,
     decrementAmount,
   })
-  const { cart, order } = state
+  const { cart, order, updatedDB, updatingDB } = state
 
   //   console.log(cart)
 
@@ -52,27 +52,27 @@ const Cart = () => {
 
       return
 
-      window.snap.pay('633418e0-98a1-461f-9f71-47038b7bc979', {
-        onSuccess: function (result) {
-          /* You may add your own implementation here */
-          alert('payment success!')
-          console.log(result)
-        },
-        onPending: function (result) {
-          /* You may add your own implementation here */
-          alert('wating your payment!')
-          console.log(result)
-        },
-        onError: function (result) {
-          /* You may add your own implementation here */
-          // alert('payment failed!')
-          console.log(result)
-        },
-        onClose: function () {
-          /* You may add your own implementation here */
-          // alert('you closed the popup without finishing the payment')
-        },
-      })
+      //   window.snap.pay('633418e0-98a1-461f-9f71-47038b7bc979', {
+      //     onSuccess: function (result) {
+      //       /* You may add your own implementation here */
+      //       alert('payment success!')
+      //       console.log(result)
+      //     },
+      //     onPending: function (result) {
+      //       /* You may add your own implementation here */
+      //       alert('wating your payment!')
+      //       console.log(result)
+      //     },
+      //     onError: function (result) {
+      //       /* You may add your own implementation here */
+      //       // alert('payment failed!')
+      //       console.log(result)
+      //     },
+      //     onClose: function () {
+      //       /* You may add your own implementation here */
+      //       // alert('you closed the popup without finishing the payment')
+      //     },
+      //   })
     } catch (err) {
       console.log(err)
     }
@@ -172,19 +172,38 @@ const Cart = () => {
 
           {/* ORDER INFO */}
           <div className="lg:flex-grow mt-8 lg:mt-0 lg:max-w-sm lg:sticky lg:top-[80px] lg:self-start border rounded-2xl divide-y">
-            <h2 className="text-2xl font-bold p-6">Order Info</h2>
+            <h2 className="text-2xl font-bold p-6 flex items-center justify-between">
+              Order Info
+              {updatingDB && (
+                <div className="flex text-xs items-center font-normal text-green-500">
+                  <CloudUploadIcon className="w-4 h-4 mr-1" /> saving
+                </div>
+              )}
+              {updatedDB && (
+                <div className="flex text-xs items-center font-normal text-green-500">
+                  <CheckIcon className="w-4 h-4 mr-1" /> saved
+                </div>
+              )}
+            </h2>
 
             {/* REQUIREMENTS */}
             {order.categoryRequirements.length > 0 && (
-              <div className="p-6">
+              <div className="p-6 lg:max-h-[230px] lg:overflow-y-auto">
                 <h3 className="font-bold text-xl">Requirements</h3>
-                <div className="mt-5 space-y-4">
+                <div className="mt-5 space-y-10">
                   {order.categoryRequirements.map((requirement) => (
                     <div key={requirement.id}>
-                      <h3 className="font-semibold mb-2">
-                        {requirement.categorySlug}
-                      </h3>
-                      <div className="space-y-3">
+                      <div className="flex items-center">
+                        <img
+                          src={requirement.categoryLogo}
+                          alt={requirement.categorySlug}
+                          className="w-5 h-5 rounded-md mr-2"
+                        />
+                        <h3 className="font-semibold">
+                          {requirement.categoryName}
+                        </h3>
+                      </div>
+                      <div className="space-y-3 mt-4">
                         {requirement.fields.map((field) => {
                           return status != 'loading' ? (
                             <RequirementField
@@ -197,6 +216,28 @@ const Cart = () => {
                           )
                         })}
                       </div>
+                      {(requirement.img || requirement.description) && (
+                        <details className="mt-4">
+                          <summary className="cursor-pointer text-gray-500">
+                            Details
+                          </summary>
+                          <div className="mt-4">
+                            {requirement.img && (
+                              <img
+                                className="rounded-xl lg:hover:scale-[1.5] hover:scale-[1.2] lg:hover:-translate-x-[35%] transition-all"
+                                src={requirement.img}
+                                alt={requirement.title}
+                              />
+                            )}
+
+                            {requirement.description && (
+                              <p className="mt-3 pb-2 text-gray-500">
+                                {requirement.description}
+                              </p>
+                            )}
+                          </div>
+                        </details>
+                      )}
                     </div>
                   ))}
                 </div>

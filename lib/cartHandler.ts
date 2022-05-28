@@ -61,6 +61,8 @@ export const addToCart = (
   if (payload.category?.requirement) {
     const newRequirement = {
       categorySlug: payload.category.slug,
+      categoryName: payload.category.name,
+      categoryLogo: payload.category.logoImg,
       ...payload.category.requirement,
     }
     if (

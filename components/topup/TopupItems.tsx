@@ -51,7 +51,6 @@ const TopupItems = ({ category, user }) => {
           </div>
           <h1 className="text-2xl font-bold mt-2 flex justify-between">
             {category.requirement.title}{' '}
-            {/* TODO: benerin display updating db */}
             {updatingDB && (
               <div className="flex text-xs items-center font-normal text-green-500">
                 <CloudUploadIcon className="w-4 h-4 mr-1" /> saving
