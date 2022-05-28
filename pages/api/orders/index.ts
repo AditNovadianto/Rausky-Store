@@ -102,6 +102,8 @@ export default apiHandler
     }
 
     if (invalidRequirements.length > 0) {
+      // delete unfinished order
+      await prisma.order.delete({ where: { id: order.id } })
       throw {
         status: 400,
         message: 'Please provide valid requirements',
