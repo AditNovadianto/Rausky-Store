@@ -1,6 +1,11 @@
 import Container from '../components/Container'
 import Wrapper from '../components/Wrapper'
-import { CheckIcon, CloudUploadIcon, TrashIcon } from '@heroicons/react/outline'
+import {
+  CheckIcon,
+  CloudUploadIcon,
+  ExclamationCircleIcon,
+  TrashIcon,
+} from '@heroicons/react/outline'
 import { useEffect } from 'react'
 import { useStateMachine } from 'little-state-machine'
 import Link from '../components/Link'
@@ -50,29 +55,28 @@ const Cart = () => {
 
       console.log(data)
 
-      return
-
-      //   window.snap.pay('633418e0-98a1-461f-9f71-47038b7bc979', {
-      //     onSuccess: function (result) {
-      //       /* You may add your own implementation here */
-      //       alert('payment success!')
-      //       console.log(result)
-      //     },
-      //     onPending: function (result) {
-      //       /* You may add your own implementation here */
-      //       alert('wating your payment!')
-      //       console.log(result)
-      //     },
-      //     onError: function (result) {
-      //       /* You may add your own implementation here */
-      //       // alert('payment failed!')
-      //       console.log(result)
-      //     },
-      //     onClose: function () {
-      //       /* You may add your own implementation here */
-      //       // alert('you closed the popup without finishing the payment')
-      //     },
-      //   })
+      //   @ts-ignore
+      window.snap.pay(data.order.paymentToken, {
+        onSuccess: function (result) {
+          /* You may add your own implementation here */
+          alert('payment success!')
+          console.log(result)
+        },
+        onPending: function (result) {
+          /* You may add your own implementation here */
+          alert('wating your payment!')
+          console.log(result)
+        },
+        onError: function (result) {
+          /* You may add your own implementation here */
+          // alert('payment failed!')
+          console.log(result)
+        },
+        onClose: function () {
+          /* You may add your own implementation here */
+          // alert('you closed the popup without finishing the payment')
+        },
+      })
     } catch (err) {
       console.log(err)
     }
@@ -171,6 +175,7 @@ const Cart = () => {
           </div>
 
           {/* ORDER INFO */}
+          {/* TODO: cek setiap field kalo ada yg belom diisi */}
           <div className="lg:flex-grow mt-8 lg:mt-0 lg:max-w-sm lg:sticky lg:top-[80px] lg:self-start border rounded-2xl divide-y">
             <h2 className="text-2xl font-bold p-6 flex items-center justify-between">
               Order Info
@@ -207,12 +212,17 @@ const Cart = () => {
                         {requirement.fields.map((field) => {
                           return status != 'loading' ? (
                             <RequirementField
+                              key={field.id}
                               field={field}
                               categorySlug={requirement.categorySlug}
                               user={isLoggedIn ? user : null}
                             />
                           ) : (
-                            <Skeleton height={50} borderRadius={12} />
+                            <Skeleton
+                              key={field.id}
+                              height={50}
+                              borderRadius={12}
+                            />
                           )
                         })}
                       </div>
@@ -268,12 +278,22 @@ const Cart = () => {
                 </div>
               </div>
 
-              <button
-                onClick={checkout}
-                className="w-full my-8 py-4 bg-green-500 hover:bg-green-400 transition-all font-semibold text-white rounded-2xl shadow-xl shadow-green-300"
-              >
-                Bayar (Rp {order.total.toLocaleString()})
-              </button>
+              {/* TODO: handle missing requirements */}
+              <div className="my-8">
+                {true && (
+                  <p className="mt-2 text-red-500 mb-3 font-medium flex items-center justify-center">
+                    <ExclamationCircleIcon className="w-4 h-4 mr-2" /> Please
+                    fill all the requirements
+                  </p>
+                )}
+                <button
+                  onClick={checkout}
+                  disabled={true}
+                  className="w-full py-4 bg-green-500 hover:bg-green-400 transition-all font-semibold text-white rounded-2xl shadow-xl shadow-green-300 disabled:bg-gray-400/40 disabled:shadow-gray-200"
+                >
+                  Pay (Rp {order.total.toLocaleString()})
+                </button>
+              </div>
             </div>
           </div>
         </Wrapper>
