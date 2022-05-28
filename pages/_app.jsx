@@ -18,6 +18,7 @@ createStore(
     cart: [],
     order: {
       requirements: {},
+      categoryRequirements: [],
       subtotal: 0,
       tax: 0,
       discount: 0,

@@ -198,7 +198,7 @@ const TopupItems = ({ category, user }) => {
                   key={product.id}
                   onClick={() => {
                     if (isProductInCart) return
-                    actions.addToCart(product)
+                    actions.addToCart({ product, category })
                   }}
                   className={cn(
                     'px-4 py-3 border rounded-xl hover:border-green-400',
@@ -230,7 +230,7 @@ const TopupItems = ({ category, user }) => {
                       <div className="flex items-center mt-3">
                         <div className="flex items-center flex-grow md:flex-grow-0 justify-between text-gray-500">
                           <button
-                            onClick={() => actions.decrementAmount(product)}
+                            onClick={() => actions.decrementAmount({ product })}
                             className="w-8 h-8 rounded-xl font-medium border hover:bg-gray-800 hover:text-gray-100"
                           >
                             {' '}
@@ -238,7 +238,9 @@ const TopupItems = ({ category, user }) => {
                           </button>
                           <div className="px-5">{productInCart.amount}</div>
                           <button
-                            onClick={() => actions.addToCart(product)}
+                            onClick={() =>
+                              actions.addToCart({ product, category })
+                            }
                             className="w-8 h-8 rounded-xl font-medium border hover:bg-gray-800 hover:text-gray-100"
                           >
                             {' '}

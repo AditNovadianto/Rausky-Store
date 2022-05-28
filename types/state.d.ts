@@ -8,7 +8,8 @@ declare module 'little-state-machine' {
       category: Category
     })[]
     order: {
-      requirements: { [category: string]: any }
+      requirements: CustomObject
+      categoryRequirements: CustomObject[]
       subtotal: number
       tax: number
       discount: number

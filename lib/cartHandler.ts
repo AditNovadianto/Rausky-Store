@@ -7,6 +7,13 @@ export const getProductInCart = (product, cart) => {
   return { isProductInCart, idx, productInCart }
 }
 
+const isRequirementInOrder = (categoryRequirements, newRequirement) => {
+  const requirement = categoryRequirements.find(
+    (requirement) => requirement.id == newRequirement.id
+  )
+  return requirement
+}
+
 export const countTotal = (cart, order) => {
   const subtotal = cart.reduce((total, item) => {
     total += item.amount * item.price
@@ -18,9 +25,12 @@ export const countTotal = (cart, order) => {
   return { total, subtotal }
 }
 
-export const addToCart = (state: GlobalState, payload): GlobalState => {
+export const addToCart = (
+  state: GlobalState,
+  payload: { product; category }
+): GlobalState => {
   const product = {
-    ...payload,
+    ...payload.product,
     amount: 1,
   }
 
@@ -38,7 +48,7 @@ export const addToCart = (state: GlobalState, payload): GlobalState => {
 
   const { subtotal, total } = countTotal(newCart, state.order)
 
-  return {
+  const newState = {
     ...state,
     cart: newCart,
     order: {
@@ -47,14 +57,55 @@ export const addToCart = (state: GlobalState, payload): GlobalState => {
       total,
     },
   }
+
+  if (payload.category.requirement) {
+    const newRequirement = {
+      categorySlug: payload.category.slug,
+      ...payload.category.requirement,
+    }
+    if (
+      !isRequirementInOrder(newState.order.categoryRequirements, newRequirement)
+    ) {
+      newState.order.categoryRequirements.push(newRequirement)
+    }
+  }
+
+  return newState
 }
 
-export const decrementAmount = (state, payload) => {
+export const decrementAmount = (
+  state: GlobalState,
+  payload: { product }
+): GlobalState => {
   const newCart = [...state.cart]
-  const { idx, productInCart } = getProductInCart(payload, state.cart)
+  let newCategoryRequirements = [...state.order.categoryRequirements]
+
+  const { idx, productInCart } = getProductInCart(payload.product, state.cart)
   const newAmount = productInCart.amount - 1
   if (newAmount <= 0) {
     newCart.splice(idx, 1)
+
+    const isProductHasRequirement = state.order.categoryRequirements.find(
+      (req) => req.categorySlug == productInCart.category.slug
+    )
+
+    // if product has requirement, update categoryRequirements
+    if (isProductHasRequirement) {
+      // get different category slugs
+      const diffCategorySlugs = []
+      for (const product of newCart) {
+        const categorySlug = product.category.slug
+        if (!diffCategorySlugs.includes(categorySlug)) {
+          diffCategorySlugs.push(categorySlug)
+        }
+      }
+
+      newCategoryRequirements = newCategoryRequirements.filter((req) => {
+        return diffCategorySlugs.includes(req.categorySlug)
+      })
+
+      console.log('newCategoryReq', newCategoryRequirements)
+    }
   } else {
     newCart.splice(idx, 1, {
       ...productInCart,
@@ -68,6 +119,7 @@ export const decrementAmount = (state, payload) => {
     cart: newCart,
     order: {
       ...state.order,
+      categoryRequirements: newCategoryRequirements,
       subtotal,
       total,
     },

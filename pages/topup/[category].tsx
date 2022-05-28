@@ -8,6 +8,8 @@ import { getSession } from 'next-auth/react'
 import { GetServerSideProps } from 'next'
 
 const Topup = ({ category, user }) => {
+  console.log(category)
+
   return (
     <Container noTopMargin title={category.name}>
       <br className="hidden md:block" />

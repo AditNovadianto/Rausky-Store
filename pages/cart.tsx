@@ -5,6 +5,7 @@ import { useEffect } from 'react'
 import { useStateMachine } from 'little-state-machine'
 import Link from '../components/Link'
 import { addToCart, removeFromCart, decrementAmount } from '../lib/cartHandler'
+import request from '../lib/request'
 
 const Cart = () => {
   const { state, actions } = useStateMachine({
@@ -14,7 +15,7 @@ const Cart = () => {
   })
   const { cart, order } = state
 
-  console.log(cart)
+  //   console.log(cart)
 
   useEffect(() => {
     let scriptTag = document.createElement('script')
@@ -32,27 +33,43 @@ const Cart = () => {
 
   //   TODO: bikin order ke backend, terus set payment token dari backend
   const checkout = async () => {
-    window.snap.pay('633418e0-98a1-461f-9f71-47038b7bc979', {
-      onSuccess: function (result) {
-        /* You may add your own implementation here */
-        alert('payment success!')
-        console.log(result)
-      },
-      onPending: function (result) {
-        /* You may add your own implementation here */
-        alert('wating your payment!')
-        console.log(result)
-      },
-      onError: function (result) {
-        /* You may add your own implementation here */
-        // alert('payment failed!')
-        console.log(result)
-      },
-      onClose: function () {
-        /* You may add your own implementation here */
-        // alert('you closed the popup without finishing the payment')
-      },
-    })
+    try {
+      const { data } = await request.post('/orders', {
+        products: cart.map((product) => ({
+          id: product.id,
+          amount: product.amount,
+        })),
+        requirements: order.requirements,
+      })
+
+      console.log(data)
+
+      return
+
+      window.snap.pay('633418e0-98a1-461f-9f71-47038b7bc979', {
+        onSuccess: function (result) {
+          /* You may add your own implementation here */
+          alert('payment success!')
+          console.log(result)
+        },
+        onPending: function (result) {
+          /* You may add your own implementation here */
+          alert('wating your payment!')
+          console.log(result)
+        },
+        onError: function (result) {
+          /* You may add your own implementation here */
+          // alert('payment failed!')
+          console.log(result)
+        },
+        onClose: function () {
+          /* You may add your own implementation here */
+          // alert('you closed the popup without finishing the payment')
+        },
+      })
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   const totalItemsInCart = cart.length
@@ -146,36 +163,58 @@ const Cart = () => {
           </div>
 
           {/* ORDER INFO */}
-          <div className="lg:flex-grow mt-8 lg:mt-0 lg:max-w-sm lg:sticky lg:top-[80px] lg:self-start border p-6 rounded-2xl">
-            <h2 className="text-2xl font-bold">Order Info</h2>
-            <div className="space-y-2 mt-6">
-              <div className="flex justify-between text-gray-500">
-                <p>Subtotal</p>
-                <p>Rp {order.subtotal.toLocaleString()}</p>
-              </div>
-              {order.tax > 0 && (
-                <div className="flex justify-between text-gray-500">
-                  <p>Pajak</p>
-                  <p>Rp {order.tax.toLocaleString()}</p>
+          <div className="lg:flex-grow mt-8 lg:mt-0 lg:max-w-sm lg:sticky lg:top-[80px] lg:self-start border rounded-2xl divide-y">
+            <h2 className="text-2xl font-bold p-6">Order Info</h2>
+
+            {/* REQUIREMENTS */}
+            <div className="space-y-2 p-6">
+              <h3 className="font-bold text-xl">Requirements</h3>
+              <div>
+                <h3 className="font-semibold mb-2">Mobile Legends</h3>
+                <div className="space-y-3">
+                  <input
+                    type="text"
+                    className="block w-full px-5 py-3 rounded-xl border border-gray-300 focus:outline-none focus:border-green-400"
+                  />
+                  <input
+                    type="text"
+                    className="block w-full px-5 py-3 rounded-xl border border-gray-300 focus:outline-none focus:border-green-400"
+                  />
                 </div>
-              )}
-              {order.discount > 0 && (
-                <div className="flex justify-between text-gray-500">
-                  <p>Diskon</p>
-                  <p>Rp {order.discount.toLocaleString()}</p>
-                </div>
-              )}
-              <div className="flex justify-between text-xl font-semibold">
-                <p className="">Total</p>
-                <p>Rp {order.total.toLocaleString()}</p>
               </div>
             </div>
-            <button
-              onClick={checkout}
-              className="w-full py-4 bg-green-500 hover:bg-green-400 transition-all font-semibold text-white rounded-2xl my-8 shadow-xl shadow-green-300"
-            >
-              Checkout (Rp {order.total.toLocaleString()})
-            </button>
+
+            <div className="p-6">
+              <div className="space-y-2">
+                <div className="flex justify-between text-gray-500">
+                  <p>Subtotal</p>
+                  <p>Rp {order.subtotal.toLocaleString()}</p>
+                </div>
+                {order.tax > 0 && (
+                  <div className="flex justify-between text-gray-500">
+                    <p>Pajak</p>
+                    <p>Rp {order.tax.toLocaleString()}</p>
+                  </div>
+                )}
+                {order.discount > 0 && (
+                  <div className="flex justify-between text-gray-500">
+                    <p>Diskon</p>
+                    <p>Rp {order.discount.toLocaleString()}</p>
+                  </div>
+                )}
+                <div className="flex justify-between text-xl font-semibold">
+                  <p className="">Total</p>
+                  <p>Rp {order.total.toLocaleString()}</p>
+                </div>
+              </div>
+
+              <button
+                onClick={checkout}
+                className="w-full my-8 py-4 bg-green-500 hover:bg-green-400 transition-all font-semibold text-white rounded-2xl shadow-xl shadow-green-300"
+              >
+                Checkout (Rp {order.total.toLocaleString()})
+              </button>
+            </div>
           </div>
         </Wrapper>
       )}
