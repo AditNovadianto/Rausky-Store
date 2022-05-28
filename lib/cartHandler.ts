@@ -27,7 +27,7 @@ export const countTotal = (cart, order) => {
 
 export const addToCart = (
   state: GlobalState,
-  payload: { product; category }
+  payload: { product; category?: any }
 ): GlobalState => {
   const product = {
     ...payload.product,
@@ -58,7 +58,7 @@ export const addToCart = (
     },
   }
 
-  if (payload.category.requirement) {
+  if (payload.category?.requirement) {
     const newRequirement = {
       categorySlug: payload.category.slug,
       ...payload.category.requirement,

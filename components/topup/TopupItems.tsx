@@ -1,5 +1,5 @@
 import { useStateMachine } from 'little-state-machine'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import cn from 'classnames'
 import {
   CheckIcon,
@@ -14,8 +14,8 @@ import {
   removeFromCart,
   editRequirement,
 } from '../../lib/cartHandler'
-import request from '../../lib/request'
 import { signIn } from 'next-auth/react'
+import RequirementField from '../RequirementField'
 
 const filterProductsBySubCategory = (subCategory, products) => {
   return subCategory
@@ -30,49 +30,16 @@ const TopupItems = ({ category, user }) => {
     removeFromCart,
     editRequirement,
   })
-  const { cart, order } = state
+  const { cart, updatedDB, updatingDB } = state
 
   const [currentSubCategory, setCurrentSubCategory] = useState(
     category.subCategories[0]?.slug
   )
-  const [updatingDB, setUpdatingDB] = useState(false)
-  const [updatedDB, setUpdatedDB] = useState(false)
-  const debounce = useRef<NodeJS.Timeout>()
-
-  const handleRequirement = (e, field) => {
-    const { value: fieldName } = field
-    actions.editRequirement({
-      fieldName,
-      fieldValue: e.target.value,
-      categorySlug: category.slug,
-    })
-
-    if (!user) return
-
-    setUpdatingDB(true)
-    setUpdatedDB(false)
-
-    clearTimeout(debounce.current)
-    debounce.current = setTimeout(async () => {
-      try {
-        await request.put(`/requirements/${fieldName}`, {
-          fieldValue: e.target.value,
-        })
-      } catch (err) {
-        console.log(err)
-      } finally {
-        setUpdatingDB(false)
-        setUpdatedDB(true)
-      }
-    }, 500)
-  }
 
   const products = filterProductsBySubCategory(
     currentSubCategory,
     category.products
   )
-
-  const requirement = order.requirements?.[category.slug]
 
   return (
     <div className="md:w-[60%] md:mt-0 mt-10 w-full md:ml-5 space-y-8">
@@ -84,6 +51,7 @@ const TopupItems = ({ category, user }) => {
           </div>
           <h1 className="text-2xl font-bold mt-2 flex justify-between">
             {category.requirement.title}{' '}
+            {/* TODO: benerin display updating db */}
             {updatingDB && (
               <div className="flex text-xs items-center font-normal text-green-500">
                 <CloudUploadIcon className="w-4 h-4 mr-1" /> saving
@@ -112,16 +80,12 @@ const TopupItems = ({ category, user }) => {
 
           <form className="mt-5 lg:flex-row flex-col flex space-x-0 lg:space-x-3 space-y-3 lg:space-y-0">
             {category.requirement.fields.map((field) => (
-              <div className="w-full" key={field.id}>
-                <input
-                  className="block w-full px-5 py-3 rounded-xl border border-gray-300 focus:outline-none focus:border-green-400"
-                  placeholder={field.placeholder}
-                  type={field.type}
-                  value={requirement?.[field.value] ?? ''}
-                  onChange={(e) => handleRequirement(e, field)}
-                />
-                {/* TODO: bikin input validation */}
-              </div>
+              <RequirementField
+                key={field.id}
+                field={field}
+                categorySlug={category.slug}
+                user={user}
+              />
             ))}
           </form>
           {(category.requirement.img || category.requirement.description) && (

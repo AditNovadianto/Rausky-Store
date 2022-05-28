@@ -15,5 +15,7 @@ declare module 'little-state-machine' {
       discount: number
       total: number
     }
+    updatingDB: boolean
+    updatedDB: boolean
   }
 }

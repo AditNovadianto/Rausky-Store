@@ -6,8 +6,14 @@ import { useStateMachine } from 'little-state-machine'
 import Link from '../components/Link'
 import { addToCart, removeFromCart, decrementAmount } from '../lib/cartHandler'
 import request from '../lib/request'
+import RequirementField from '../components/RequirementField'
+import { useSession } from 'next-auth/react'
+import Skeleton from 'react-loading-skeleton'
 
 const Cart = () => {
+  const { data: session, status } = useSession()
+  const user = session?.user
+  const isLoggedIn = status != 'loading' && user
   const { state, actions } = useStateMachine({
     addToCart,
     removeFromCart,
@@ -132,7 +138,9 @@ const Cart = () => {
                       {/* SET QUANTITY */}
                       <div className="flex items-center text-gray-500">
                         <button
-                          onClick={() => actions.decrementAmount(item)}
+                          onClick={() =>
+                            actions.decrementAmount({ product: item })
+                          }
                           className="w-8 h-8 rounded-xl font-medium border hover:bg-gray-800 hover:text-gray-100"
                         >
                           {' '}
@@ -140,7 +148,7 @@ const Cart = () => {
                         </button>
                         <div className="px-5">{item.amount}</div>
                         <button
-                          onClick={() => actions.addToCart(item)}
+                          onClick={() => actions.addToCart({ product: item })}
                           className="w-8 h-8 rounded-xl font-medium border hover:bg-gray-800 hover:text-gray-100"
                         >
                           {' '}
@@ -167,22 +175,33 @@ const Cart = () => {
             <h2 className="text-2xl font-bold p-6">Order Info</h2>
 
             {/* REQUIREMENTS */}
-            <div className="space-y-2 p-6">
-              <h3 className="font-bold text-xl">Requirements</h3>
-              <div>
-                <h3 className="font-semibold mb-2">Mobile Legends</h3>
-                <div className="space-y-3">
-                  <input
-                    type="text"
-                    className="block w-full px-5 py-3 rounded-xl border border-gray-300 focus:outline-none focus:border-green-400"
-                  />
-                  <input
-                    type="text"
-                    className="block w-full px-5 py-3 rounded-xl border border-gray-300 focus:outline-none focus:border-green-400"
-                  />
+            {order.categoryRequirements.length > 0 && (
+              <div className="p-6">
+                <h3 className="font-bold text-xl">Requirements</h3>
+                <div className="mt-5 space-y-4">
+                  {order.categoryRequirements.map((requirement) => (
+                    <div key={requirement.id}>
+                      <h3 className="font-semibold mb-2">
+                        {requirement.categorySlug}
+                      </h3>
+                      <div className="space-y-3">
+                        {requirement.fields.map((field) => {
+                          return status != 'loading' ? (
+                            <RequirementField
+                              field={field}
+                              categorySlug={requirement.categorySlug}
+                              user={isLoggedIn ? user : null}
+                            />
+                          ) : (
+                            <Skeleton height={50} borderRadius={12} />
+                          )
+                        })}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </div>
+            )}
 
             <div className="p-6">
               <div className="space-y-2">
@@ -212,7 +231,7 @@ const Cart = () => {
                 onClick={checkout}
                 className="w-full my-8 py-4 bg-green-500 hover:bg-green-400 transition-all font-semibold text-white rounded-2xl shadow-xl shadow-green-300"
               >
-                Checkout (Rp {order.total.toLocaleString()})
+                Bayar (Rp {order.total.toLocaleString()})
               </button>
             </div>
           </div>
