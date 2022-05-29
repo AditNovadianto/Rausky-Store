@@ -1,3 +1,4 @@
+import cn from 'classnames'
 import { useStateMachine } from 'little-state-machine'
 import { useEffect, useRef } from 'react'
 import { editRequirement } from '../lib/cartHandler'
@@ -7,8 +8,9 @@ interface Props {
   field: CustomObject
   categorySlug: string
   user?: CustomObject
+  error?: string
 }
-const RequirementField = ({ field, categorySlug, user }: Props) => {
+const RequirementField = ({ field, categorySlug, user, error }: Props) => {
   const { state, actions } = useStateMachine({
     editRequirement,
     setUpdatingDB: (state, value) => {
@@ -58,13 +60,20 @@ const RequirementField = ({ field, categorySlug, user }: Props) => {
   return (
     <div className="w-full">
       <input
-        className="block w-full px-5 py-3 rounded-xl border border-gray-300 focus:outline-none focus:border-green-400"
+        className={cn(
+          'block w-full px-5 py-3 rounded-xl border focus:outline-none',
+          error
+            ? 'border-red-300 focus:border-red-400'
+            : 'border-gray-300 focus:border-green-400'
+        )}
         placeholder={field.placeholder}
         type={field.type}
         value={fieldValue ?? ''}
         onChange={(e) => handleRequirement(e, field)}
       />
-      {/* TODO: bikin input validation */}
+      {error && (
+        <p className="text-red-500 text-sm mt-1 font-medium">{error}</p>
+      )}
     </div>
   )
 }

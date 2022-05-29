@@ -154,7 +154,7 @@ export default apiHandler
 
     const { token, redirect_url } = await snap.createTransaction(paymentData)
 
-    const fullOrder = await prisma.order.update({
+    let fullOrder = await prisma.order.update({
       where: { id: order.id },
       data: {
         total,
@@ -164,8 +164,16 @@ export default apiHandler
       },
       include: {
         user: true,
+        products: {
+          select: {
+            product: { include: { category: true } },
+          },
+        },
       },
     })
+
+    // @ts-ignore
+    fullOrder.products = fullOrder.products.map(({ product }) => product)
 
     res.status(201).json({ order: fullOrder })
   })

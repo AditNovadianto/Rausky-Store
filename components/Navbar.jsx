@@ -69,13 +69,10 @@ const Navbar = () => {
               <span className="text-black hidden lg:block">Rausky</span>
             </Link>
           ) : (
-            <button
-              onClick={router.back}
-              className="flex items-center space-x-2"
-            >
+            <Link href="/" className="flex items-center space-x-2">
               <ArrowLeftIcon className="w-5 h-5" />
               <span className="font-medium hidden md:block">Back</span>
-            </button>
+            </Link>
           )}
 
           <div className="items-center hidden md:flex">
@@ -108,7 +105,6 @@ const Navbar = () => {
             </button>
 
             <Link href="/cart" className="relative ml-4 flex-shrink-0">
-              {/* TODO: bikin badge */}
               {totalItemsInCart > 0 && <Badge>{totalItemsInCart}</Badge>}
 
               <img src="/images/Bag.svg" alt="Bag-icon" />

@@ -10,10 +10,15 @@ declare module 'little-state-machine' {
     order: {
       requirements: CustomObject
       categoryRequirements: CustomObject[]
+      missingRequirements: CustomObject
       subtotal: number
       tax: number
       discount: number
       total: number
+    }
+    payFinish: {
+      order: CustomObject
+      data: CustomObject
     }
     updatingDB: boolean
     updatedDB: boolean

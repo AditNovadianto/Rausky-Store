@@ -23,7 +23,13 @@ export const getSpecificCategory = async ({
       requirement: {
         include: {
           fields: {
-            select: { placeholder: true, type: true, id: true, value: true },
+            select: {
+              placeholder: true,
+              type: true,
+              id: true,
+              value: true,
+              name: true,
+            },
           },
         },
       },

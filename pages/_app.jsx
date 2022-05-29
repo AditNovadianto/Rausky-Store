@@ -19,10 +19,15 @@ createStore(
     order: {
       requirements: {},
       categoryRequirements: [],
+      missingRequirements: {},
       subtotal: 0,
       tax: 0,
       discount: 0,
       total: 0,
+    },
+    payFinish: {
+      order: {},
+      data: {},
     },
   },
   {

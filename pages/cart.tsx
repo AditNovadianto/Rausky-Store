@@ -14,6 +14,7 @@ import request from '../lib/request'
 import RequirementField from '../components/RequirementField'
 import { useSession } from 'next-auth/react'
 import Skeleton from 'react-loading-skeleton'
+import { useRouter } from 'next/router'
 
 const Cart = () => {
   const { data: session, status } = useSession()
@@ -23,8 +24,33 @@ const Cart = () => {
     addToCart,
     removeFromCart,
     decrementAmount,
+    setPayFinishData: (state, payload) => {
+      return {
+        ...state,
+        payFinish: {
+          order: payload.order,
+          data: payload.data,
+        },
+      }
+    },
+    clearOrder: (state) => {
+      return {
+        ...state,
+        cart: [],
+        order: {
+          requirements: {},
+          categoryRequirements: [],
+          missingRequirements: {},
+          subtotal: 0,
+          tax: 0,
+          discount: 0,
+          total: 0,
+        },
+      }
+    },
   })
   const { cart, order, updatedDB, updatingDB } = state
+  const router = useRouter()
 
   //   console.log(cart)
 
@@ -53,28 +79,17 @@ const Cart = () => {
         requirements: order.requirements,
       })
 
-      console.log(data)
-
       //   @ts-ignore
       window.snap.pay(data.order.paymentToken, {
-        onSuccess: function (result) {
-          /* You may add your own implementation here */
-          alert('payment success!')
-          console.log(result)
+        onSuccess: (result) => {
+          actions.setPayFinishData({ order: data.order, data: result })
+          actions.clearOrder()
+          router.push('/pay-finish')
         },
-        onPending: function (result) {
-          /* You may add your own implementation here */
-          alert('wating your payment!')
-          console.log(result)
-        },
-        onError: function (result) {
-          /* You may add your own implementation here */
-          // alert('payment failed!')
-          console.log(result)
-        },
-        onClose: function () {
-          /* You may add your own implementation here */
-          // alert('you closed the popup without finishing the payment')
+        onPending: (result) => {
+          actions.setPayFinishData({ order: data.order, data: result })
+          actions.clearOrder()
+          router.push('/pay-finish')
         },
       })
     } catch (err) {
@@ -82,6 +97,12 @@ const Cart = () => {
     }
   }
 
+  const isFieldError = ({ requirement, field }) => {
+    return order.missingRequirements[requirement.categorySlug]?.[field.value]
+  }
+  const isAnyError = Object.values(order.missingRequirements).some((errors) => {
+    return Object.keys(errors).length > 0
+  })
   const totalItemsInCart = cart.length
 
   return (
@@ -175,7 +196,6 @@ const Cart = () => {
           </div>
 
           {/* ORDER INFO */}
-          {/* TODO: cek setiap field kalo ada yg belom diisi */}
           <div className="lg:flex-grow mt-8 lg:mt-0 lg:max-w-sm lg:sticky lg:top-[80px] lg:self-start border rounded-2xl divide-y">
             <h2 className="text-2xl font-bold p-6 flex items-center justify-between">
               Order Info
@@ -210,13 +230,20 @@ const Cart = () => {
                       </div>
                       <div className="space-y-3 mt-4">
                         {requirement.fields.map((field) => {
+                          const errorMessage = isFieldError({
+                            requirement,
+                            field,
+                          })
+
                           return status != 'loading' ? (
-                            <RequirementField
-                              key={field.id}
-                              field={field}
-                              categorySlug={requirement.categorySlug}
-                              user={isLoggedIn ? user : null}
-                            />
+                            <div key={field.id}>
+                              <RequirementField
+                                field={field}
+                                categorySlug={requirement.categorySlug}
+                                user={isLoggedIn ? user : null}
+                                error={errorMessage}
+                              />
+                            </div>
                           ) : (
                             <Skeleton
                               key={field.id}
@@ -280,7 +307,7 @@ const Cart = () => {
 
               {/* TODO: handle missing requirements */}
               <div className="my-8">
-                {true && (
+                {isAnyError && (
                   <p className="mt-2 text-red-500 mb-3 font-medium flex items-center justify-center">
                     <ExclamationCircleIcon className="w-4 h-4 mr-2" /> Please
                     fill all the requirements
@@ -288,7 +315,7 @@ const Cart = () => {
                 )}
                 <button
                   onClick={checkout}
-                  disabled={true}
+                  disabled={isAnyError}
                   className="w-full py-4 bg-green-500 hover:bg-green-400 transition-all font-semibold text-white rounded-2xl shadow-xl shadow-green-300 disabled:bg-gray-400/40 disabled:shadow-gray-200"
                 >
                   Pay (Rp {order.total.toLocaleString()})
