@@ -52,16 +52,17 @@ enum Role {
 }
 
 model User {
-    id            String    @id @default(auto()) @map("_id") @db.ObjectId
-    name          String?
-    email         String?   @unique
-    emailVerified DateTime?
-    image         String?
-    role          Role?     @default(USER)
-    accounts      Account[]
-    sessions      Session[]
-    orders        Order[]
-    Product       Product[]
+    id                String        @id @default(auto()) @map("_id") @db.ObjectId
+    name              String?
+    email             String?       @unique
+    emailVerified     DateTime?
+    image             String?
+    role              Role?         @default(USER)
+    accounts          Account[]
+    sessions          Session[]
+    orders            Order[]
+    Product           Product[]
+    requirementFields UsersFields[]
 }
 
 model Category {
@@ -98,6 +99,16 @@ model CategoryRequirementField {
     type                  String?              @default("text")
     categoryRequirement   CategoryRequirement? @relation(fields: [categoryRequirementId], references: [id], onDelete: Cascade)
     categoryRequirementId String?              @db.ObjectId
+    users                 UsersFields[]
+}
+
+model UsersFields {
+    id      String                   @id @default(auto()) @map("_id") @db.ObjectId
+    userId  String                   @db.ObjectId
+    fieldId String                   @db.ObjectId
+    user    User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    field   CategoryRequirementField @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+    value   String?
 }
 
 model SubCategory {
@@ -147,12 +158,11 @@ model Order {
     id           String             @id @default(auto()) @map("_id") @db.ObjectId
     total        Int?
     tax          Int?
-    requirement  Json? // used to send game information (e.g nickname, id)
     paymentUrl   String?
     paymentToken String?
     products     ProductsOnOrders[]
-    userId       String             @db.ObjectId
-    user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId       String?            @db.ObjectId
+    user         User?              @relation(fields: [userId], references: [id], onDelete: Cascade)
     createdAt    DateTime           @default(now())
     updatedAt    DateTime           @updatedAt
 }

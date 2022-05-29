@@ -1,10 +1,11 @@
 import axios from 'axios'
-import Router from 'next/router'
 
-const baseUrl = process.env.NEXTAUTH_URL
+const request = axios.create()
 
-const request = axios.create({
-  baseURL: `${baseUrl}/api`,
+// set baseURL to current url origin before sending request
+request.interceptors.request.use((config) => {
+  config.baseURL = window.location.origin + '/api'
+  return config
 })
 
 // before sending response to client
@@ -16,9 +17,9 @@ request.interceptors.response.use(
   },
   function (error) {
     // redirect to /signin page if user is not logged in
-    if (error.response.status == 401) {
-      Router.push('/signin')
-    }
+    // if (error.response.status == 401) {
+    //   Router.push('/signin')
+    // }
     return Promise.reject(error.response)
   }
 )

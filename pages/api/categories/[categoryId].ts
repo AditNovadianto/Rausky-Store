@@ -1,7 +1,12 @@
 import apiHandler, { checkAuth } from '../../../lib/apiHandler'
 import prisma from '../../../lib/prisma'
 
-export const getSpecificCategory = async ({ categorySlug }) => {
+export const getSpecificCategory = async ({
+  categorySlug,
+}: {
+  categorySlug: string
+  userId?: string
+}) => {
   const category = await prisma.category.findUnique({
     where: {
       slug: categorySlug,
@@ -11,16 +16,26 @@ export const getSpecificCategory = async ({ categorySlug }) => {
         orderBy: { price: 'asc' },
         include: {
           subCategory: { select: { name: true, slug: true } },
+          category: { select: { name: true, slug: true, logoImg: true } },
         },
       },
       subCategories: true,
       requirement: {
         include: {
-          fields: true,
+          fields: {
+            select: {
+              placeholder: true,
+              type: true,
+              id: true,
+              value: true,
+              name: true,
+            },
+          },
         },
       },
     },
   })
+
   return category
 }
 
