@@ -69,6 +69,7 @@ const RequirementField = ({ field, categorySlug, user, error }: Props) => {
         placeholder={field.placeholder}
         type={field.type}
         value={fieldValue ?? ''}
+        onWheel={(e) => (e.target as HTMLInputElement).blur()}
         onChange={(e) => handleRequirement(e, field)}
       />
       {error && (
