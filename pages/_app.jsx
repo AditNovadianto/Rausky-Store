@@ -17,6 +17,7 @@ createStore(
   {
     cart: [],
     order: {
+      user: {},
       requirements: {},
       categoryRequirements: [],
       missingRequirements: {},

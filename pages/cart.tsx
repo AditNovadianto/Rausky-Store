@@ -12,7 +12,7 @@ import Link from '../components/Link'
 import { addToCart, removeFromCart, decrementAmount } from '../lib/cartHandler'
 import request from '../lib/request'
 import RequirementField from '../components/RequirementField'
-import { useSession } from 'next-auth/react'
+import { signIn, useSession } from 'next-auth/react'
 import Skeleton from 'react-loading-skeleton'
 import { useRouter } from 'next/router'
 
@@ -34,17 +34,27 @@ const Cart = () => {
       }
     },
     clearOrder: (state) => {
+      request.delete('/carts/me')
       return {
         ...state,
         cart: [],
         order: {
-          requirements: {},
-          categoryRequirements: [],
-          missingRequirements: {},
+          ...state.order,
           subtotal: 0,
           tax: 0,
           discount: 0,
           total: 0,
+        },
+      }
+    },
+    setUser: (state, payload: { fieldName: string; fieldValue: string }) => {
+      const newUser = { ...state.order.user }
+      newUser[payload.fieldName] = payload.fieldValue
+      return {
+        ...state,
+        order: {
+          ...state.order,
+          user: newUser,
         },
       }
     },
@@ -77,6 +87,7 @@ const Cart = () => {
           amount: product.amount,
         })),
         requirements: order.requirements,
+        user: !user ? order.user : null,
       })
 
       //   @ts-ignore
@@ -210,116 +221,161 @@ const Cart = () => {
                 </div>
               )}
             </h2>
+            <div className="divide-y lg:max-h-[65vh] lg:overflow-y-auto">
+              {/* REQUIREMENTS */}
+              {order.categoryRequirements.length > 0 && (
+                <div className="p-6">
+                  <h3 className="font-bold text-xl">Requirements</h3>
+                  <div className="mt-5 space-y-10">
+                    {order.categoryRequirements.map((requirement) => (
+                      <div key={requirement.id}>
+                        <div className="flex items-center">
+                          <img
+                            src={requirement.categoryLogo}
+                            alt={requirement.categorySlug}
+                            className="w-5 h-5 rounded-md mr-2"
+                          />
+                          <h3 className="font-semibold">
+                            {requirement.categoryName}
+                          </h3>
+                        </div>
+                        <div className="space-y-3 mt-4">
+                          {requirement.fields.map((field) => {
+                            const errorMessage = isFieldError({
+                              requirement,
+                              field,
+                            })
 
-            {/* REQUIREMENTS */}
-            {order.categoryRequirements.length > 0 && (
-              <div className="p-6 lg:max-h-[230px] lg:overflow-y-auto">
-                <h3 className="font-bold text-xl">Requirements</h3>
-                <div className="mt-5 space-y-10">
-                  {order.categoryRequirements.map((requirement) => (
-                    <div key={requirement.id}>
-                      <div className="flex items-center">
-                        <img
-                          src={requirement.categoryLogo}
-                          alt={requirement.categorySlug}
-                          className="w-5 h-5 rounded-md mr-2"
-                        />
-                        <h3 className="font-semibold">
-                          {requirement.categoryName}
-                        </h3>
-                      </div>
-                      <div className="space-y-3 mt-4">
-                        {requirement.fields.map((field) => {
-                          const errorMessage = isFieldError({
-                            requirement,
-                            field,
-                          })
-
-                          return status != 'loading' ? (
-                            <div key={field.id}>
-                              <RequirementField
-                                field={field}
-                                categorySlug={requirement.categorySlug}
-                                user={isLoggedIn ? user : null}
-                                error={errorMessage}
+                            return status != 'loading' ? (
+                              <div key={field.id}>
+                                <RequirementField
+                                  field={field}
+                                  categorySlug={requirement.categorySlug}
+                                  user={isLoggedIn ? user : null}
+                                  error={errorMessage}
+                                />
+                              </div>
+                            ) : (
+                              <Skeleton
+                                key={field.id}
+                                height={50}
+                                borderRadius={12}
                               />
+                            )
+                          })}
+                        </div>
+                        {(requirement.img || requirement.description) && (
+                          <details className="mt-4">
+                            <summary className="cursor-pointer text-gray-500">
+                              Details
+                            </summary>
+                            <div className="mt-4">
+                              {requirement.img && (
+                                <img
+                                  className="rounded-xl lg:hover:scale-[1.5] hover:scale-[1.2] lg:hover:-translate-x-[35%] transition-all"
+                                  src={requirement.img}
+                                  alt={requirement.title}
+                                />
+                              )}
+
+                              {requirement.description && (
+                                <p className="mt-3 pb-2 text-gray-500">
+                                  {requirement.description}
+                                </p>
+                              )}
                             </div>
-                          ) : (
-                            <Skeleton
-                              key={field.id}
-                              height={50}
-                              borderRadius={12}
-                            />
-                          )
-                        })}
+                          </details>
+                        )}
                       </div>
-                      {(requirement.img || requirement.description) && (
-                        <details className="mt-4">
-                          <summary className="cursor-pointer text-gray-500">
-                            Details
-                          </summary>
-                          <div className="mt-4">
-                            {requirement.img && (
-                              <img
-                                className="rounded-xl lg:hover:scale-[1.5] hover:scale-[1.2] lg:hover:-translate-x-[35%] transition-all"
-                                src={requirement.img}
-                                alt={requirement.title}
-                              />
-                            )}
+                    ))}
+                  </div>
+                </div>
+              )}
 
-                            {requirement.description && (
-                              <p className="mt-3 pb-2 text-gray-500">
-                                {requirement.description}
-                              </p>
-                            )}
-                          </div>
-                        </details>
-                      )}
+              {/* USER NAME AND EMAIL */}
+              {!user && (
+                <div className="p-6">
+                  <h3 className="font-bold text-xl">
+                    Personal data (opsional)
+                  </h3>
+                  <div className="text-gray-500 text-sm">
+                    <button
+                      onClick={() => signIn()}
+                      className="text-green-500 hover:underline"
+                    >
+                      Sign In
+                    </button>{' '}
+                    atau lengkapi data di bawah
+                    <br /> untuk mendapat bukti pembayaran melalui email
+                  </div>
+                  <div className="mt-4 space-y-4">
+                    <input
+                      type="text"
+                      className="input"
+                      placeholder="Masukkan nama"
+                      onChange={(e) =>
+                        actions.setUser({
+                          fieldName: 'name',
+                          fieldValue: e.target.value,
+                        })
+                      }
+                    />
+                    <input
+                      type="email"
+                      className="input"
+                      placeholder="Masukkan email"
+                      onChange={(e) =>
+                        actions.setUser({
+                          fieldName: 'email',
+                          fieldValue: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* ORDER SUMMARY */}
+              <div className="p-6">
+                <div className="space-y-2">
+                  <div className="flex justify-between text-gray-500">
+                    <p>Subtotal</p>
+                    <p>Rp {order.subtotal.toLocaleString()}</p>
+                  </div>
+                  {order.tax > 0 && (
+                    <div className="flex justify-between text-gray-500">
+                      <p>Pajak</p>
+                      <p>Rp {order.tax.toLocaleString()}</p>
                     </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div className="p-6">
-              <div className="space-y-2">
-                <div className="flex justify-between text-gray-500">
-                  <p>Subtotal</p>
-                  <p>Rp {order.subtotal.toLocaleString()}</p>
-                </div>
-                {order.tax > 0 && (
-                  <div className="flex justify-between text-gray-500">
-                    <p>Pajak</p>
-                    <p>Rp {order.tax.toLocaleString()}</p>
+                  )}
+                  {order.discount > 0 && (
+                    <div className="flex justify-between text-gray-500">
+                      <p>Diskon</p>
+                      <p>Rp {order.discount.toLocaleString()}</p>
+                    </div>
+                  )}
+                  <div className="flex justify-between text-xl font-semibold">
+                    <p className="">Total</p>
+                    <p>Rp {order.total.toLocaleString()}</p>
                   </div>
-                )}
-                {order.discount > 0 && (
-                  <div className="flex justify-between text-gray-500">
-                    <p>Diskon</p>
-                    <p>Rp {order.discount.toLocaleString()}</p>
-                  </div>
-                )}
-                <div className="flex justify-between text-xl font-semibold">
-                  <p className="">Total</p>
-                  <p>Rp {order.total.toLocaleString()}</p>
                 </div>
-              </div>
 
-              {/* TODO: handle missing requirements */}
-              <div className="my-8">
-                {isAnyError && (
-                  <p className="mt-2 text-red-500 mb-3 font-medium flex items-center justify-center">
-                    <ExclamationCircleIcon className="w-4 h-4 mr-2" /> Please
-                    fill all the requirements
-                  </p>
-                )}
-                <button
-                  onClick={checkout}
-                  disabled={isAnyError}
-                  className="w-full py-4 bg-green-500 hover:bg-green-400 transition-all font-semibold text-white rounded-2xl shadow-xl shadow-green-300 disabled:bg-gray-400/40 disabled:shadow-gray-200"
-                >
-                  Pay (Rp {order.total.toLocaleString()})
-                </button>
+                {/* TODO: handle missing requirements */}
+                <div className="my-8">
+                  {isAnyError && (
+                    <p className="mt-2 text-red-500 mb-3 font-medium flex items-center justify-center">
+                      <ExclamationCircleIcon className="w-4 h-4 mr-2" /> Please
+                      fill all the requirements
+                    </p>
+                  )}
+                  <button
+                    onClick={checkout}
+                    disabled={isAnyError}
+                    className="w-full py-4 bg-green-500 hover:bg-green-400 transition-all font-semibold text-white rounded-2xl shadow-xl shadow-green-300 disabled:bg-gray-400/40 disabled:shadow-gray-200"
+                  >
+                    Pay (Rp {order.total.toLocaleString()})
+                  </button>
+                </div>
               </div>
             </div>
           </div>

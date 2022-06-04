@@ -8,6 +8,7 @@ declare module 'little-state-machine' {
       category: Category
     })[]
     order: {
+      user: { name: string; email: string } | {}
       requirements: CustomObject
       categoryRequirements: CustomObject[]
       missingRequirements: CustomObject

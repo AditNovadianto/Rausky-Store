@@ -24,3 +24,12 @@ export default app
     })
     res.status(200).json({ cart: myCart })
   })
+  //   delete my cart
+  .delete(checkAuth(), async (req, res) => {
+    await prisma.cart.delete({
+      where: { userId: req.user.id },
+    })
+    res
+      .status(200)
+      .json({ message: `success delete cart owned by user id ${req.user.id}` })
+  })

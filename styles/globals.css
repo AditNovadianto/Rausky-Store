@@ -18,3 +18,9 @@
         -webkit-tap-highlight-color:  rgba(255, 255, 255, 0); 
     }
 }
+
+@layer components {
+    .input {
+        @apply block w-full px-5 py-3 rounded-xl border focus:outline-none border-gray-300 focus:border-green-400;
+    }
+}
