@@ -32,7 +32,6 @@ createStore(
   },
   {
     name: 'state',
-    persist: process.env.NODE_ENV === 'production' ? 'beforeUnload' : 'none',
   }
 )
 

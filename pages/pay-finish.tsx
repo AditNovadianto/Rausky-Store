@@ -3,7 +3,11 @@ import Container from '../components/Container'
 import Wrapper from '../components/Wrapper'
 
 // TODO: bikin halaman pay finish
-// TODO: edit object orderbuat disimpen ke order history
+// TODO: edit object order buat disimpen ke order history
+// - requirements
+// - product2 nya
+// - payment method
+// - status
 const PayFinish = () => {
   const { state } = useStateMachine()
   const { payFinish } = state
