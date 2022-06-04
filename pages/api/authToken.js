@@ -1,8 +1,10 @@
 import apiHandler from '../../lib/apiHandler'
 import nookies from 'nookies'
 
+const app = apiHandler()
+
 // this api route is used for testing in postman
-export default apiHandler.post((req, res) => {
+export default app.post((req, res) => {
   const { sessionToken, csrfToken } = req.body
   if (!sessionToken || !csrfToken) {
     throw { status: 400, message: 'please provide sessionToken, csrfToken' }

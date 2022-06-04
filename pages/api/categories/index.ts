@@ -18,7 +18,9 @@ export const getAllCategories = async (
   return categories
 }
 
-export default apiHandler
+const app = apiHandler()
+
+export default app
   // get all categories
   .get(async (req, res) => {
     const { select } = req.query as {

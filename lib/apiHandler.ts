@@ -4,17 +4,18 @@ import { getSession } from 'next-auth/react'
 import { User } from 'next-auth'
 import { Role } from '@prisma/client'
 
-export default nc<NextApiRequest, NextApiResponse>({
-  onError: (err, req, res, next) => {
-    console.error(err)
-    res
-      .status(err.status || 500)
-      .json({ message: err.message || 'Something broke!', ...err })
-  },
-  onNoMatch: (req, res) => {
-    res.status(404).json({ message: `${req.method} ${req.url} not found` })
-  },
-})
+export default () =>
+  nc<NextApiRequest, NextApiResponse>({
+    onError: (err, req, res, next) => {
+      console.error(err)
+      res
+        .status(err.status || 500)
+        .json({ message: err.message || 'Something broke!', ...err })
+    },
+    onNoMatch: (req, res) => {
+      res.status(404).json({ message: `${req.method} ${req.url} not found` })
+    },
+  })
 
 interface ExtendedRequest extends NextApiRequest {
   user: User

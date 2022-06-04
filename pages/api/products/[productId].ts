@@ -1,7 +1,9 @@
 import apiHandler, { checkAuth } from '../../../lib/apiHandler'
 import prisma from '../../../lib/prisma'
 
-export default apiHandler
+const app = apiHandler()
+
+export default app
   // edit product
   .put(checkAuth('ADMIN'), async (req, res) => {
     const product = await prisma.product.update({

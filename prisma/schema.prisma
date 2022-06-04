@@ -63,6 +63,7 @@ model User {
     orders            Order[]
     Product           Product[]
     requirementFields UsersFields[]
+    cart              Cart?
 }
 
 model Category {
@@ -154,12 +155,22 @@ model ProductsOnOrders {
     order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }
 
+// TODO: refactor cart model buat nyimpen product categories
+model Cart {
+    id       String @id @default(auto()) @map("_id") @db.ObjectId
+    products Json[]
+    userId   String @unique @db.ObjectId
+    user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
 model Order {
     id           String             @id @default(auto()) @map("_id") @db.ObjectId
-    total        Int?
-    tax          Int?
+    total        Int?               @default(0)
+    tax          Int?               @default(0)
+    discount     Int?               @default(0)
     paymentUrl   String?
     paymentToken String?
+    requirements Json?
     products     ProductsOnOrders[]
     userId       String?            @db.ObjectId
     user         User?              @relation(fields: [userId], references: [id], onDelete: Cascade)

@@ -1,7 +1,9 @@
 import apiHandler, { checkAuth } from '../../../lib/apiHandler'
 import prisma from '../../../lib/prisma'
 
-export default apiHandler.put(checkAuth(), async (req, res) => {
+const app = apiHandler()
+
+export default app.put(checkAuth(), async (req, res) => {
   const reqField = await prisma.categoryRequirementField.findFirst({
     where: { value: req.query.fieldName as string },
   })

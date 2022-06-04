@@ -1,4 +1,5 @@
 import { GlobalState } from 'little-state-machine'
+import request from './request'
 
 export const getProductInCart = (product, cart) => {
   const idx = cart.findIndex((item) => item.id == product.id)
@@ -84,6 +85,10 @@ const checkUserRequirement = ({ categorySlug, order }) => {
   return order.missingRequirements
 }
 
+const updateUserCart = (products) => {
+  return request.put('/carts/me', { products })
+}
+
 export const addToCart = (
   state: GlobalState,
   payload: { product; category?: any }
@@ -137,6 +142,7 @@ export const addToCart = (
     order: state.order,
   })
 
+  updateUserCart(newCart)
   return newState
 }
 
@@ -170,6 +176,8 @@ export const decrementAmount = (
   const { subtotal, total } = countTotal(newCart, state.order)
   newOrder = { ...newOrder, subtotal, total }
 
+  updateUserCart(newCart)
+
   return {
     ...state,
     cart: newCart,
@@ -196,6 +204,7 @@ export const removeFromCart = (state: GlobalState, payload): GlobalState => {
 
   const { subtotal, total } = countTotal(newCart, state.order)
   newOrder = { ...newOrder, subtotal, total }
+  updateUserCart(newCart)
   return {
     ...state,
     cart: newCart,
@@ -235,6 +244,48 @@ export const setRequirements = (state, payload) => {
     order: {
       ...state.order,
       requirements: payload,
+    },
+  }
+}
+
+export const setCart = (state: GlobalState, payload): GlobalState => {
+  const newOrder = { ...state.order }
+  const { total, subtotal } = countTotal(payload, state.order)
+  newOrder.total = total
+  newOrder.subtotal = subtotal
+
+  //   TODO: set category requirements from db
+
+  //   TODO: TEMP! verify each product requirement
+  payload.forEach((product) => {
+    //   store category requirement
+    if (product.category?.requirement) {
+      const newRequirement = {
+        categorySlug: product.category.slug,
+        categoryName: product.category.name,
+        categoryLogo: product.category.logoImg,
+        ...product.category.requirement,
+      }
+      if (
+        !isRequirementInOrder(newOrder.categoryRequirements, newRequirement)
+      ) {
+        newOrder.categoryRequirements.push(newRequirement)
+      }
+    }
+
+    newOrder.missingRequirements = checkUserRequirement({
+      categorySlug: product.category?.slug,
+      order: newOrder,
+    })
+  })
+
+  return {
+    ...state,
+    cart: payload,
+    order: {
+      ...state.order,
+      total,
+      subtotal,
     },
   }
 }

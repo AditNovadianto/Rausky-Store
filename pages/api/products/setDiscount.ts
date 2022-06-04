@@ -1,7 +1,8 @@
-import { Category } from '@prisma/client'
 import apiHandler, { checkAuth } from '../../../lib/apiHandler'
 
-export default apiHandler
+const app = apiHandler()
+
+export default app
   // set discount to all products in category
   .post(checkAuth('ADMIN'), async (req, res) => {
     const { discount, category } = req.body
