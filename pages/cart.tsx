@@ -14,7 +14,6 @@ import request from '../lib/request'
 import RequirementField from '../components/RequirementField'
 import { signIn, useSession } from 'next-auth/react'
 import Skeleton from 'react-loading-skeleton'
-import { useRouter } from 'next/router'
 
 const Cart = () => {
   const { data: session, status } = useSession()
@@ -40,6 +39,8 @@ const Cart = () => {
         cart: [],
         order: {
           ...state.order,
+          categoryRequirements: [],
+          missingRequirements: {},
           subtotal: 0,
           tax: 0,
           discount: 0,
@@ -60,7 +61,6 @@ const Cart = () => {
     },
   })
   const { cart, order, updatedDB, updatingDB } = state
-  const router = useRouter()
 
   //   console.log(cart)
 
@@ -95,12 +95,12 @@ const Cart = () => {
         onSuccess: (result) => {
           actions.setPayFinishData({ order: data.order, data: result })
           actions.clearOrder()
-          router.push('/pay-finish')
+          window.location.href = '/pay-finish'
         },
         onPending: (result) => {
           actions.setPayFinishData({ order: data.order, data: result })
           actions.clearOrder()
-          router.push('/pay-finish')
+          window.location.href = '/pay-finish'
         },
       })
     } catch (err) {
@@ -298,7 +298,7 @@ const Cart = () => {
                   <h3 className="font-bold text-xl">
                     Personal data (opsional)
                   </h3>
-                  <div className="text-gray-500 text-sm">
+                  <div className="text-gray-500 text-sm mt-1">
                     <button
                       onClick={() => signIn()}
                       className="text-green-500 hover:underline"
@@ -307,8 +307,12 @@ const Cart = () => {
                     </button>{' '}
                     atau lengkapi data di bawah
                     <br /> untuk mendapat bukti pembayaran melalui email
+                    <br />{' '}
+                    <span className="text-yellow-500">
+                      *untuk saat ini gak beneran masuk ke email
+                    </span>
                   </div>
-                  <div className="mt-4 space-y-4">
+                  <div className="mt-5 space-y-4">
                     <input
                       type="text"
                       className="input"

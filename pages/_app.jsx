@@ -33,7 +33,6 @@ createStore(
   },
   {
     name: 'state',
-    persist: 'none',
   }
 )
 
