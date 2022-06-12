@@ -85,7 +85,7 @@ const Cart = () => {
     const { order: updatedOrder } = data
     actions.setOrderFinish(updatedOrder)
     actions.clearOrder()
-    router.push('/pay-finish')
+    location.href = '/pay-finish?orderId=' + updatedOrder.id
   }
 
   const checkout = async () => {
