@@ -12,6 +12,7 @@ import {
 } from '@heroicons/react/outline'
 import ProductItem from '../components/ProductItem'
 import Skeleton from 'react-loading-skeleton'
+import request from '../lib/request'
 
 // TODO: update hrefnya
 const contacts = [
@@ -36,27 +37,45 @@ const contacts = [
 ]
 
 const PayFinish = () => {
-  const { state } = useStateMachine()
+  const { state, actions } = useStateMachine({
+    setOrderFinish: (state, payload) => {
+      return {
+        ...state,
+        orderFinish: payload,
+      }
+    },
+  })
   const [loading, setLoading] = useState(true)
   const [showOrderPreview, setShowOrderPreview] = useState(false)
   const { orderFinish } = state
   const router = useRouter()
-  const { orderId } = router.query
-
-  console.log(orderFinish)
 
   useEffect(() => {
     const checkOrder = async () => {
       if (isObjectEmpty(orderFinish)) {
+        const orderId = new URLSearchParams(window.location.search).get(
+          'orderId'
+        )
         if (!orderId) {
           router.replace('/')
           return
         }
-        // TODO: get data order di db dari orderId, terus simpen ke orderFinish
+
+        try {
+          const { data } = await request.get(`/orders/${orderId}`)
+          const { order } = data
+          actions.setOrderFinish(order)
+        } catch {
+          router.replace('/')
+          return
+        }
       }
       setLoading(false)
     }
     checkOrder()
+    return () => {
+      actions.setOrderFinish({})
+    }
   }, [])
 
   return (
@@ -212,11 +231,7 @@ const PayFinish = () => {
 export default PayFinish
 
 const LoadingSkeletons = () => (
-  <Wrapper className="flex flex-col-reverse lg:flex-row">
-    <div className="w-full mt-10 lg:mt-0 lg:mr-10">
-      <Skeleton height={30} width="40%" />
-      <Skeleton height={400} className="mt-5" />
-    </div>
+  <Wrapper className="max-w-2xl mx-auto">
     <div className="w-full">
       <Skeleton height={30} width="80%" />
       <div className="my-5">

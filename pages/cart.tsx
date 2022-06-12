@@ -60,7 +60,6 @@ const Cart = () => {
     },
   })
   const { cart, order, updatedDB, updatingDB } = state
-  const router = useRouter()
 
   useEffect(() => {
     let scriptTag = document.createElement('script')
