@@ -63,6 +63,7 @@ model User {
     orders            Order[]
     Product           Product[]
     requirementFields UsersFields[]
+    cart              Cart?
 }
 
 model Category {
@@ -154,15 +155,35 @@ model ProductsOnOrders {
     order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }
 
+// TODO: refactor cart model buat nyimpen product categories
+model Cart {
+    id       String @id @default(auto()) @map("_id") @db.ObjectId
+    products Json[]
+    userId   String @unique @db.ObjectId
+    user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum PaymentStatus {
+    WAITING_PAYMENT
+    CANCELED
+    PAID
+    VERIFIED
+}
+
 model Order {
-    id           String             @id @default(auto()) @map("_id") @db.ObjectId
-    total        Int?
-    tax          Int?
-    paymentUrl   String?
-    paymentToken String?
-    products     ProductsOnOrders[]
-    userId       String?            @db.ObjectId
-    user         User?              @relation(fields: [userId], references: [id], onDelete: Cascade)
-    createdAt    DateTime           @default(now())
-    updatedAt    DateTime           @updatedAt
+    id            String             @id @default(auto()) @map("_id") @db.ObjectId
+    total         Int?               @default(0)
+    tax           Int?               @default(0)
+    discount      Int?               @default(0)
+    paymentUrl    String?
+    paymentToken  String?
+    requirements  Json?
+    products      ProductsOnOrders[]
+    paymentMethod String?
+    status        PaymentStatus?     @default(WAITING_PAYMENT)
+    paidAt        DateTime?
+    userId        String?            @db.ObjectId
+    user          User?              @relation(fields: [userId], references: [id], onDelete: Cascade)
+    createdAt     DateTime           @default(now())
+    updatedAt     DateTime           @updatedAt
 }

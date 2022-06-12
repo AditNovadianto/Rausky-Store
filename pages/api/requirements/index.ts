@@ -1,7 +1,9 @@
 import apiHandler, { checkAuth } from '../../../lib/apiHandler'
 import prisma from '../../../lib/prisma'
 
-export default apiHandler
+const app = apiHandler()
+
+export default app
   // get all users fields
   .get(checkAuth(), async (req, res) => {
     const usersFields = await prisma.usersFields.findMany({

@@ -16,7 +16,27 @@ export const getSpecificCategory = async ({
         orderBy: { price: 'asc' },
         include: {
           subCategory: { select: { name: true, slug: true } },
-          category: { select: { name: true, slug: true, logoImg: true } },
+          //   TODO: this is temp, update cart model terus apus ini
+          category: {
+            select: {
+              name: true,
+              slug: true,
+              logoImg: true,
+              requirement: {
+                include: {
+                  fields: {
+                    select: {
+                      placeholder: true,
+                      type: true,
+                      id: true,
+                      value: true,
+                      name: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
       },
       subCategories: true,
@@ -39,7 +59,9 @@ export const getSpecificCategory = async ({
   return category
 }
 
-export default apiHandler
+const app = apiHandler()
+
+export default app
   // get specific category + among all products
   .get(async (req, res) => {
     const { categoryId: categorySlug } = req.query as {

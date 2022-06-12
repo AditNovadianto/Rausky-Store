@@ -20,7 +20,7 @@ request.interceptors.response.use(
     // if (error.response.status == 401) {
     //   Router.push('/signin')
     // }
-    return Promise.reject(error.response)
+    return Promise.reject(error.response ?? error)
   }
 )
 

@@ -61,7 +61,7 @@ const RequirementField = ({ field, categorySlug, user, error }: Props) => {
     <div className="w-full">
       <input
         className={cn(
-          'block w-full px-5 py-3 rounded-xl border focus:outline-none',
+          'input',
           error
             ? 'border-red-300 focus:border-red-400'
             : 'border-gray-300 focus:border-green-400'
@@ -69,6 +69,7 @@ const RequirementField = ({ field, categorySlug, user, error }: Props) => {
         placeholder={field.placeholder}
         type={field.type}
         value={fieldValue ?? ''}
+        onWheel={(e) => (e.target as HTMLInputElement).blur()}
         onChange={(e) => handleRequirement(e, field)}
       />
       {error && (

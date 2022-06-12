@@ -4,7 +4,6 @@ import {
   CheckIcon,
   CloudUploadIcon,
   ExclamationCircleIcon,
-  TrashIcon,
 } from '@heroicons/react/outline'
 import { useEffect } from 'react'
 import { useStateMachine } from 'little-state-machine'
@@ -12,11 +11,13 @@ import Link from '../components/Link'
 import { addToCart, removeFromCart, decrementAmount } from '../lib/cartHandler'
 import request from '../lib/request'
 import RequirementField from '../components/RequirementField'
-import { useSession } from 'next-auth/react'
+import { signIn, useSession } from 'next-auth/react'
 import Skeleton from 'react-loading-skeleton'
+import ProductItem from '../components/ProductItem'
 import { useRouter } from 'next/router'
 
 const Cart = () => {
+  const router = useRouter()
   const { data: session, status } = useSession()
   const user = session?.user
   const isLoggedIn = status != 'loading' && user
@@ -24,21 +25,19 @@ const Cart = () => {
     addToCart,
     removeFromCart,
     decrementAmount,
-    setPayFinishData: (state, payload) => {
+    setOrderFinish: (state, payload) => {
       return {
         ...state,
-        payFinish: {
-          order: payload.order,
-          data: payload.data,
-        },
+        orderFinish: payload,
       }
     },
     clearOrder: (state) => {
+      request.delete('/carts/me')
       return {
         ...state,
         cart: [],
         order: {
-          requirements: {},
+          ...state.order,
           categoryRequirements: [],
           missingRequirements: {},
           subtotal: 0,
@@ -48,11 +47,19 @@ const Cart = () => {
         },
       }
     },
+    setUser: (state, payload: { fieldName: string; fieldValue: string }) => {
+      const newUser = { ...state.order.user }
+      newUser[payload.fieldName] = payload.fieldValue
+      return {
+        ...state,
+        order: {
+          ...state.order,
+          user: newUser,
+        },
+      }
+    },
   })
-  const { cart, order, updatedDB, updatingDB } = state
-  const router = useRouter()
-
-  //   console.log(cart)
+  const { cart, order, updatedDB, updatingDB, orderFinish } = state
 
   useEffect(() => {
     let scriptTag = document.createElement('script')
@@ -68,7 +75,6 @@ const Cart = () => {
     }
   }, [])
 
-  //   TODO: bikin order ke backend, terus set payment token dari backend
   const checkout = async () => {
     try {
       const { data } = await request.post('/orders', {
@@ -77,24 +83,41 @@ const Cart = () => {
           amount: product.amount,
         })),
         requirements: order.requirements,
+        user: !user ? order.user : null,
       })
 
-      //   @ts-ignore
+      // @ts-ignore
       window.snap.pay(data.order.paymentToken, {
-        onSuccess: (result) => {
-          actions.setPayFinishData({ order: data.order, data: result })
-          actions.clearOrder()
-          router.push('/pay-finish')
-        },
         onPending: (result) => {
-          actions.setPayFinishData({ order: data.order, data: result })
-          actions.clearOrder()
-          router.push('/pay-finish')
+          handleSuccessPayment({ result })
+        },
+        onClose: (result) => {
+          handleUnfinishPayment({ orderId: data.order.id })
         },
       })
     } catch (err) {
       console.log(err)
     }
+  }
+
+  const handleSuccessPayment = async ({ result }) => {
+    const { data } = await request.put(`/orders/${result.order_id}`, {
+      paymentMethod: result.payment_type,
+      status: 'PAID',
+      paidAt: new Date(result.transaction_time).toISOString(),
+    })
+    actions.setOrderFinish(data.order)
+    actions.clearOrder()
+    router.push({
+      pathname: '/pay-finish',
+      query: {
+        orderId: data.order.id,
+      },
+    })
+  }
+
+  const handleUnfinishPayment = async ({ orderId }) => {
+    await request.delete(`/orders/${orderId}`)
   }
 
   const isFieldError = ({ requirement, field }) => {
@@ -142,55 +165,11 @@ const Cart = () => {
                 Browse more
               </Link>
             </div>
+
+            {/* PRODUCT LIST */}
             <div className="space-y-8 mt-8">
               {cart.map((item) => (
-                <div key={item.id} className="flex">
-                  <img
-                    className="w-[80px] h-[80px] object-cover rounded-2xl"
-                    src={item.img ?? item.category.logoImg}
-                    alt={item.title}
-                  />
-                  <div className="ml-4 flex-grow">
-                    <p className="text-sm text-green-500">
-                      {item.category.name}
-                    </p>
-                    <h3 className="font-semibold text-lg">{item.title}</h3>
-                    <p className="text-gray-500 font-semibold">
-                      Rp {item.price.toLocaleString()}
-                    </p>
-
-                    <div className="flex justify-between lg:justify-start items-center mt-4">
-                      {/* SET QUANTITY */}
-                      <div className="flex items-center text-gray-500">
-                        <button
-                          onClick={() =>
-                            actions.decrementAmount({ product: item })
-                          }
-                          className="w-8 h-8 rounded-xl font-medium border hover:bg-gray-800 hover:text-gray-100"
-                        >
-                          {' '}
-                          -{' '}
-                        </button>
-                        <div className="px-5">{item.amount}</div>
-                        <button
-                          onClick={() => actions.addToCart({ product: item })}
-                          className="w-8 h-8 rounded-xl font-medium border hover:bg-gray-800 hover:text-gray-100"
-                        >
-                          {' '}
-                          +{' '}
-                        </button>
-                      </div>
-
-                      {/* DELETE */}
-                      <button
-                        onClick={() => actions.removeFromCart(item)}
-                        className="p-1.5 bg-gray-200 hover:bg-red-500 text-gray-500 hover:text-gray-100 rounded-xl lg:ml-5"
-                      >
-                        <TrashIcon className="w-5 h-5 text-current" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                <ProductItem key={item.id} item={item} actions={actions} />
               ))}
             </div>
           </div>
@@ -210,116 +189,165 @@ const Cart = () => {
                 </div>
               )}
             </h2>
+            <div className="divide-y lg:max-h-[65vh] lg:overflow-y-auto">
+              {/* REQUIREMENTS */}
+              {order.categoryRequirements.length > 0 && (
+                <div className="p-6">
+                  <h3 className="font-bold text-xl">Requirements</h3>
+                  <div className="mt-5 space-y-10">
+                    {order.categoryRequirements.map((requirement) => (
+                      <div key={requirement.id}>
+                        <div className="flex items-center">
+                          <img
+                            src={requirement.categoryLogo}
+                            alt={requirement.categorySlug}
+                            className="w-5 h-5 rounded-md mr-2"
+                          />
+                          <h3 className="font-semibold">
+                            {requirement.categoryName}
+                          </h3>
+                        </div>
+                        <div className="space-y-3 mt-4">
+                          {requirement.fields.map((field) => {
+                            const errorMessage = isFieldError({
+                              requirement,
+                              field,
+                            })
 
-            {/* REQUIREMENTS */}
-            {order.categoryRequirements.length > 0 && (
-              <div className="p-6 lg:max-h-[230px] lg:overflow-y-auto">
-                <h3 className="font-bold text-xl">Requirements</h3>
-                <div className="mt-5 space-y-10">
-                  {order.categoryRequirements.map((requirement) => (
-                    <div key={requirement.id}>
-                      <div className="flex items-center">
-                        <img
-                          src={requirement.categoryLogo}
-                          alt={requirement.categorySlug}
-                          className="w-5 h-5 rounded-md mr-2"
-                        />
-                        <h3 className="font-semibold">
-                          {requirement.categoryName}
-                        </h3>
-                      </div>
-                      <div className="space-y-3 mt-4">
-                        {requirement.fields.map((field) => {
-                          const errorMessage = isFieldError({
-                            requirement,
-                            field,
-                          })
-
-                          return status != 'loading' ? (
-                            <div key={field.id}>
-                              <RequirementField
-                                field={field}
-                                categorySlug={requirement.categorySlug}
-                                user={isLoggedIn ? user : null}
-                                error={errorMessage}
+                            return status != 'loading' ? (
+                              <div key={field.id}>
+                                <RequirementField
+                                  field={field}
+                                  categorySlug={requirement.categorySlug}
+                                  user={isLoggedIn ? user : null}
+                                  error={errorMessage}
+                                />
+                              </div>
+                            ) : (
+                              <Skeleton
+                                key={field.id}
+                                height={50}
+                                borderRadius={12}
                               />
+                            )
+                          })}
+                        </div>
+                        {(requirement.img || requirement.description) && (
+                          <details className="mt-4">
+                            <summary className="cursor-pointer text-gray-500">
+                              Details
+                            </summary>
+                            <div className="mt-4">
+                              {requirement.img && (
+                                <img
+                                  className="rounded-xl lg:hover:scale-[1.5] hover:scale-[1.2] lg:hover:-translate-x-[35%] transition-all"
+                                  src={requirement.img}
+                                  alt={requirement.title}
+                                />
+                              )}
+
+                              {requirement.description && (
+                                <p className="mt-3 pb-2 text-gray-500">
+                                  {requirement.description}
+                                </p>
+                              )}
                             </div>
-                          ) : (
-                            <Skeleton
-                              key={field.id}
-                              height={50}
-                              borderRadius={12}
-                            />
-                          )
-                        })}
+                          </details>
+                        )}
                       </div>
-                      {(requirement.img || requirement.description) && (
-                        <details className="mt-4">
-                          <summary className="cursor-pointer text-gray-500">
-                            Details
-                          </summary>
-                          <div className="mt-4">
-                            {requirement.img && (
-                              <img
-                                className="rounded-xl lg:hover:scale-[1.5] hover:scale-[1.2] lg:hover:-translate-x-[35%] transition-all"
-                                src={requirement.img}
-                                alt={requirement.title}
-                              />
-                            )}
+                    ))}
+                  </div>
+                </div>
+              )}
 
-                            {requirement.description && (
-                              <p className="mt-3 pb-2 text-gray-500">
-                                {requirement.description}
-                              </p>
-                            )}
-                          </div>
-                        </details>
-                      )}
+              {/* USER NAME AND EMAIL */}
+              {!user && (
+                <div className="p-6">
+                  <h3 className="font-bold text-xl">
+                    Personal data (opsional)
+                  </h3>
+                  <div className="text-gray-500 text-sm mt-1">
+                    <button
+                      onClick={() => signIn()}
+                      className="text-green-500 hover:underline"
+                    >
+                      Sign In
+                    </button>{' '}
+                    atau lengkapi data di bawah
+                    <br /> untuk mendapat bukti pembayaran melalui email
+                    <br />{' '}
+                    <span className="text-yellow-500">
+                      *untuk saat ini gak beneran masuk ke email
+                    </span>
+                  </div>
+                  <div className="mt-5 space-y-4">
+                    <input
+                      type="text"
+                      className="input"
+                      placeholder="Masukkan nama"
+                      onChange={(e) =>
+                        actions.setUser({
+                          fieldName: 'name',
+                          fieldValue: e.target.value,
+                        })
+                      }
+                    />
+                    <input
+                      type="email"
+                      className="input"
+                      placeholder="Masukkan email"
+                      onChange={(e) =>
+                        actions.setUser({
+                          fieldName: 'email',
+                          fieldValue: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* ORDER SUMMARY */}
+              <div className="p-6">
+                <div className="space-y-2">
+                  <div className="flex justify-between text-gray-500">
+                    <p>Subtotal</p>
+                    <p>Rp {order.subtotal.toLocaleString()}</p>
+                  </div>
+                  {order.tax > 0 && (
+                    <div className="flex justify-between text-gray-500">
+                      <p>Pajak</p>
+                      <p>Rp {order.tax.toLocaleString()}</p>
                     </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div className="p-6">
-              <div className="space-y-2">
-                <div className="flex justify-between text-gray-500">
-                  <p>Subtotal</p>
-                  <p>Rp {order.subtotal.toLocaleString()}</p>
-                </div>
-                {order.tax > 0 && (
-                  <div className="flex justify-between text-gray-500">
-                    <p>Pajak</p>
-                    <p>Rp {order.tax.toLocaleString()}</p>
+                  )}
+                  {order.discount > 0 && (
+                    <div className="flex justify-between text-gray-500">
+                      <p>Diskon</p>
+                      <p>Rp {order.discount.toLocaleString()}</p>
+                    </div>
+                  )}
+                  <div className="flex justify-between text-xl font-semibold">
+                    <p className="">Total</p>
+                    <p>Rp {order.total.toLocaleString()}</p>
                   </div>
-                )}
-                {order.discount > 0 && (
-                  <div className="flex justify-between text-gray-500">
-                    <p>Diskon</p>
-                    <p>Rp {order.discount.toLocaleString()}</p>
-                  </div>
-                )}
-                <div className="flex justify-between text-xl font-semibold">
-                  <p className="">Total</p>
-                  <p>Rp {order.total.toLocaleString()}</p>
                 </div>
-              </div>
 
-              {/* TODO: handle missing requirements */}
-              <div className="my-8">
-                {isAnyError && (
-                  <p className="mt-2 text-red-500 mb-3 font-medium flex items-center justify-center">
-                    <ExclamationCircleIcon className="w-4 h-4 mr-2" /> Please
-                    fill all the requirements
-                  </p>
-                )}
-                <button
-                  onClick={checkout}
-                  disabled={isAnyError}
-                  className="w-full py-4 bg-green-500 hover:bg-green-400 transition-all font-semibold text-white rounded-2xl shadow-xl shadow-green-300 disabled:bg-gray-400/40 disabled:shadow-gray-200"
-                >
-                  Pay (Rp {order.total.toLocaleString()})
-                </button>
+                {/* TODO: handle missing requirements */}
+                <div className="my-8">
+                  {isAnyError && (
+                    <p className="mt-2 text-red-500 mb-3 font-medium flex items-center justify-center">
+                      <ExclamationCircleIcon className="w-4 h-4 mr-2" /> Please
+                      fill all the requirements
+                    </p>
+                  )}
+                  <button
+                    onClick={checkout}
+                    disabled={isAnyError}
+                    className="w-full py-4 bg-green-500 hover:bg-green-400 transition-all font-semibold text-white rounded-2xl shadow-xl shadow-green-300 disabled:bg-gray-400/40 disabled:shadow-gray-200"
+                  >
+                    Pay (Rp {order.total.toLocaleString()})
+                  </button>
+                </div>
               </div>
             </div>
           </div>

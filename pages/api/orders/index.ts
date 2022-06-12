@@ -2,13 +2,15 @@ import apiHandler from '../../../lib/apiHandler'
 import midtransClient from 'midtrans-client'
 import { getSession } from 'next-auth/react'
 
+const app = apiHandler()
+
 let snap = new midtransClient.Snap({
   // Set to true if you want Production Environment (accept real transaction).
   isProduction: false,
   serverKey: process.env.MIDTRANS_SERVER_KEY,
 })
 
-export default apiHandler
+export default app
   // create new order
   .post(async (req, res) => {
     const { products, requirements, user: reqUser } = req.body
@@ -161,6 +163,7 @@ export default apiHandler
         tax,
         paymentToken: token,
         paymentUrl: redirect_url,
+        requirements,
       },
       include: {
         user: true,

@@ -11,12 +11,13 @@ import 'react-loading-skeleton/dist/skeleton.css'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import request from '../lib/request'
-import { setRequirements } from '../lib/cartHandler'
+import { setRequirements, setCart } from '../lib/cartHandler'
 
 createStore(
   {
     cart: [],
     order: {
+      user: {},
       requirements: {},
       categoryRequirements: [],
       missingRequirements: {},
@@ -25,14 +26,10 @@ createStore(
       discount: 0,
       total: 0,
     },
-    payFinish: {
-      order: {},
-      data: {},
-    },
+    orderFinish: {},
   },
   {
     name: 'state',
-    persist: process.env.NODE_ENV === 'production' ? 'beforeUnload' : 'none',
   }
 )
 
@@ -52,24 +49,36 @@ const MyComponent = ({ Component, pageProps }) => {
   const router = useRouter()
   const { actions } = useStateMachine({
     setRequirements,
+    setCart,
   })
 
   useEffect(() => {
-    const setMyRequirements = async () => {
+    const setMyCart = async () => {
       try {
-        const { data } = await request.get('/requirements')
-        const { requirements } = data
-        actions.setRequirements(requirements)
+        const res = await request.get('/carts/me')
+        actions.setCart(res.data.cart.products)
       } catch (err) {}
     }
-    setMyRequirements()
+    const setMyRequirements = async () => {
+      try {
+        const res = await request.get('/requirements')
+        actions.setRequirements(res.data.requirements)
+      } catch (err) {}
+    }
+
+    // TODO: simpen loading di global state
+    const getUserData = async () => {
+      await setMyRequirements()
+      await setMyCart()
+    }
+    getUserData()
   }, [])
 
   return (
     <>
       <NextNProgress color="#90EE90" options={{ showSpinner: false }} />
       <Component {...pageProps} />
-      {router.route != '/cart' && <ContinuePayBtn />}
+      {!['/cart', '/signin'].includes(router.route) && <ContinuePayBtn />}
     </>
   )
 }
