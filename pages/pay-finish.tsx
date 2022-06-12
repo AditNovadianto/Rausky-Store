@@ -83,20 +83,20 @@ const PayFinish = () => {
           </div>
 
           {/* ORDER INFORMATION */}
-          <div className="mt-5 flex space-x-4">
-            <div className="w-full font-medium text-sm p-2 border border-t-4 border-t-green-500 rounded-xl">
+          <div className="mt-5 flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4 print:flex-row print:space-y-0 print:space-x-4">
+            <div className="w-full font-medium text-sm p-2 border border-l-2 border-l-green-500 md:border-l md:border-l-gray-200 md:border-t-4 md:border-t-green-500 print:border-l print:border-l-gray-200 print:border-t-4 print:border-t-green-500 rounded-xl">
               <h3 className="flex items-center">
                 Payment method <CreditCardIcon className="w-4 h-4 ml-1" />
               </h3>
               <p className="text-gray-500">{orderFinish.paymentMethod}</p>
             </div>
-            <div className="w-full font-medium text-sm p-2 border border-t-4 border-t-green-500 rounded-xl">
+            <div className="w-full font-medium text-sm p-2 border border-l-2 border-l-green-500 md:border-l md:border-l-gray-200 md:border-t-4 md:border-t-green-500 print:border-l print:border-l-gray-200 print:border-t-4 print:border-t-green-500 rounded-xl">
               <h3 className="flex items-center">
                 Status <CheckCircleIcon className="w-4 h-4 ml-1" />
               </h3>
               <p className="text-gray-500">{orderFinish.status}</p>
             </div>
-            <div className="w-full font-medium text-sm p-2 border border-t-4 border-t-green-500 rounded-xl">
+            <div className="w-full font-medium text-sm p-2 border border-l-2 border-l-green-500 md:border-l md:border-l-gray-200 md:border-t-4 md:border-t-green-500 print:border-l print:border-l-gray-200 print:border-t-4 print:border-t-green-500 rounded-xl">
               <h3 className="flex items-center">
                 Paid At <ClockIcon className="w-4 h-4 ml-1" />
               </h3>
@@ -116,7 +116,7 @@ const PayFinish = () => {
             </div>
           </div>
 
-          <div className="mt-10 flex space-x-4">
+          <div className="mt-10 flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4">
             {/* ORDER SUMMARY */}
             <div className="flex-[2] p-4 pb-8 print:pb-4 border rounded-2xl">
               <h3 className="font-semibold text-xl">Summary</h3>
