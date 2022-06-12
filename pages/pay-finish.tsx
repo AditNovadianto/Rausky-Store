@@ -83,7 +83,7 @@ const PayFinish = () => {
             </div>
           )}
 
-          <div className="flex-[1] max-w-2xl mx-auto">
+          <div className="flex-[1] max-w-2xl mx-auto print:max-w-none print:mx-0">
             <h3 className="font-semibold text-2xl flex items-center">
               <span>
                 Thanks for your orders
