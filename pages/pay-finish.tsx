@@ -38,6 +38,7 @@ const contacts = [
 const PayFinish = () => {
   const { state } = useStateMachine()
   const [loading, setLoading] = useState(true)
+  const [showOrderPreview, setShowOrderPreview] = useState(false)
   const { orderFinish } = state
   const router = useRouter()
   const { orderId } = router.query
@@ -65,18 +66,37 @@ const PayFinish = () => {
       ) : (
         <Wrapper className="flex flex-col-reverse lg:flex-row">
           {/* ORDER PREVIEW */}
-          <div className="print:hidden flex-[1] overflow-hidden mt-10 lg:mt-0 lg:mr-10 lg:sticky lg:top-[80px] lg:self-start">
-            <h2 className="font-semibold text-xl flex items-center">
-              <CodeIcon className="w-6 h-6 mr-2" /> Order Preview
-            </h2>
-            <pre className="mt-2 overflow-auto max-h-[70vh] bg-gray-800 text-green-500 rounded-2xl p-5">
-              {JSON.stringify(orderFinish, null, 2)}
-            </pre>
-          </div>
-          <div className="flex-[1]">
-            <h3 className="font-semibold text-2xl">
-              Thanks for your orders
-              {orderFinish.user?.name ? `, ${orderFinish.user.name}` : ''}! ✅
+          {showOrderPreview && (
+            <div className="print:hidden flex-[1] overflow-hidden mt-10 lg:mt-0 lg:mr-10 lg:sticky lg:top-[80px] lg:self-start">
+              <h2 className="font-semibold text-xl flex items-center">
+                <CodeIcon className="w-6 h-6 mr-2" /> Order Preview
+                <button
+                  className="ml-2 text-sm bg-gray-900 hover:bg-gray-500 text-white px-2 py-1 rounded-lg"
+                  onClick={() => setShowOrderPreview(false)}
+                >
+                  Hide
+                </button>
+              </h2>
+              <pre className="mt-2 overflow-auto max-h-[70vh] bg-gray-800 text-green-500 rounded-2xl p-5">
+                {JSON.stringify(orderFinish, null, 2)}
+              </pre>
+            </div>
+          )}
+
+          <div className="flex-[1] max-w-2xl mx-auto">
+            <h3 className="font-semibold text-2xl flex items-center">
+              <span>
+                Thanks for your orders
+                {orderFinish.user?.name ? `, ${orderFinish.user.name}` : ''}! ✅
+              </span>
+              {!showOrderPreview && (
+                <button
+                  className="print:hidden hidden md:block ml-auto hover:text-gray-500"
+                  onClick={() => setShowOrderPreview(true)}
+                >
+                  <CodeIcon className="w-6 h-6 mr-2" />
+                </button>
+              )}
             </h3>
 
             <div className="mt-5">
@@ -173,6 +193,15 @@ const PayFinish = () => {
             >
               <PrinterIcon className="w-5 h-5 mr-2" /> Print
             </button>
+
+            {!showOrderPreview && (
+              <button
+                className="print:hidden w-full flex md:hidden mt-5 hover:text-gray-500"
+                onClick={() => setShowOrderPreview(true)}
+              >
+                <CodeIcon className="w-6 h-6 ml-auto" />
+              </button>
+            )}
           </div>
         </Wrapper>
       )}
