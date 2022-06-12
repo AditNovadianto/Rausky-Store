@@ -4,7 +4,6 @@ import {
   CheckIcon,
   CloudUploadIcon,
   ExclamationCircleIcon,
-  TrashIcon,
 } from '@heroicons/react/outline'
 import { useEffect } from 'react'
 import { useStateMachine } from 'little-state-machine'
@@ -14,10 +13,11 @@ import request from '../lib/request'
 import RequirementField from '../components/RequirementField'
 import { signIn, useSession } from 'next-auth/react'
 import Skeleton from 'react-loading-skeleton'
-import { useRouter } from 'next/router'
 import ProductItem from '../components/ProductItem'
+import { useRouter } from 'next/router'
 
 const Cart = () => {
+  const router = useRouter()
   const { data: session, status } = useSession()
   const user = session?.user
   const isLoggedIn = status != 'loading' && user
@@ -84,7 +84,12 @@ const Cart = () => {
     const { order: updatedOrder } = data
     actions.setOrderFinish(updatedOrder)
     actions.clearOrder()
-    location.href = '/pay-finish?orderId=' + updatedOrder.id
+    router.push({
+      pathname: '/pay-finish',
+      query: {
+        orderId: updatedOrder.id,
+      },
+    })
   }
 
   const checkout = async () => {
