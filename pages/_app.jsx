@@ -26,10 +26,7 @@ createStore(
       discount: 0,
       total: 0,
     },
-    payFinish: {
-      order: {},
-      data: {},
-    },
+    orderFinish: {},
   },
   {
     name: 'state',
@@ -81,7 +78,7 @@ const MyComponent = ({ Component, pageProps }) => {
     <>
       <NextNProgress color="#90EE90" options={{ showSpinner: false }} />
       <Component {...pageProps} />
-      {router.route != '/cart' && <ContinuePayBtn />}
+      {!['/cart', '/signin'].includes(router.route) && <ContinuePayBtn />}
     </>
   )
 }

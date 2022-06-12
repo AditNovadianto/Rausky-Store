@@ -14,6 +14,8 @@ import request from '../lib/request'
 import RequirementField from '../components/RequirementField'
 import { signIn, useSession } from 'next-auth/react'
 import Skeleton from 'react-loading-skeleton'
+import { useRouter } from 'next/router'
+import ProductItem from '../components/ProductItem'
 
 const Cart = () => {
   const { data: session, status } = useSession()
@@ -23,13 +25,10 @@ const Cart = () => {
     addToCart,
     removeFromCart,
     decrementAmount,
-    setPayFinishData: (state, payload) => {
+    setOrderFinish: (state, payload) => {
       return {
         ...state,
-        payFinish: {
-          order: payload.order,
-          data: payload.data,
-        },
+        orderFinish: payload,
       }
     },
     clearOrder: (state) => {
@@ -61,8 +60,7 @@ const Cart = () => {
     },
   })
   const { cart, order, updatedDB, updatingDB } = state
-
-  //   console.log(cart)
+  const router = useRouter()
 
   useEffect(() => {
     let scriptTag = document.createElement('script')
@@ -78,7 +76,18 @@ const Cart = () => {
     }
   }, [])
 
-  //   TODO: bikin order ke backend, terus set payment token dari backend
+  const handleSuccessPayment = async ({ result, order }) => {
+    const { data } = await request.put(`/orders/${order.id}`, {
+      paymentMethod: result.payment_type,
+      status: 'PAID',
+      paidAt: new Date(result.transaction_time).toISOString(),
+    })
+    const { order: updatedOrder } = data
+    actions.setOrderFinish(updatedOrder)
+    actions.clearOrder()
+    router.push('/pay-finish')
+  }
+
   const checkout = async () => {
     try {
       const { data } = await request.post('/orders', {
@@ -92,16 +101,12 @@ const Cart = () => {
 
       //   @ts-ignore
       window.snap.pay(data.order.paymentToken, {
-        onSuccess: (result) => {
-          actions.setPayFinishData({ order: data.order, data: result })
-          actions.clearOrder()
-          window.location.href = '/pay-finish'
-        },
-        onPending: (result) => {
-          actions.setPayFinishData({ order: data.order, data: result })
-          actions.clearOrder()
-          window.location.href = '/pay-finish'
-        },
+        onSuccess: (result) =>
+          handleSuccessPayment({ result, order: data.order }),
+        onPending: (result) =>
+          handleSuccessPayment({ result, order: data.order }),
+        // TODO: kalo transaksi berhasil, tambahin informasi tambahan di order (payment method, dll)
+        // TODO: tambahin callback kalo transaksi dicancel / gagal, hapus order dari db
       })
     } catch (err) {
       console.log(err)
@@ -153,55 +158,11 @@ const Cart = () => {
                 Browse more
               </Link>
             </div>
+
+            {/* PRODUCT LIST */}
             <div className="space-y-8 mt-8">
               {cart.map((item) => (
-                <div key={item.id} className="flex">
-                  <img
-                    className="w-[80px] h-[80px] object-cover rounded-2xl"
-                    src={item.img ?? item.category.logoImg}
-                    alt={item.title}
-                  />
-                  <div className="ml-4 flex-grow">
-                    <p className="text-sm text-green-500">
-                      {item.category.name}
-                    </p>
-                    <h3 className="font-semibold text-lg">{item.title}</h3>
-                    <p className="text-gray-500 font-semibold">
-                      Rp {item.price.toLocaleString()}
-                    </p>
-
-                    <div className="flex justify-between lg:justify-start items-center mt-4">
-                      {/* SET QUANTITY */}
-                      <div className="flex items-center text-gray-500">
-                        <button
-                          onClick={() =>
-                            actions.decrementAmount({ product: item })
-                          }
-                          className="w-8 h-8 rounded-xl font-medium border hover:bg-gray-800 hover:text-gray-100"
-                        >
-                          {' '}
-                          -{' '}
-                        </button>
-                        <div className="px-5">{item.amount}</div>
-                        <button
-                          onClick={() => actions.addToCart({ product: item })}
-                          className="w-8 h-8 rounded-xl font-medium border hover:bg-gray-800 hover:text-gray-100"
-                        >
-                          {' '}
-                          +{' '}
-                        </button>
-                      </div>
-
-                      {/* DELETE */}
-                      <button
-                        onClick={() => actions.removeFromCart(item)}
-                        className="p-1.5 bg-gray-200 hover:bg-red-500 text-gray-500 hover:text-gray-100 rounded-xl lg:ml-5"
-                      >
-                        <TrashIcon className="w-5 h-5 text-current" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                <ProductItem key={item.id} item={item} actions={actions} />
               ))}
             </div>
           </div>

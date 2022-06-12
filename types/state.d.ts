@@ -1,5 +1,5 @@
 import 'little-state-machine'
-import { Category, Product } from '@prisma/client'
+import { Category, Order, Product, User } from '@prisma/client'
 
 declare module 'little-state-machine' {
   interface GlobalState {
@@ -17,9 +17,11 @@ declare module 'little-state-machine' {
       discount: number
       total: number
     }
-    payFinish: {
-      order: CustomObject
-      data: CustomObject
+    orderFinish: Order & {
+      products: (Product & {
+        category: Category
+      })[]
+      user: User
     }
     updatingDB: boolean
     updatedDB: boolean
