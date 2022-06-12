@@ -7,15 +7,20 @@ interface Props {
 
 const ProductItem = ({ item, actions }: Props) => {
   return (
-    <div key={item.id} className="flex">
+    <div key={item.id} className="flex flex-col md:flex-row">
       <img
         className="w-[80px] h-[80px] object-cover rounded-2xl"
         src={item.img ?? item.category.logoImg}
         alt={item.title}
       />
-      <div className="ml-4 flex-grow">
+      <div className="mt-4 md:mt-0 md:ml-4 flex-grow">
         <p className="text-sm text-green-500">{item.category.name}</p>
-        <h3 className="font-semibold text-lg">{item.title}</h3>
+        <h3 className="font-semibold text-lg">
+          {item.title}{' '}
+          {item.amount && item.amount > 1 && (
+            <span className="ml-2 text-gray-500">x{item.amount}</span>
+          )}
+        </h3>
         <p className="text-gray-500 font-semibold">
           Rp {item.price.toLocaleString()}
         </p>

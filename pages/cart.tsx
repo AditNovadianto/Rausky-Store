@@ -59,7 +59,7 @@ const Cart = () => {
       }
     },
   })
-  const { cart, order, updatedDB, updatingDB } = state
+  const { cart, order, updatedDB, updatingDB, orderFinish } = state
 
   useEffect(() => {
     let scriptTag = document.createElement('script')
@@ -75,23 +75,6 @@ const Cart = () => {
     }
   }, [])
 
-  const handleSuccessPayment = async ({ result, order }) => {
-    const { data } = await request.put(`/orders/${order.id}`, {
-      paymentMethod: result.payment_type,
-      status: 'PAID',
-      paidAt: new Date(result.transaction_time).toISOString(),
-    })
-    const { order: updatedOrder } = data
-    actions.setOrderFinish(updatedOrder)
-    actions.clearOrder()
-    router.push({
-      pathname: '/pay-finish',
-      query: {
-        orderId: updatedOrder.id,
-      },
-    })
-  }
-
   const checkout = async () => {
     try {
       const { data } = await request.post('/orders', {
@@ -103,18 +86,38 @@ const Cart = () => {
         user: !user ? order.user : null,
       })
 
-      //   @ts-ignore
+      // @ts-ignore
       window.snap.pay(data.order.paymentToken, {
-        onSuccess: (result) =>
-          handleSuccessPayment({ result, order: data.order }),
-        onPending: (result) =>
-          handleSuccessPayment({ result, order: data.order }),
-        // TODO: kalo transaksi berhasil, tambahin informasi tambahan di order (payment method, dll)
-        // TODO: tambahin callback kalo transaksi dicancel / gagal, hapus order dari db
+        onPending: (result) => {
+          handleSuccessPayment({ result })
+        },
+        onClose: (result) => {
+          handleUnfinishPayment({ orderId: data.order.id })
+        },
       })
     } catch (err) {
       console.log(err)
     }
+  }
+
+  const handleSuccessPayment = async ({ result }) => {
+    const { data } = await request.put(`/orders/${result.order_id}`, {
+      paymentMethod: result.payment_type,
+      status: 'PAID',
+      paidAt: new Date(result.transaction_time).toISOString(),
+    })
+    actions.setOrderFinish(data.order)
+    actions.clearOrder()
+    router.push({
+      pathname: '/pay-finish',
+      query: {
+        orderId: data.order.id,
+      },
+    })
+  }
+
+  const handleUnfinishPayment = async ({ orderId }) => {
+    await request.delete(`/orders/${orderId}`)
   }
 
   const isFieldError = ({ requirement, field }) => {
