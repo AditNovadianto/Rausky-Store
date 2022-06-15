@@ -4,6 +4,7 @@ import Wrapper from '../components/Wrapper'
 import { parseData } from '../lib/utils'
 import { getAllCategories } from './api/categories'
 
+// TODO: ganti sultan rausky + statistik penjualan dengan live chat
 const Home = ({ categories }) => {
   const topupCategories = categories.filter((category) => category.isTopup)
   const otherCategories = categories.filter((category) => !category.isTopup)

@@ -110,6 +110,7 @@ const Navbar = () => {
               <img src="/images/Bag.svg" alt="Bag-icon" />
             </Link>
 
+            {/* TODO: bikin main menu */}
             <button className="ml-4 flex-shrink-0">
               <img src="/images/person.svg" alt="person" />
             </button>

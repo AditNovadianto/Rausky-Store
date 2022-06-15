@@ -16,6 +16,22 @@ import Skeleton from 'react-loading-skeleton'
 import ProductItem from '../components/ProductItem'
 import { useRouter } from 'next/router'
 
+const attachMidtransScript = () => {
+  let scriptTag = document.createElement('script')
+  scriptTag.type = 'text/javascript'
+  scriptTag.src = 'https://app.sandbox.midtrans.com/snap/snap.js'
+  scriptTag.id = 'midtrans-script'
+
+  const myMidtransClientKey = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY
+  scriptTag.setAttribute('data-client-key', myMidtransClientKey)
+
+  document.body.appendChild(scriptTag)
+}
+
+const removeMidtransScript = () => {
+  document.getElementById('midtrans-script').remove()
+}
+
 const Cart = () => {
   const router = useRouter()
   const { data: session, status } = useSession()
@@ -59,21 +75,28 @@ const Cart = () => {
       }
     },
   })
-  const { cart, order, updatedDB, updatingDB, orderFinish } = state
+  const { cart, order, updatedDB, updatingDB } = state
 
   useEffect(() => {
-    let scriptTag = document.createElement('script')
-    scriptTag.type = 'text/javascript'
-    scriptTag.src = 'https://app.sandbox.midtrans.com/snap/snap.js'
-
-    const myMidtransClientKey = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY
-    scriptTag.setAttribute('data-client-key', myMidtransClientKey)
-
-    document.body.appendChild(scriptTag)
+    attachMidtransScript()
     return () => {
-      document.body.removeChild(scriptTag)
+      removeMidtransScript()
     }
   }, [])
+
+  // this useEffect use to fix weird bug after payment finish
+  // where users are not redirected to /pay-finish
+  useEffect(() => {
+    const { orderId } = router.query
+    if (orderId) {
+      router.push({
+        pathname: '/pay-finish',
+        query: {
+          orderId,
+        },
+      })
+    }
+  }, [router])
 
   const checkout = async () => {
     try {
