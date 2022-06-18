@@ -195,7 +195,7 @@ const PayFinish = () => {
             </div>
 
             {/* ORDER RATING */}
-            <div className="mt-10">
+            <div className="mt-10 print:hidden">
               <h3 className="font-semibold text-xl">Rating</h3>
               {orderFinish.rating && (
                 <div className="mt-3 p-2 rounded-xl border border-green-300 bg-green-100">
