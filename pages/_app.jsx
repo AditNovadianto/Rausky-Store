@@ -12,6 +12,7 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import request from '../lib/request'
 import { setRequirements, setCart } from '../lib/cartHandler'
+import { Toaster } from 'react-hot-toast'
 
 createStore(
   {
@@ -79,6 +80,7 @@ const MyComponent = ({ Component, pageProps }) => {
       <NextNProgress color="#90EE90" options={{ showSpinner: false }} />
       <Component {...pageProps} />
       {!['/cart', '/signin'].includes(router.route) && <ContinuePayBtn />}
+      <Toaster />
     </>
   )
 }

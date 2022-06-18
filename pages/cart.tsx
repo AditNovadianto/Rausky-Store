@@ -87,12 +87,13 @@ const Cart = () => {
   // this useEffect use to fix weird bug after payment finish
   // where users are not redirected to /pay-finish
   useEffect(() => {
-    const { orderId } = router.query
-    if (orderId) {
+    const { order_id } = router.query
+    if (order_id) {
+      actions.clearOrder()
       router.push({
         pathname: '/pay-finish',
         query: {
-          orderId,
+          orderId: order_id,
         },
       })
     }

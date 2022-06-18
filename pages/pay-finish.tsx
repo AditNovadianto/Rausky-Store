@@ -1,4 +1,3 @@
-import { CodeIcon, PrinterIcon } from '@heroicons/react/outline'
 import { useStateMachine } from 'little-state-machine'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -9,10 +8,18 @@ import {
   CreditCardIcon,
   ClockIcon,
   CheckCircleIcon,
+  CodeIcon,
+  PrinterIcon,
+  StarIcon,
 } from '@heroicons/react/outline'
+import { StarIcon as StarIconSolid } from '@heroicons/react/solid'
 import ProductItem from '../components/ProductItem'
 import Skeleton from 'react-loading-skeleton'
 import request from '../lib/request'
+import ReactStars from 'react-rating-stars-component'
+import Confetti from 'react-confetti'
+import toast from 'react-hot-toast'
+import cn from 'classnames'
 
 // TODO: update hrefnya
 const contacts = [
@@ -36,6 +43,7 @@ const contacts = [
   },
 ]
 
+// TODO: tambahin animasi confetti
 const PayFinish = () => {
   const { state, actions } = useStateMachine({
     setOrderFinish: (state, payload) => {
@@ -49,6 +57,10 @@ const PayFinish = () => {
   const [showOrderPreview, setShowOrderPreview] = useState(false)
   const { orderFinish } = state
   const router = useRouter()
+
+  const [comment, setComment] = useState('')
+  const [star, setStar] = useState(0)
+  const [sendingRating, setSendingRating] = useState(false)
 
   useEffect(() => {
     const checkOrder = async () => {
@@ -65,7 +77,9 @@ const PayFinish = () => {
           const { data } = await request.get(`/orders/${orderId}`)
           const { order } = data
           actions.setOrderFinish(order)
-        } catch {
+          setStar(order.rating.star)
+          setComment(order.rating.comment)
+        } catch (err) {
           router.replace('/')
           return
         }
@@ -78,12 +92,41 @@ const PayFinish = () => {
     }
   }, [])
 
+  console.log(orderFinish)
+
+  const sendRating = async () => {
+    let toastId
+    try {
+      toastId = toast.loading('Sending rating')
+      setSendingRating(true)
+      const { data } = await request.post('/ratings', {
+        star,
+        comment,
+        orderId: orderFinish.id,
+      })
+      console.log(data.rating)
+      actions.setOrderFinish({ ...orderFinish, rating: data.rating })
+      toast.success(
+        `Thank you for your feedback${
+          orderFinish.user ? `, ${orderFinish.user.name}` : ''
+        }`,
+        { id: toastId }
+      )
+    } catch (err) {
+      console.log(err)
+      toast.error('Opps... Something error', { id: toastId })
+    } finally {
+      setSendingRating(false)
+    }
+  }
+
   return (
     <Container>
       {loading ? (
         <LoadingSkeletons />
       ) : (
         <Wrapper className="flex flex-col-reverse lg:flex-row">
+          <Confetti recycle={false} style={{ zIndex: 100 }} />
           {/* ORDER PREVIEW */}
           {showOrderPreview && (
             <div className="print:hidden flex-[1] overflow-hidden mt-10 lg:mt-0 lg:mr-10 lg:sticky lg:top-[80px] lg:self-start">
@@ -151,11 +194,70 @@ const PayFinish = () => {
               </div>
             </div>
 
+            {/* ORDER RATING */}
+            <div className="mt-10">
+              <h3 className="font-semibold text-xl">Rating</h3>
+              {orderFinish.rating && (
+                <div className="mt-3 p-2 rounded-xl border border-green-300 bg-green-100">
+                  Thank you
+                  {orderFinish.user && (
+                    <>
+                      , <b>{orderFinish.user.name}</b>
+                    </>
+                  )}{' '}
+                  😊. Your rating has been sent.
+                </div>
+              )}
+              <div
+                className={cn(
+                  'mt-3 flex flex-col',
+                  orderFinish.rating && 'pointer-events-none'
+                )}
+              >
+                <div>
+                  <ReactStars
+                    count={5}
+                    emptyIcon={<StarIcon className="w-10 h-10 text-gray-300" />}
+                    filledIcon={
+                      <StarIconSolid className="w-10 h-10 text-yellow-500" />
+                    }
+                    onChange={(star) => setStar(star)}
+                    disabled={orderFinish.rating}
+                    value={star}
+                  />
+                </div>
+                <textarea
+                  disabled={star == 0 || sendingRating}
+                  className="mt-3 px-3 py-2 border border-gray-300 rounded-t-md focus:outline-none focus:border-green-400"
+                  placeholder="How was the experience while using Rausky?"
+                  onChange={(e) => setComment(e.target.value)}
+                  value={comment}
+                  cols={30}
+                  rows={3}
+                ></textarea>
+                {!orderFinish.rating && (
+                  <button
+                    disabled={star == 0 || sendingRating}
+                    onClick={sendRating}
+                    className="bg-green-500 disabled:bg-gray-400/60 text-white w-full py-3 rounded-b-md font-semibold hover:bg-green-400"
+                  >
+                    {star == 0 ? (
+                      'Please select star'
+                    ) : (
+                      <>
+                        Send Rating ({star} Star{star > 1 && 's'})
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
+            </div>
+
             {/* PRODUCT LIST */}
             <div className="mt-10">
               <h3 className="font-semibold text-xl">Products</h3>
               <div className="mt-8 space-y-8">
-                {orderFinish.products.map((item) => (
+                {orderFinish.products?.map((item) => (
                   <ProductItem key={item.id} item={item} />
                 ))}
               </div>
@@ -167,15 +269,15 @@ const PayFinish = () => {
                 <h3 className="font-semibold text-xl">Summary</h3>
                 <div className="mt-2 flex justify-between text-gray-500">
                   <p>Pajak</p>
-                  <p>Rp {orderFinish.tax.toLocaleString()}</p>
+                  <p>Rp {orderFinish.tax?.toLocaleString()}</p>
                 </div>
                 <div className="mt-2 flex justify-between text-gray-500">
                   <p>Diskon</p>
-                  <p>Rp {orderFinish.discount.toLocaleString()}</p>
+                  <p>Rp {orderFinish.discount?.toLocaleString()}</p>
                 </div>
                 <div className="flex mt-4 p-4 print:p-0 rounded-2xl justify-between text-xl font-semibold bg-green-500 text-white print:text-black print:shadow-none shadow-xl shadow-green-300">
                   <p className="">Total</p>
-                  <p>Rp {orderFinish.total.toLocaleString()}</p>
+                  <p>Rp {orderFinish.total?.toLocaleString()}</p>
                 </div>
               </div>
               {/* CONTACT */}
@@ -208,7 +310,7 @@ const PayFinish = () => {
             {/* PRINT BUTTON */}
             <button
               onClick={print}
-              className="print:hidden mt-5 w-full flex items-center justify-center py-3 rounded-2xl border border-gray-900 font-semibold hover:bg-gray-900 hover:text-white transition-colors"
+              className="print:hidden mt-8 w-full flex items-center justify-center py-3 rounded-2xl border border-gray-900 font-semibold hover:bg-gray-900 hover:text-white transition-colors"
             >
               <PrinterIcon className="w-5 h-5 mr-2" /> Print
             </button>

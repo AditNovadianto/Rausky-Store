@@ -8,6 +8,7 @@ export default app
       where: { id: req.query.orderId as string },
       include: {
         user: true,
+        rating: true,
         products: {
           select: {
             product: { include: { category: true } },
@@ -37,6 +38,7 @@ export default app
       },
       include: {
         user: true,
+        rating: true,
         products: {
           select: {
             product: { include: { category: true } },
