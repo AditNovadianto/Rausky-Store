@@ -222,7 +222,6 @@ const PayFinish = () => {
                       <StarIconSolid className="w-10 h-10 text-yellow-500" />
                     }
                     onChange={(star) => setStar(star)}
-                    disabled={orderFinish.rating}
                     value={star}
                   />
                 </div>

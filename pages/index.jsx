@@ -1,13 +1,35 @@
+import { StarIcon as StarIconSolid } from '@heroicons/react/solid'
+import { useState } from 'react'
+import { useEffect } from 'react'
+import Skeleton from 'react-loading-skeleton'
 import Container from '../components/Container'
 import Link from '../components/Link'
 import Wrapper from '../components/Wrapper'
 import { parseData } from '../lib/utils'
 import { getAllCategories } from './api/categories'
+import request from '../lib/request'
+import Rating from '../components/Rating'
+import RatingsModal from '../components/home/RatingsModal'
 
-// TODO: ganti sultan rausky + statistik penjualan dengan live chat
+const getRatingCount = (ratings, star) => {
+  return ratings.filter((rating) => rating.star == star).length
+}
+
 const Home = ({ categories }) => {
   const topupCategories = categories.filter((category) => category.isTopup)
   const otherCategories = categories.filter((category) => !category.isTopup)
+  const [ratings, setRatings] = useState(null)
+  const [showAllRatings, setShowAllRatings] = useState(false)
+
+  console.log(ratings)
+
+  useEffect(() => {
+    const fetchAppRatings = async () => {
+      const { data } = await request.get('/ratings')
+      setRatings(data)
+    }
+    fetchAppRatings()
+  }, [])
 
   return (
     <Container>
@@ -72,36 +94,91 @@ const Home = ({ categories }) => {
               ))}
             </div>
           </section>
+        </div>
 
-          {/* ALL PRODUCTS */}
-          <section className="hidden lg:block">
-            <h2 className="text-2xl font-bold mb-4">Biar ga kosong aja</h2>
-            {/* TODO: tampilin all products */}
+        <div className="lg:sticky lg:self-start lg:top-[80px] space-y-8 lg:flex-[1]">
+          {/* RATINGS */}
+          <section>
+            <h2 className="text-2xl font-bold mb-4 flex items-center">
+              Ratings{' '}
+              {ratings ? (
+                <span className="text-gray-500 font-normal text-lg ml-2">
+                  ({ratings.count.toLocaleString()})
+                </span>
+              ) : (
+                <Skeleton width={30} className="ml-2" />
+              )}
+            </h2>
+            {/* AVG RATING */}
+            <div className="flex items-center">
+              <StarIconSolid className="w-10 h-10 text-yellow-500 -ml-2" />
+              {ratings ? (
+                <span className="ml-2 font-semibold text-xl">
+                  {ratings.avg}
+                </span>
+              ) : (
+                <Skeleton width={30} height={25} className="ml-2" />
+              )}
+            </div>
+            {/* RATING STATISTICS */}
+            {ratings ? (
+              <div className="mt-4 space-y-2">
+                {[5, 4, 3, 2, 1].map((star) => {
+                  const ratingCount = getRatingCount(ratings.ratings, star)
+                  const ratingCountPercent =
+                    (ratingCount / ratings.ratings.length) * 100
+                  return (
+                    <div key={star} className="flex items-center">
+                      <span className="text-xs mr-5 font-medium">{star}</span>
+                      <div
+                        role="progress"
+                        title={ratingCount.toLocaleString()}
+                        className="w-full h-2 rounded-full bg-gray-200 overflow-hidden"
+                      >
+                        <div
+                          className="h-full bg-yellow-500 rounded-full"
+                          style={{
+                            width: ratingCountPercent + '%',
+                          }}
+                        ></div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            ) : (
+              <Skeleton count={5} height={8} borderRadius={50} />
+            )}
+            {/* RATING LIST */}
+            <div className="mt-4 space-y-3">
+              {ratings ? (
+                ratings.ratings
+                  .slice(0, 2)
+                  .map((rating) => <Rating key={rating.id} rating={rating} />)
+              ) : (
+                <Skeleton count={2} height={60} borderRadius={12} />
+              )}
+            </div>
+            {ratings && (
+              <>
+                <button
+                  onClick={() => setShowAllRatings(true)}
+                  className="mt-3 text-green-500 font-medium hover:underline"
+                >
+                  show more &rarr;
+                </button>
+              </>
+            )}
           </section>
         </div>
 
-        <div className="lg:sticky lg:self-start lg:top-[80px] space-y-8">
-          <section>
-            <h2 className="text-2xl font-bold mb-4">Sultan Rausky</h2>
-            {/* TODO: tampilin sultan rausky */}
-            <div>Tebo</div>
-            <div>Umang</div>
-            <div>Kuncoro</div>
-          </section>
-
-          {/* STATISTICS */}
-          <section>
-            <h2 className="text-2xl font-bold mb-4">Statistik Penjualan</h2>
-            {/* TODO: bikin statistik penjualan */}
-            <p>coming soon 😎</p>
-          </section>
-        </div>
-
-        {/* ALL PRODUCTS */}
-        <section className="lg:hidden">
-          <h2 className="text-2xl font-bold mb-4">Biar ga kosong aja</h2>
-          {/* TODO: tampilin all products */}
-        </section>
+        {ratings && (
+          <RatingsModal
+            open={showAllRatings}
+            onClose={() => setShowAllRatings(false)}
+            ratings={ratings}
+          />
+        )}
       </Wrapper>
     </Container>
   )

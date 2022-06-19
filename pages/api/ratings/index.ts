@@ -3,6 +3,27 @@ import prisma from '../../../lib/prisma'
 
 const app = apiHandler()
 
+export const getRatings = async () => {
+  const { _avg } = await prisma.rating.aggregate({
+    _avg: {
+      star: true,
+    },
+  })
+  const ratings = await prisma.rating.findMany({
+    orderBy: { updatedAt: 'desc' },
+    include: {
+      order: {
+        select: { user: true },
+      },
+    },
+  })
+  return {
+    avg: Number(_avg.star.toFixed(1)),
+    ratings,
+    count: ratings.length,
+  }
+}
+
 export default app
   // create rating
   .post(async (req, res) => {
@@ -15,4 +36,9 @@ export default app
       },
     })
     res.status(201).json({ rating })
+  })
+  // aggregate rating
+  .get(async (req, res) => {
+    const ratings = await getRatings()
+    res.status(200).json(ratings)
   })
