@@ -61,7 +61,7 @@ model User {
     accounts          Account[]
     sessions          Session[]
     orders            Order[]
-    Product           Product[]
+    products          Product[]
     requirementFields UsersFields[]
     cart              Cart?
 }
@@ -134,11 +134,11 @@ model Product {
     stock         Int?               @default(0)
     categoryId    String?            @db.ObjectId
     moreInfo      Json?
-    userId        String             @db.ObjectId
+    userId        String?            @db.ObjectId
     subCategoryId String?            @db.ObjectId
     orders        ProductsOnOrders[]
     category      Category?          @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-    user          User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+    user          User?              @relation(fields: [userId], references: [id], onDelete: Cascade)
     subCategory   SubCategory?       @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
     createdAt     DateTime           @default(now())
     updatedAt     DateTime           @updatedAt

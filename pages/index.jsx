@@ -147,7 +147,9 @@ const Home = ({ categories }) => {
                 })}
               </div>
             ) : (
-              <Skeleton count={5} height={8} borderRadius={50} />
+              <div className="mt-4">
+                <Skeleton count={5} height={8} borderRadius={50} />
+              </div>
             )}
             {/* RATING LIST */}
             <div className="mt-4 space-y-3">

@@ -21,23 +21,46 @@ export default app
   })
   // create new product
   .post(checkAuth('ADMIN'), async (req, res) => {
-    const { title, price, category, subCategory } = req.body
+    if (Array.isArray(req.body)) {
+      const products = await Promise.all(
+        req.body.map((product) => {
+          const { title, price, category, subCategory } = product
+          if (!title || !price) {
+            throw { status: 400, message: 'Please provide title, price' }
+          }
+          if (subCategory) {
+            product.subCategory = { connect: { slug: subCategory } }
+          }
+          return prisma.product.create({
+            data: {
+              ...product,
+              category: { connect: { slug: category } },
+              user: { connect: { id: req.user.id } },
+            },
+          })
+        })
+      )
 
-    if (!title || !price) {
-      throw { status: 400, message: 'Please provide title, price' }
+      res.status(201).json({ products, count: products.length })
+    } else {
+      const { title, price, category, subCategory } = req.body
+
+      if (!title || !price) {
+        throw { status: 400, message: 'Please provide title, price' }
+      }
+
+      if (subCategory) {
+        req.body.subCategory = { connect: { slug: subCategory } }
+      }
+
+      const product = await prisma.product.create({
+        data: {
+          ...req.body,
+          category: { connect: { slug: category } },
+          user: { connect: { id: req.user.id } },
+        },
+      })
+
+      res.status(201).json({ product })
     }
-
-    if (subCategory) {
-      req.body.subCategory = { connect: { slug: subCategory } }
-    }
-
-    const product = await prisma.product.create({
-      data: {
-        ...req.body,
-        category: { connect: { slug: category } },
-        user: { connect: { id: req.user.id } },
-      },
-    })
-
-    res.status(201).json({ product })
   })

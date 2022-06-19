@@ -2,6 +2,9 @@ import { StarIcon } from '@heroicons/react/outline'
 import { StarIcon as StarIconSolid } from '@heroicons/react/solid'
 import ReactStars from 'react-rating-stars-component'
 
+const defaultAvatar =
+  'https://www.kindpng.com/picc/m/207-2074624_white-gray-circle-avatar-png-transparent-png.png'
+
 const Rating = ({ rating }) => {
   return (
     <div className="p-3 rounded-xl border">
@@ -14,13 +17,20 @@ const Rating = ({ rating }) => {
         />
       </div>
       <div className="text-sm mt-1">
-        <span>
-          {/* TODO: tambah user image */}
-          <b>{rating.order.user?.name || 'Guest'}</b> &middot;{' '}
-          <span className="text-gray-600 text-xs">
+        <div className="text-xs flex items-center my-2">
+          <span className="flex items-center">
+            <img
+              className="w-5 h-5 rounded-full mr-2 object-cover"
+              src={rating.order.user?.image || defaultAvatar}
+              alt=""
+            />
+            <b className="text-sm">{rating.order.user?.name || 'Guest'}</b>{' '}
+            <span className="mx-1">&middot;</span>
+          </span>
+          <span className="text-gray-600">
             {new Date(rating.createdAt).toLocaleDateString()}
           </span>
-        </span>
+        </div>
         {/* TODO: tanya WPU cara bikin truncate */}
         <p className="text-gray-600 max-h-[80px]">{rating.comment}</p>
       </div>
