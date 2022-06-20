@@ -1,9 +1,7 @@
 import { StarIcon } from '@heroicons/react/outline'
 import { StarIcon as StarIconSolid } from '@heroicons/react/solid'
 import ReactStars from 'react-rating-stars-component'
-
-const defaultAvatar =
-  'https://www.kindpng.com/picc/m/207-2074624_white-gray-circle-avatar-png-transparent-png.png'
+import { defaultAvatar } from '../lib/data'
 
 const Rating = ({ rating }) => {
   return (
