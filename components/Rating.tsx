@@ -8,13 +8,16 @@ const defaultAvatar =
 const Rating = ({ rating }) => {
   return (
     <div className="p-3 rounded-xl border">
-      <div className="pointer-events-none -ml-1">
+      <div className="pointer-events-none -ml-1 flex justify-between items-center">
         <ReactStars
           count={5}
           emptyIcon={<StarIcon className="w-5 h-5 text-gray-300" />}
           filledIcon={<StarIconSolid className="w-5 h-5 text-yellow-500" />}
           value={rating.star}
         />
+        <span className="text-gray-600 text-xs">
+          {new Date(rating.createdAt).toLocaleDateString()}
+        </span>
       </div>
       <div className="text-sm mt-1">
         <div className="text-xs flex items-center my-2">
@@ -22,13 +25,14 @@ const Rating = ({ rating }) => {
             <img
               className="w-5 h-5 rounded-full mr-2 object-cover"
               src={rating.order.user?.image || defaultAvatar}
-              alt=""
+              alt={rating.order.user?.name || 'Guest'}
             />
             <b className="text-sm">{rating.order.user?.name || 'Guest'}</b>{' '}
-            <span className="mx-1">&middot;</span>
-          </span>
-          <span className="text-gray-600">
-            {new Date(rating.createdAt).toLocaleDateString()}
+            {rating.order.user?.role == 'ADMIN' && (
+              <span className="ml-1 text-[10px] font-bold tracking-wide bg-yellow-500 text-white px-1 rounded-md">
+                ADMIN
+              </span>
+            )}
           </span>
         </div>
         {/* TODO: tanya WPU cara bikin truncate */}

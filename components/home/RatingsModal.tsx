@@ -3,6 +3,7 @@ import { StarIcon as StarIconSolid } from '@heroicons/react/solid'
 import Rating from '../Rating'
 import { useEffect, useState } from 'react'
 import cn from 'classnames'
+import { XIcon } from '@heroicons/react/outline'
 
 const buttonClassname =
   'flex-grow p-2 rounded-md border text-sm font-semibold flex items-center justify-center'
@@ -32,12 +33,22 @@ const RatingsModal = ({ open, onClose, ratings }) => {
 
   return (
     <Modal open={open} onClose={onClose}>
-      <h1 className="sticky w-full top-0 p-5 text-2xl font-bold bg-white z-10 shadow-sm">
-        Ratings{' '}
-        <span className="text-gray-500 font-normal">
-          ({ratings.ratings.length})
-        </span>
-        <div className="flex mt-3 space-x-4">
+      <header className="sticky w-full top-0 p-5 text-2xl font-bold bg-white z-10 shadow-sm">
+        <h2 className="flex justify-between items-center">
+          <div>
+            Ratings{' '}
+            <span className="text-gray-500 font-normal">
+              ({ratings.ratings.length})
+            </span>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-green-500"
+          >
+            <XIcon className="w-6 h-6" />
+          </button>
+        </h2>
+        <div className="flex mt-3 space-x-4 overflow-y-auto">
           {[5, 4, 3, 2, 1].map((star) => (
             <button
               key={star}
@@ -68,7 +79,7 @@ const RatingsModal = ({ open, onClose, ratings }) => {
             </button>
           ))}
         </div>
-      </h1>
+      </header>
       <div className="overflow-auto p-5 space-y-4">
         {filteredRatings.map((rating) => (
           <Rating key={rating.id} rating={rating} />

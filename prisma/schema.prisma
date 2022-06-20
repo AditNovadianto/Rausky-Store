@@ -46,8 +46,10 @@ model VerificationToken {
     @@unique([identifier, token])
 }
 
+// TODO: bikin role fake admin buat ngeliat tampilan admin dashboard, tapi ga bisa diinteraksi
 enum Role {
     USER
+    FAKE_ADMIN
     ADMIN
 }
 

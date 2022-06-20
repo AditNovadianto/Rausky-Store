@@ -54,7 +54,7 @@ const Navbar = () => {
         </Wrapper>
       </div>
 
-      <nav className="print:hidden sticky top-0 z-50 bg-white border-b">
+      <nav className="print:hidden sticky top-0 z-50 bg-white shadow-sm">
         <Wrapper className="flex items-center w-full justify-between py-2.5 lg:py-2">
           {router.route == '/' ? (
             <Link
@@ -66,7 +66,7 @@ const Navbar = () => {
                 alt="rausky-logo"
                 className="w-[40px]"
               />
-              <span className="text-black hidden lg:block">Rausky</span>
+              <span className="text-black">Rausky</span>
             </Link>
           ) : (
             <Link href="/" className="flex items-center space-x-2">
