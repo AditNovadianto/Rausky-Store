@@ -48,7 +48,7 @@ const Profile = ({ user }: Props) => {
 
           {/* USER ROLE BADGE (MOBILE) */}
           {user.role == 'ADMIN' && (
-            <span className="md:hidden text-xs mt-4 font-bold tracking-wide bg-yellow-500 text-white px-2 py-1 rounded-md">
+            <span className="md:hidden text-xs mt-4 font-bold tracking-wide bg-green-500 text-white px-2 py-1 rounded-md">
               ADMIN
             </span>
           )}
@@ -59,7 +59,7 @@ const Profile = ({ user }: Props) => {
               {user.name}
               {/* USER ROLE BADGE (DESKTOP) */}
               {user.role == 'ADMIN' && (
-                <span className="hidden md:block ml-3 text-xs tracking-wide bg-yellow-500 text-white px-2 py-1 rounded-md">
+                <span className="hidden md:block ml-3 text-xs tracking-wide bg-green-500 text-white px-2 py-1 rounded-md">
                   ADMIN
                 </span>
               )}

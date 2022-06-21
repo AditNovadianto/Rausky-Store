@@ -26,7 +26,7 @@ const providerLogo = {
 
 const SignIn = ({ providers }: Props) => {
   return (
-    <Container title="SignIn" noNavbar>
+    <Container title="Sign In" noNavbar>
       <Wrapper className="py-20 text-center flex flex-col items-center max-w-xs md:max-w-4xl">
         <Link href="/">
           <img src="/images/rausky-logo.png" alt="" />

@@ -27,7 +27,7 @@ const Rating = ({ rating }) => {
             />
             <b className="text-sm">{rating.order.user?.name || 'Guest'}</b>{' '}
             {rating.order.user?.role == 'ADMIN' && (
-              <span className="ml-1 text-[10px] font-bold tracking-wide bg-yellow-500 text-white px-1 rounded-md">
+              <span className="ml-1 text-[10px] font-bold tracking-wide bg-green-500 text-white px-1 rounded-md">
                 ADMIN
               </span>
             )}

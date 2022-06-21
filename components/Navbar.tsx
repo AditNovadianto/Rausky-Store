@@ -223,7 +223,6 @@ const Navbar = () => {
             </Link>
 
             {/* PROFILE BUTTON */}
-            {/* TODO: bikin main menu */}
             <div className="md:ml-2">
               {status == 'loading' ? (
                 <div className="flex items-center">
@@ -248,6 +247,11 @@ const Navbar = () => {
                       <span className="hidden md:block font-medium max-w-[10ch] truncate ml-2">
                         {user?.name}
                       </span>
+                      {user?.role == 'ADMIN' && (
+                        <span className="ml-1 text-[10px] font-bold tracking-wide bg-green-500 text-white px-1 rounded-md">
+                          ADMIN
+                        </span>
+                      )}
                     </Dropdown>
                   ) : (
                     <div className="flex items-center">
