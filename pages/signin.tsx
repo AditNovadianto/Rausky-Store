@@ -31,7 +31,7 @@ const SignIn = ({ providers }: Props) => {
         <Link href="/">
           <img src="/images/rausky-logo.png" alt="" />
         </Link>
-        <h3 className="font-bold text-3xl">Sign In dulu bos</h3>
+        <h3 className="font-bold text-3xl">Sign In to Rausky Gamestore</h3>
         <div className="w-full mt-10 space-y-5 flex flex-col md:flex-row md:space-y-0 md:space-x-5">
           {Object.values(providers).map((provider) => {
             return (

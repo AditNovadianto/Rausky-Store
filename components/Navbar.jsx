@@ -6,7 +6,8 @@ import Skeleton from 'react-loading-skeleton'
 import { useStateMachine } from 'little-state-machine'
 import Badge from './Badge'
 import { useRouter } from 'next/router'
-import { ArrowLeftIcon } from '@heroicons/react/outline'
+import { ArrowLeftIcon, DotsVerticalIcon } from '@heroicons/react/outline'
+import { defaultAvatar } from '../lib/data'
 
 const navLinks = ['Tentang Rausky', 'Manufacturing', 'Packaging']
 
@@ -21,6 +22,7 @@ const Navbar = () => {
     setSearch(!search)
   }
 
+  const user = session?.user
   const totalItemsInCart = cart.length
 
   return (
@@ -96,24 +98,62 @@ const Navbar = () => {
             </form>
           </div>
 
+          {/* SEARCH BUTTON (MOBILE) */}
           <div className="flex items-center">
             <button
-              className="ml-10 flex-shrink-0 md:hidden"
+              className="ml-10 flex-shrink-0 p-2 md:hidden"
               onClick={showSearch}
             >
               <img src="/images/Union.svg" alt="Union" />
             </button>
 
-            <Link href="/cart" className="relative ml-4 flex-shrink-0">
+            {/* CART BUTTON */}
+            <Link
+              href="/cart"
+              className="relative flex-shrink-0 rounded-md p-2 hover:bg-gray-100"
+            >
               {totalItemsInCart > 0 && <Badge>{totalItemsInCart}</Badge>}
 
               <img src="/images/Bag.svg" alt="Bag-icon" />
             </Link>
 
+            {/* PROFILE BUTTON */}
             {/* TODO: bikin main menu */}
-            <button className="ml-4 flex-shrink-0">
-              <img src="/images/person.svg" alt="person" />
-            </button>
+            <div className="md:ml-2">
+              {status == 'loading' ? (
+                <div className="flex items-center">
+                  <Skeleton width={24} height={24} circle={true} />
+                  <Skeleton width={50} height="100%" />
+                </div>
+              ) : (
+                <div>
+                  {user ? (
+                    <button className="flex items-center flex-shrink-0 rounded-md -mr-2 p-2 hover:bg-gray-100">
+                      <img
+                        className="w-6 h-6 object-cover rounded-full"
+                        src={user?.image}
+                        alt={user?.name}
+                      />
+                      <span className="hidden md:block font-medium max-w-[10ch] truncate ml-2">
+                        {user?.name}
+                      </span>
+                    </button>
+                  ) : (
+                    <div className="flex items-center">
+                      <button className="p-2 rounded-md hover:bg-gray-100 md:mr-2">
+                        <DotsVerticalIcon className="w-5 text-gray-500" />
+                      </button>
+                      <button
+                        onClick={() => signIn()}
+                        className="hidden md:block bg-green-500 hover:bg-green-400 text-white px-3 py-1 rounded-md font-semibold"
+                      >
+                        Sign In
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </Wrapper>
 
