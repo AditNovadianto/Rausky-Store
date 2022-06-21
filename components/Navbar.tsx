@@ -8,16 +8,39 @@ import Badge from './Badge'
 import { useRouter } from 'next/router'
 import {
   ArrowLeftIcon,
+  DesktopComputerIcon,
   DotsVerticalIcon,
   LoginIcon,
   LogoutIcon,
+  MailIcon,
+  MenuIcon,
+  SunIcon,
   UserIcon,
 } from '@heroicons/react/outline'
 import Dropdown, { DropdownItem } from './Dropdown'
 import { InformationCircleIcon, MoonIcon } from '@heroicons/react/outline'
 import { useMediaQuery } from '@mui/material'
+import cn from 'classnames'
 
-const navLinks = ['Tentang Rausky', 'Manufacturing', 'Packaging']
+// TODO: simpen theme di global state
+const currentTheme = 'light'
+const themes = [
+  {
+    name: 'device',
+    Icon: DesktopComputerIcon,
+    label: 'Device Preference',
+  },
+  {
+    name: 'dark',
+    Icon: MoonIcon,
+    label: 'Dark',
+  },
+  {
+    name: 'light',
+    Icon: SunIcon,
+    label: 'Light',
+  },
+]
 
 const Navbar = () => {
   const [search, setSearch] = useState(false)
@@ -36,11 +59,26 @@ const Navbar = () => {
 
   let menuItems: DropdownItem[] = [
     {
-      icon: MoonIcon,
-      label: 'Theme: Device Theme',
-      onClick: () => {
-        alert('swtich theme')
-      },
+      icon: themes.find((theme) => theme.name == currentTheme).Icon,
+      label: 'Theme',
+      customMore: (
+        <div className="flex flex-col">
+          {themes.map((theme) => (
+            <button
+              key={theme.name}
+              className={cn(
+                'p-2 text-left w-full flex items-center hover:bg-gray-100 rounded-lg',
+                theme.name == currentTheme
+                  ? 'font-semibold text-green-500'
+                  : 'font-normal text-gray-600'
+              )}
+            >
+              <theme.Icon className="w-5 h-5 mr-2" />
+              {theme.label}
+            </button>
+          ))}
+        </div>
+      ),
     },
     {
       icon: 'https://cdn-icons-png.flaticon.com/512/25/25231.png',
@@ -50,11 +88,21 @@ const Navbar = () => {
       },
     },
     {
-      icon: InformationCircleIcon,
-      label: 'About',
-      onClick: () => {
-        router.push('/about')
-      },
+      icon: MenuIcon,
+      label: 'Other',
+      more: [
+        {
+          icon: InformationCircleIcon,
+          label: 'About Rausky',
+          onClick: () => {
+            router.push('/about')
+          },
+        },
+        {
+          icon: MailIcon,
+          label: 'Give us Feedback',
+        },
+      ],
     },
   ]
 
@@ -98,32 +146,18 @@ const Navbar = () => {
 
   return (
     <>
-      <div className="print:hidden bg-gray-50 py-1.5">
-        <Wrapper className="flex justify-between text-sm">
-          {status == 'loading' ? (
-            <Skeleton width={90} />
-          ) : session ? (
-            <p className="font-medium">Halo {session.user.name} 👋</p>
-          ) : (
-            <button
-              className="font-medium hover:text-green-500"
-              onClick={() => signIn()}
+      <div className="print:hidden bg-yellow-100 py-1.5">
+        <Wrapper>
+          <p className="text-sm font-medium text-center">
+            For now, all payments and transactions are not real (still in
+            sandbox mode).{' '}
+            <Link
+              href="/blog/rausky-payments"
+              className="text-blue-500 hover:underline"
             >
-              Sign In
-            </button>
-          )}
-
-          <div className="space-x-5 hidden md:flex">
-            {navLinks.map((link) => (
-              <Link
-                className="font-light text-gray-500 hover:text-green-500"
-                href="#"
-                key={link}
-              >
-                {link}
-              </Link>
-            ))}
-          </div>
+              Learn more
+            </Link>
+          </p>
         </Wrapper>
       </div>
 
@@ -199,10 +233,12 @@ const Navbar = () => {
               ) : (
                 <div>
                   {user ? (
+                    // USER DROPDOWN
                     <Dropdown
                       items={menuItemsWithUser}
                       className="flex items-center flex-shrink-0 rounded-md -mr-2 p-2 hover:bg-gray-100"
                       deps={[session]}
+                      minWidth={280}
                     >
                       <img
                         className="w-6 h-6 object-cover rounded-full"
@@ -215,10 +251,11 @@ const Navbar = () => {
                     </Dropdown>
                   ) : (
                     <div className="flex items-center">
-                      {/* TOGGLE DROPDOWN */}
+                      {/* NO USER DROPDOWN */}
                       <Dropdown
                         items={menuItems}
                         className="flex items-center p-2 rounded-md hover:bg-gray-100 md:mr-2"
+                        minWidth={280}
                       >
                         <DotsVerticalIcon className="w-5 text-gray-500" />
                       </Dropdown>
