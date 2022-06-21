@@ -1,13 +1,21 @@
 import Link from './Link'
 import Wrapper from './Wrapper'
 import { useState } from 'react'
-import { signIn, useSession } from 'next-auth/react'
+import { signIn, signOut, useSession } from 'next-auth/react'
 import Skeleton from 'react-loading-skeleton'
 import { useStateMachine } from 'little-state-machine'
 import Badge from './Badge'
 import { useRouter } from 'next/router'
-import { ArrowLeftIcon, DotsVerticalIcon } from '@heroicons/react/outline'
-import { defaultAvatar } from '../lib/data'
+import {
+  ArrowLeftIcon,
+  DotsVerticalIcon,
+  LoginIcon,
+  LogoutIcon,
+  UserIcon,
+} from '@heroicons/react/outline'
+import Dropdown, { DropdownItem } from './Dropdown'
+import { InformationCircleIcon, MoonIcon } from '@heroicons/react/outline'
+import { useMediaQuery } from '@mui/material'
 
 const navLinks = ['Tentang Rausky', 'Manufacturing', 'Packaging']
 
@@ -17,6 +25,7 @@ const Navbar = () => {
   const { state } = useStateMachine()
   const { cart } = state
   const router = useRouter()
+  const onMobile = useMediaQuery('(max-width: 640px)')
 
   const showSearch = () => {
     setSearch(!search)
@@ -24,6 +33,68 @@ const Navbar = () => {
 
   const user = session?.user
   const totalItemsInCart = cart.length
+
+  let menuItems: DropdownItem[] = [
+    {
+      icon: MoonIcon,
+      label: 'Theme: Device Theme',
+      onClick: () => {
+        alert('swtich theme')
+      },
+    },
+    {
+      icon: 'https://cdn-icons-png.flaticon.com/512/25/25231.png',
+      label: 'Star Github',
+      onClick: () => {
+        window.open('https://github.com/AditNovadianto/Rausky-Store', '_blank')
+      },
+    },
+    {
+      icon: InformationCircleIcon,
+      label: 'About',
+      onClick: () => {
+        router.push('/about')
+      },
+    },
+  ]
+
+  if (onMobile && status == 'unauthenticated') {
+    menuItems = [
+      {
+        icon: LoginIcon,
+        label: 'Sign In',
+        className: 'bg-green-500 text-white font-semibold',
+        onClick: async () => {
+          signIn()
+        },
+      },
+      ...menuItems,
+    ]
+  }
+
+  const menuItemsWithUser: DropdownItem[] = [
+    {
+      icon: UserIcon,
+      label: 'Your Profile',
+      onClick: () => {
+        router.push('/profile')
+      },
+    },
+    ...menuItems,
+    {
+      icon: LogoutIcon,
+      label: 'Sign Out',
+      onClick: async () => {
+        // https://next-auth.js.org/getting-started/client#specifying-a-callbackurl-1
+        await signOut({
+          redirect: false, // no page reload
+        })
+        if (router.route != '/') {
+          router.push('/')
+        }
+      },
+    },
+  ]
 
   return (
     <>
@@ -101,7 +172,7 @@ const Navbar = () => {
           {/* SEARCH BUTTON (MOBILE) */}
           <div className="flex items-center">
             <button
-              className="ml-10 flex-shrink-0 p-2 md:hidden"
+              className="flex-shrink-0 p-2 md:hidden"
               onClick={showSearch}
             >
               <img src="/images/Union.svg" alt="Union" />
@@ -128,7 +199,11 @@ const Navbar = () => {
               ) : (
                 <div>
                   {user ? (
-                    <button className="flex items-center flex-shrink-0 rounded-md -mr-2 p-2 hover:bg-gray-100">
+                    <Dropdown
+                      items={menuItemsWithUser}
+                      className="flex items-center flex-shrink-0 rounded-md -mr-2 p-2 hover:bg-gray-100"
+                      deps={[session]}
+                    >
                       <img
                         className="w-6 h-6 object-cover rounded-full"
                         src={user?.image}
@@ -137,12 +212,16 @@ const Navbar = () => {
                       <span className="hidden md:block font-medium max-w-[10ch] truncate ml-2">
                         {user?.name}
                       </span>
-                    </button>
+                    </Dropdown>
                   ) : (
                     <div className="flex items-center">
-                      <button className="p-2 rounded-md hover:bg-gray-100 md:mr-2">
+                      {/* TOGGLE DROPDOWN */}
+                      <Dropdown
+                        items={menuItems}
+                        className="flex items-center p-2 rounded-md hover:bg-gray-100 md:mr-2"
+                      >
                         <DotsVerticalIcon className="w-5 text-gray-500" />
-                      </button>
+                      </Dropdown>
                       <button
                         onClick={() => signIn()}
                         className="hidden md:block bg-green-500 hover:bg-green-400 text-white px-3 py-1 rounded-md font-semibold"
