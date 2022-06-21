@@ -228,7 +228,7 @@ const Navbar = () => {
               {status == 'loading' ? (
                 <div className="flex items-center">
                   <Skeleton width={24} height={24} circle={true} />
-                  <Skeleton width={50} height="100%" />
+                  {!onMobile && <Skeleton width={50} height="100%" />}
                 </div>
               ) : (
                 <div>

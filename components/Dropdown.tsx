@@ -1,5 +1,4 @@
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/outline'
-import { useMediaQuery } from '@mui/material'
 import cn from 'classnames'
 import { useEffect, useRef, useState } from 'react'
 
@@ -35,7 +34,6 @@ const Dropdown = ({
   const [containerWidth, setContainerWidth] = useState(0)
   const [dropdownItems, setDropdownItems] = useState(items)
   const [inMore, setInMore] = useState(null)
-  const onMobile = useMediaQuery('(max-width: 640px)')
 
   useEffect(() => {
     const changeContainerWidth = () => {
@@ -53,21 +51,22 @@ const Dropdown = ({
     setDropdownItems(items)
   }
 
-  const dropdownProps = onMobile
-    ? {
-        onClick: () => {
-          setShow(true)
-        },
-      }
-    : {
-        onMouseEnter: () => {
-          setShow(true)
-        },
-        onMouseLeave: () => {
-          setShow(false)
-          resetDropdown()
-        },
-      }
+  const dropdownProps =
+    'ontouchstart' in window // if in touch device
+      ? {
+          onClick: () => {
+            setShow(true)
+          },
+        }
+      : {
+          onMouseEnter: () => {
+            setShow(true)
+          },
+          onMouseLeave: () => {
+            setShow(false)
+            resetDropdown()
+          },
+        }
 
   return (
     <>
