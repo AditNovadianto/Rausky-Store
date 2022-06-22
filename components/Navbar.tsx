@@ -134,7 +134,7 @@ const Navbar = () => {
       label: 'Admin Dashboard',
       disabled: user?.role != 'ADMIN',
       onClick: () => {
-        router.push('/admin')
+        open('/admin', '_blank')
       },
     },
     ...menuItems,

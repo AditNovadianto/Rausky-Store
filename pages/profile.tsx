@@ -1,13 +1,11 @@
-import { LockClosedIcon, PencilIcon } from '@heroicons/react/outline'
+import { PencilIcon } from '@heroicons/react/outline'
 import { useMediaQuery } from '@mui/material'
 import { Role } from '@prisma/client'
 import { GetServerSideProps } from 'next'
 import { getSession } from 'next-auth/react'
 import { useState } from 'react'
 import Container from '../components/Container'
-import Link from '../components/Link'
 import { CustomTab, CustomTabs } from '../components/mui/Tabs'
-import AdminDashboard from '../components/profile/AdminDashboard'
 import Wrapper from '../components/Wrapper'
 
 interface Props {
@@ -78,12 +76,13 @@ const Profile = ({ user }: Props) => {
           </div>
           <div className="mt-8">
             {user.role == 'ADMIN' && (
-              <Link
+              <a
                 href="/admin"
+                target="_blank"
                 className="block w-full md:max-w-[350px] md:mb-6 p-4 rounded-2xl border border-green-400 font-semibold bg-green-200 text-green-600 hover:bg-green-500 hover:text-white hover:shadow-xl hover:shadow-green-300 hover:-translate-y-1.5 transition-all"
               >
                 Go to Admin Dashboard &rarr;
-              </Link>
+              </a>
             )}
 
             <div className="hidden md:block">

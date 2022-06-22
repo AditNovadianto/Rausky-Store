@@ -12,3 +12,12 @@ declare module 'next-auth' {
     } & DefaultSession['user']
   }
 }
+
+export type User = {
+  id?: string
+  role?: Role
+} & {
+  name?: string
+  email?: string
+  image?: string
+}
