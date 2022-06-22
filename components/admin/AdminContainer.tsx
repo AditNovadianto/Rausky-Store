@@ -46,7 +46,7 @@ const AdminContainer = ({ children, user }) => {
       <Head>
         <title>{currentPage.label} - Rausky Admin</title>
       </Head>
-      <aside className="flex-[1] h-screen py-2 pl-8">
+      <aside className="h-screen py-2 pl-8 pr-12">
         <div className="flex items-center">
           <img
             className="w-20 -ml-5"
@@ -79,7 +79,7 @@ const AdminContainer = ({ children, user }) => {
           ))}
         </div>
       </aside>
-      <div className="flex-[6] h-screen flex bg-green-50 flex-col overflow-auto">
+      <div className="flex-[6] h-screen flex flex-col overflow-auto">
         <header className="mt-6 mb-3 px-5 flex items-center justify-between">
           <h2 className="text-2xl font-semibold flex items-center">
             <currentPage.Icon className="w-8 h-8 mr-2" /> {currentPage.label}
@@ -97,11 +97,7 @@ const AdminContainer = ({ children, user }) => {
             </button>
           </div>
         </header>
-        <div className="p-5 h-full">
-          <div className="bg-white p-4 rounded-2xl shadow-xl shadow-green-100 h-full">
-            {children}
-          </div>
-        </div>
+        <div className="p-5">{children}</div>
       </div>
     </div>
   )
