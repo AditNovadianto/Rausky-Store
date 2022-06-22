@@ -21,6 +21,7 @@ import Dropdown, { DropdownItem } from './Dropdown'
 import { InformationCircleIcon, MoonIcon } from '@heroicons/react/outline'
 import { useMediaQuery } from '@mui/material'
 import cn from 'classnames'
+import { StarIcon } from '@heroicons/react/solid'
 
 // TODO: simpen theme di global state
 const currentTheme = 'light'
@@ -120,12 +121,20 @@ const Navbar = () => {
     ]
   }
 
-  const menuItemsWithUser: DropdownItem[] = [
+  let menuItemsWithUser: DropdownItem[] = [
     {
       icon: UserIcon,
       label: 'Your Profile',
       onClick: () => {
         router.push('/profile')
+      },
+    },
+    {
+      icon: StarIcon,
+      label: 'Admin Dashboard',
+      disabled: user?.role != 'ADMIN',
+      onClick: () => {
+        router.push('/admin')
       },
     },
     ...menuItems,

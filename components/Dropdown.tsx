@@ -1,15 +1,19 @@
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/outline'
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  LockClosedIcon,
+} from '@heroicons/react/outline'
 import cn from 'classnames'
 import { useEffect, useRef, useState } from 'react'
 
 export interface DropdownItem {
   icon?: any
-  rightIcon?: any
   className?: string
   label: string
   more?: DropdownItem[]
   customMore?: any
   onClick?: () => void
+  disabled?: boolean
 }
 
 interface Props {
@@ -115,10 +119,12 @@ const Dropdown = ({
               return (
                 <button
                   key={idx}
+                  disabled={item.disabled || false}
                   className={cn(
                     'w-full p-2 rounded-lg text-left truncate',
                     item.className ||
-                      'hover:bg-gray-100 text-gray-500 hover:text-gray-800'
+                      'hover:bg-gray-100 text-gray-500 hover:text-gray-800',
+                    'disabled:hover:bg-transparent disabled:opacity-30 disabled:text-current'
                   )}
                   onClick={() => {
                     if (item.customMore) {
@@ -144,12 +150,15 @@ const Dropdown = ({
                         ) : (
                           <item.icon className="w-5 h-5 mr-2" />
                         ))}
-
-                      {item.label}
+                      {item.label}{' '}
                     </div>
 
-                    {(item.more || item.customMore) && (
-                      <ChevronRightIcon className="w-5 h-5 mr-2" />
+                    {item.disabled ? (
+                      <LockClosedIcon className="w-5 h-5" />
+                    ) : (
+                      (item.more || item.customMore) && (
+                        <ChevronRightIcon className="w-5 h-5" />
+                      )
                     )}
                   </div>
                 </button>
