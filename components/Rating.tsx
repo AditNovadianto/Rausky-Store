@@ -2,6 +2,7 @@ import { StarIcon } from '@heroicons/react/outline'
 import { StarIcon as StarIconSolid } from '@heroicons/react/solid'
 import ReactStars from 'react-rating-stars-component'
 import { defaultAvatar } from '../lib/data'
+import UserBadge from './UserBadge'
 
 const Rating = ({ rating }) => {
   return (
@@ -26,11 +27,7 @@ const Rating = ({ rating }) => {
               alt={rating.order.user?.name || 'Guest'}
             />
             <b className="text-sm">{rating.order.user?.name || 'Guest'}</b>{' '}
-            {rating.order.user?.role == 'ADMIN' && (
-              <span className="ml-1 text-[10px] font-bold tracking-wide bg-green-500 text-white px-1 rounded-md">
-                ADMIN
-              </span>
-            )}
+            {rating.order.user && <UserBadge role={rating.order.user.role} />}
           </span>
         </div>
         {/* TODO: tanya WPU cara bikin truncate */}

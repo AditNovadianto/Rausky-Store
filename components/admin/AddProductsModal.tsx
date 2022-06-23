@@ -9,6 +9,7 @@ import {
 import { IconButton } from '@mui/material'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import request from '../../lib/request'
 import Dropdown from '../Dropdown'
 import Modal from '../Modal'
@@ -49,12 +50,25 @@ const AddProductsModal = ({ open, onClose, category }) => {
   }
 
   const saveNewProducts = async () => {
+    let toastId: string
+    const message = `${newProducts.length} product${
+      newProducts.length > 1 ? 's' : ''
+    }`
+
     try {
+      toastId = toast.loading(`Saving ${message}...`)
       await request.post('/products', newProducts)
+      toast.success(`${message} saved`, { id: toastId })
       location.reload()
     } catch (err) {
       console.log(err)
-    } finally {
+      let errorMessage = ''
+      if (err.status == 403) {
+        errorMessage = 'Opps... fake admin is not allowed to do this operation'
+      } else {
+        errorMessage = 'Failed. Check console for details'
+      }
+      toast.error(errorMessage, { id: toastId })
     }
   }
 

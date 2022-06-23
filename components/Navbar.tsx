@@ -22,6 +22,7 @@ import { InformationCircleIcon, MoonIcon } from '@heroicons/react/outline'
 import { useMediaQuery } from '@mui/material'
 import cn from 'classnames'
 import { StarIcon } from '@heroicons/react/solid'
+import UserBadge from './UserBadge'
 
 // TODO: simpen theme di global state
 const currentTheme = 'light'
@@ -132,7 +133,7 @@ const Navbar = () => {
     {
       icon: StarIcon,
       label: 'Admin Dashboard',
-      disabled: user?.role != 'ADMIN',
+      disabled: user?.role == 'USER',
       onClick: () => {
         open('/admin', '_blank')
       },
@@ -256,11 +257,7 @@ const Navbar = () => {
                       <span className="hidden md:block font-medium max-w-[10ch] truncate ml-2">
                         {user?.name}
                       </span>
-                      {user?.role == 'ADMIN' && (
-                        <span className="ml-1 text-[10px] font-bold tracking-wide bg-green-500 text-white px-1 rounded-md">
-                          ADMIN
-                        </span>
-                      )}
+                      <UserBadge role={user?.role} />
                     </Dropdown>
                   ) : (
                     <div className="flex items-center">

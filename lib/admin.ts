@@ -29,7 +29,7 @@ export const getUserAdmin = async (
   }
 
   const { user } = session
-  if (user.role != 'ADMIN') {
+  if (!['ADMIN', 'FAKE_ADMIN'].includes(user.role)) {
     return [
       null,
       {
