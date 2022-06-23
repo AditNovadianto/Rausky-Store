@@ -19,6 +19,8 @@ export default app
     })
     res.status(200).json({ products, length: products.length })
   })
+
+  //   TODO: atur biar gambar product otomatis ngikutin category / subCategory img
   // create new product
   .post(checkAuth('ADMIN'), async (req, res) => {
     if (Array.isArray(req.body)) {
@@ -27,6 +29,9 @@ export default app
           const { title, price, category, subCategory } = product
           if (!title || !price) {
             throw { status: 400, message: 'Please provide title, price' }
+          }
+          if (typeof price == 'string') {
+            product.price = Number(price)
           }
           if (subCategory) {
             product.subCategory = { connect: { slug: subCategory } }
@@ -47,6 +52,10 @@ export default app
 
       if (!title || !price) {
         throw { status: 400, message: 'Please provide title, price' }
+      }
+
+      if (typeof price == 'string') {
+        req.body.price = Number(price)
       }
 
       if (subCategory) {

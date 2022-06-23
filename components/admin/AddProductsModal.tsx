@@ -8,6 +8,7 @@ import {
 } from '@heroicons/react/outline'
 import { IconButton } from '@mui/material'
 import { useEffect, useState } from 'react'
+import request from '../../lib/request'
 import Dropdown from '../Dropdown'
 import Modal from '../Modal'
 
@@ -15,7 +16,6 @@ const initialNewProducts = (category) => {
   let newProduct: CustomObject = {
     title: '',
     price: '',
-    img: category.logoImg || '',
     category: category.slug,
   }
 
@@ -28,6 +28,41 @@ const initialNewProducts = (category) => {
 
 const AddProductsModal = ({ open, onClose, category }) => {
   const [newProducts, setNewProducts] = useState(initialNewProducts(category))
+  const [errors, setErrors] = useState({})
+
+  const validateNewProducts = () => {
+    setErrors({})
+    newProducts.forEach((newProduct, index) => {
+      let errorFields: CustomObject = {}
+      Object.entries(newProduct).forEach(([field, value]) => {
+        if (!value) {
+          errorFields[field] = `${field} cannot be empty`
+        }
+      })
+
+      if (Object.keys(errorFields).length > 0) {
+        setErrors({ ...errors, [index]: errorFields })
+      }
+    })
+  }
+
+  const saveNewProducts = async () => {
+    try {
+      // TODO: tambahin toast
+      const { data } = await request.post('/products', newProducts)
+      setNewProducts(initialNewProducts(category))
+      onClose()
+    } catch (err) {
+      console.log(err)
+    } finally {
+    }
+  }
+
+  useEffect(() => {
+    validateNewProducts()
+  }, [newProducts])
+
+  console.log(errors)
 
   const inputHandler = (index: number, prop: string, value) => {
     setNewProducts((newProducts) => {
@@ -40,16 +75,7 @@ const AddProductsModal = ({ open, onClose, category }) => {
   }
 
   const addHandler = () => {
-    setNewProducts([
-      ...newProducts,
-      {
-        title: '',
-        price: '',
-        img: category.logoImg || '',
-        category: category.slug,
-        subCategory: '',
-      },
-    ])
+    setNewProducts([...newProducts, initialNewProducts(category)[0]])
   }
 
   const duplicateHandler = (index: number) => {
@@ -84,8 +110,6 @@ const AddProductsModal = ({ open, onClose, category }) => {
     resetHandler()
   }, [category])
 
-  console.log(category)
-
   return (
     <Modal open={open} onClose={onClose}>
       <header className="sticky top-0 z-[100] bg-white p-5 flex justify-between items-center shadow-sm">
@@ -106,7 +130,8 @@ const AddProductsModal = ({ open, onClose, category }) => {
           </button>
           <button
             type="button"
-            disabled={newProducts.length == 0}
+            onClick={saveNewProducts}
+            disabled={newProducts.length == 0 || Object.keys(errors).length > 0}
             className="flex justify-center items-center bg-green-500 hover:bg-green-400 text-white transition-colors font-semibold w-full px-4 py-2 rounded-xl"
           >
             <UploadIcon className="w-5 h-5 mr-1" /> Save ({newProducts.length})
@@ -116,7 +141,6 @@ const AddProductsModal = ({ open, onClose, category }) => {
 
       <div className="overflow-auto p-5 space-y-6">
         {newProducts?.map((newProduct, index) => {
-          console.log(index)
           return (
             <div key={index}>
               <header className="flex items-center justify-between">
@@ -173,6 +197,11 @@ const AddProductsModal = ({ open, onClose, category }) => {
                         inputHandler(index, 'title', e.target.value)
                       }
                     />
+                    {errors[index]?.title && (
+                      <span className="text-sm text-red-500 font-medium">
+                        {errors[index].title}
+                      </span>
+                    )}
                   </label>
                   {/* PRICE */}
                   <label className="block">
@@ -188,6 +217,11 @@ const AddProductsModal = ({ open, onClose, category }) => {
                         inputHandler(index, 'price', e.target.value)
                       }
                     />
+                    {errors[index]?.price && (
+                      <span className="text-sm text-red-500 font-medium">
+                        {errors[index].price}
+                      </span>
+                    )}
                   </label>
 
                   {/* SUBCATEGORY */}
@@ -209,6 +243,11 @@ const AddProductsModal = ({ open, onClose, category }) => {
                           </option>
                         ))}
                       </select>
+                      {errors[index]?.subCategory && (
+                        <span className="text-sm text-red-500 font-medium">
+                          {errors[index].subCategory}
+                        </span>
+                      )}
                     </label>
                   ) : null}
                 </div>
