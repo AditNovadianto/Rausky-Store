@@ -6,9 +6,11 @@ import { getUserAdmin } from '../../lib/admin'
 import { parseData } from '../../lib/utils'
 import { getAllCategories } from '../api/categories'
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid'
+import AddProductsModal from '../../components/admin/AddProductsModal'
 
 const Products = ({ user, categories }) => {
   const [category, setCategory] = useState(categories[0])
+  const [showAddProducts, setShowAddProducts] = useState(false)
 
   console.log(category)
 
@@ -33,7 +35,7 @@ const Products = ({ user, categories }) => {
         </div>
         <select
           onChange={(e) => setCategory(categories[e.target.value])}
-          className="border focus:outline-none focus:border-green-400 focus:ring focus:ring-green-200 focus:ring-opacity-70 px-2 py-1 rounded-md cursor-pointer text-gray-600"
+          className="select"
         >
           {categories.map((category, idx) => (
             <option key={category.id} value={idx}>
@@ -120,9 +122,17 @@ const Products = ({ user, categories }) => {
               ({category.products.length})
             </span>
           </h2>
-          <button className="flex items-center bg-green-500 text-white px-2 py-1 font-medium rounded-md hover:bg-green-400">
+          <button
+            onClick={() => setShowAddProducts(true)}
+            className="flex items-center bg-green-500 text-white px-2 py-1 font-medium rounded-md hover:bg-green-400"
+          >
             <PlusSmIcon className="w-5 h-5 mr-1" /> Product
           </button>
+          <AddProductsModal
+            open={showAddProducts}
+            onClose={() => setShowAddProducts(false)}
+            category={category}
+          />
         </div>
 
         {/* TODO: tampilin products pake table mui */}
