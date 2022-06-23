@@ -7,6 +7,7 @@ import { parseData } from '../../lib/utils'
 import { getAllCategories } from '../api/categories'
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid'
 import AddProductsModal from '../../components/admin/AddProductsModal'
+import Chart from '../../components/Chart'
 
 const Products = ({ user, categories }) => {
   const [category, setCategory] = useState(categories[0])
@@ -91,25 +92,49 @@ const Products = ({ user, categories }) => {
             )}
 
             <div>
-              <label>
-                <span className="block text-gray-500 text-sm mb-1">Name</span>
-                <input
-                  className="text-xl font-medium focus:outline-none border rounded-md px-3 py-2 focus:border-green-400"
-                  type="text"
-                  value={category.name}
-                />
-              </label>
+              <h2 className="text-xl font-semibold">{category.name}</h2>
+              <button className="mt-1 text-green-500 hover:underline font-medium flex items-center">
+                <PencilIcon className="w-5 h-5 mr-2" /> Edit Category Details
+              </button>
             </div>
           </div>
-          <button className="mt-5 text-green-500 hover:underline font-medium flex items-center">
-            <PencilIcon className="w-5 h-5 mr-2" /> Edit Details
-          </button>
         </div>
         {/* CATEGORY CHART */}
-        {/* TODO: bikin category chart pake react-charts https://react-chartjs-2.js.org/ */}
-        <div className="border flex-grow w-full">
-          <p>Total revenue</p>
-          <p>Total Sales chart</p>
+        <div className="flex-grow w-full">
+          <div className="flex justify-between">
+            <div>
+              <h3 className="text-lg text-gray-600">Total Revenue</h3>
+              <select className="select mt-1">
+                <option value="">All Time</option>
+                <option value="">Previous Month</option>
+                <option value="">This Month</option>
+              </select>
+            </div>
+            <h3 className="text-3xl font-semibold">Rp 5,000,000</h3>
+          </div>
+          <Chart
+            type="line"
+            className="mt-4"
+            data={{
+              labels: [
+                'January',
+                'February',
+                'March',
+                'April',
+                'May',
+                'June',
+                'July',
+              ],
+              datasets: [
+                {
+                  label: 'Sales',
+                  borderColor: 'green',
+                  backgroundColor: 'green',
+                  data: [10, 30, 20, 80, 90, 75, 89],
+                },
+              ],
+            }}
+          />
         </div>
       </div>
 

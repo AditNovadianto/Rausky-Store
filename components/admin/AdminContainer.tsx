@@ -8,6 +8,28 @@ import cn from 'classnames'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import Link from '../../components/Link'
+import UserBadge from '../UserBadge'
+
+import {
+  Chart,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js'
+
+Chart.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+)
 
 const sidebarLinks = [
   {
@@ -55,9 +77,7 @@ const AdminContainer = ({ children, user }) => {
           />
           <div>
             <h3 className="font-bold text-xl">Rausky</h3>
-            <span className="text-[10px] font-bold tracking-wide bg-green-500 text-white px-2 py-1 rounded-md">
-              ADMIN
-            </span>
+            <UserBadge role={user.role} className="text-sm" />
           </div>
         </div>
 
