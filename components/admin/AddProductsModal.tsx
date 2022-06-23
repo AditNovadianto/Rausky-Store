@@ -11,15 +11,20 @@ import { useEffect, useState } from 'react'
 import Dropdown from '../Dropdown'
 import Modal from '../Modal'
 
-const initialNewProducts = (category) => [
-  {
+const initialNewProducts = (category) => {
+  let newProduct: CustomObject = {
     title: '',
     price: '',
     img: category.logoImg || '',
     category: category.slug,
-    subCategory: '',
-  },
-]
+  }
+
+  if (category.subCategories.length > 0) {
+    newProduct.subCategory = category.subCategories[0].slug
+  }
+
+  return [newProduct]
+}
 
 const AddProductsModal = ({ open, onClose, category }) => {
   const [newProducts, setNewProducts] = useState(initialNewProducts(category))
@@ -66,6 +71,15 @@ const AddProductsModal = ({ open, onClose, category }) => {
     setNewProducts(initialNewProducts(category))
   }
 
+  const resetSpecificHandler = (index: number) => {
+    const [reset] = initialNewProducts(category)
+    setNewProducts((newProducts) => [
+      ...newProducts.slice(0, index),
+      reset,
+      ...newProducts.slice(index + 1),
+    ])
+  }
+
   useEffect(() => {
     resetHandler()
   }, [category])
@@ -85,20 +99,17 @@ const AddProductsModal = ({ open, onClose, category }) => {
           <button
             type="button"
             onClick={resetHandler}
-            disabled={newProducts.length <= 1}
-            className="flex justify-center items-center border border-red-600 text-red-600 hover:bg-red-600 hover:text-white transition-colors font-semibold w-full px-4 py-2 rounded-xl"
+            disabled={newProducts.length == 0}
+            className="flex justify-center items-center border border-red-600 text-red-600 hover:bg-red-600 hover:text-white transition-colors font-semibold w-full px-4 py-2 rounded-xl whitespace-nowrap"
           >
-            <RefreshIcon className="w-5 h-5 mr-1" /> Reset
+            <RefreshIcon className="w-5 h-5 mr-1" /> Reset All
           </button>
           <button
             type="button"
             disabled={newProducts.length == 0}
             className="flex justify-center items-center bg-green-500 hover:bg-green-400 text-white transition-colors font-semibold w-full px-4 py-2 rounded-xl"
           >
-            <UploadIcon className="w-5 h-5 mr-1" />{' '}
-            <span className="whitespace-nowrap">
-              Save ({newProducts.length})
-            </span>
+            <UploadIcon className="w-5 h-5 mr-1" /> Save ({newProducts.length})
           </button>
         </div>
       </header>
@@ -122,6 +133,13 @@ const AddProductsModal = ({ open, onClose, category }) => {
                       label: 'Duplicate',
                       onClick: () => {
                         duplicateHandler(index)
+                      },
+                    },
+                    {
+                      icon: RefreshIcon,
+                      label: 'Reset',
+                      onClick: () => {
+                        resetSpecificHandler(index)
                       },
                     },
                     {
@@ -171,6 +189,8 @@ const AddProductsModal = ({ open, onClose, category }) => {
                       }
                     />
                   </label>
+
+                  {/* SUBCATEGORY */}
                   {category.subCategories.length ? (
                     <label className="block w-full">
                       <span className="block text-sm text-gray-500 mb-1">
@@ -183,7 +203,6 @@ const AddProductsModal = ({ open, onClose, category }) => {
                           inputHandler(index, 'subCategory', e.target.value)
                         }
                       >
-                        <option value=""> --select-- </option>
                         {category.subCategories.map((subCategory) => (
                           <option key={subCategory.id} value={subCategory.slug}>
                             {subCategory.name}
