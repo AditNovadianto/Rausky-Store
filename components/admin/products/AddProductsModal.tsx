@@ -8,7 +8,7 @@ import {
 } from '@heroicons/react/outline'
 import { IconButton } from '@mui/material'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { adminRequestHandler } from '../../../lib/admin'
 import request from '../../../lib/request'
 import Dropdown from '../../Dropdown'
 import Modal from '../../Modal'
@@ -52,34 +52,25 @@ const AddProductsModal = ({ open, onClose, category, setCategories }) => {
       const index = categories.findIndex((c) => c.id == category.id)
       return [
         ...categories.slice(0, index),
-        { ...category, products: [...category.products, ...products] },
+        { ...category, products },
         ...categories.slice(index + 1),
       ]
     })
   }
 
   const saveNewProducts = async () => {
-    let toastId: string
-    const message = `${newProducts.length} product${
+    const message = `${newProducts.length} Product${
       newProducts.length > 1 ? 's' : ''
     }`
-
-    try {
-      toastId = toast.loading(`Saving ${message}...`)
-      const { data } = await request.post('/products', newProducts)
-      updateCategoryProducts(data.products)
-      onClose()
-      toast.success(`${message} saved`, { id: toastId })
-    } catch (err) {
-      console.log(err)
-      let errorMessage = ''
-      if (err.status == 403) {
-        errorMessage = 'Opps... fake admin is not allowed to do this operation'
-      } else {
-        errorMessage = 'Failed. Check console for details'
-      }
-      toast.error(errorMessage, { id: toastId })
-    }
+    adminRequestHandler({
+      loading: `Saving ${message}...`,
+      handler: async () => {
+        const { data } = await request.post('/products', newProducts)
+        updateCategoryProducts([...category.products, ...data.products])
+        onClose()
+      },
+      success: `${message} Saved`,
+    })
   }
 
   useEffect(() => {

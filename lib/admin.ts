@@ -1,4 +1,5 @@
 import { getSession } from 'next-auth/react'
+import toast from 'react-hot-toast'
 import { User } from '../types/next-auth'
 
 export const getUserAdmin = async (
@@ -42,4 +43,33 @@ export const getUserAdmin = async (
   }
 
   return [user, null]
+}
+
+export const adminRequestHandler = async ({
+  loading,
+  success,
+  handler,
+  onError,
+}: {
+  loading: string
+  success: string
+  handler: () => void
+  onError?: () => void
+}) => {
+  let toastId: string
+  try {
+    toastId = toast.loading(loading)
+    await handler()
+    toast.success(success, { id: toastId })
+  } catch (err) {
+    console.log(err)
+    let errorMessage = ''
+    if (err.status == 403) {
+      errorMessage = 'Opps... fake admin is not allowed to do this operation'
+    } else {
+      errorMessage = 'Failed. Check console for details'
+    }
+    toast.error(errorMessage, { id: toastId })
+    onError && onError()
+  }
 }

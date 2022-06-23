@@ -174,7 +174,7 @@ const Products = ({ user, categories: categoriesFromServer }) => {
         </div>
 
         {/* TODO: tampilin products pake table mui */}
-        <ProductsTable products={category.products} />
+        <ProductsTable setCategories={setCategories} category={category} />
       </div>
     </AdminContainer>
   )
