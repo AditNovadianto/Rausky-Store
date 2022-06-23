@@ -7,12 +7,11 @@ import {
   UploadIcon,
 } from '@heroicons/react/outline'
 import { IconButton } from '@mui/material'
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import request from '../../lib/request'
-import Dropdown from '../Dropdown'
-import Modal from '../Modal'
+import request from '../../../lib/request'
+import Dropdown from '../../Dropdown'
+import Modal from '../../Modal'
 
 const initialNewProducts = (category) => {
   let newProduct: CustomObject = {
@@ -28,10 +27,9 @@ const initialNewProducts = (category) => {
   return [newProduct]
 }
 
-const AddProductsModal = ({ open, onClose, category }) => {
+const AddProductsModal = ({ open, onClose, category, setCategories }) => {
   const [newProducts, setNewProducts] = useState(initialNewProducts(category))
   const [errors, setErrors] = useState({})
-  const router = useRouter()
 
   const validateNewProducts = () => {
     setErrors({})
@@ -49,6 +47,17 @@ const AddProductsModal = ({ open, onClose, category }) => {
     })
   }
 
+  const updateCategoryProducts = (products) => {
+    setCategories((categories) => {
+      const index = categories.findIndex((c) => c.id == category.id)
+      return [
+        ...categories.slice(0, index),
+        { ...category, products: [...category.products, ...products] },
+        ...categories.slice(index + 1),
+      ]
+    })
+  }
+
   const saveNewProducts = async () => {
     let toastId: string
     const message = `${newProducts.length} product${
@@ -57,9 +66,10 @@ const AddProductsModal = ({ open, onClose, category }) => {
 
     try {
       toastId = toast.loading(`Saving ${message}...`)
-      await request.post('/products', newProducts)
+      const { data } = await request.post('/products', newProducts)
+      updateCategoryProducts(data.products)
+      onClose()
       toast.success(`${message} saved`, { id: toastId })
-      location.reload()
     } catch (err) {
       console.log(err)
       let errorMessage = ''

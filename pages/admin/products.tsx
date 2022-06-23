@@ -5,14 +5,16 @@ import AdminContainer from '../../components/admin/AdminContainer'
 import { getUserAdmin } from '../../lib/admin'
 import { parseData } from '../../lib/utils'
 import { getAllCategories } from '../api/categories'
-import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid'
-import AddProductsModal from '../../components/admin/AddProductsModal'
+import AddProductsModal from '../../components/admin/products/AddProductsModal'
 import Chart from '../../components/Chart'
+import ProductsTable from '../../components/admin/products/ProductsTable'
 
-const Products = ({ user, categories }) => {
-  const [category, setCategory] = useState(categories[0])
+const Products = ({ user, categories: categoriesFromServer }) => {
+  const [categories, setCategories] = useState(categoriesFromServer)
+  const [categoryIndex, setCategoryIndex] = useState(0)
   const [showAddProducts, setShowAddProducts] = useState(false)
 
+  const category = categories[categoryIndex]
   console.log(category)
 
   const editLogoImg = () => {
@@ -35,7 +37,7 @@ const Products = ({ user, categories }) => {
           </button>
         </div>
         <select
-          onChange={(e) => setCategory(categories[e.target.value])}
+          onChange={(e) => setCategoryIndex(Number(e.target.value))}
           className="select"
         >
           {categories.map((category, idx) => (
@@ -112,29 +114,39 @@ const Products = ({ user, categories }) => {
             </div>
             <h3 className="text-3xl font-semibold">Rp 5,000,000</h3>
           </div>
-          <Chart
-            type="line"
-            className="mt-4"
-            data={{
-              labels: [
-                'January',
-                'February',
-                'March',
-                'April',
-                'May',
-                'June',
-                'July',
-              ],
-              datasets: [
-                {
-                  label: 'Sales',
-                  borderColor: 'green',
-                  backgroundColor: 'green',
-                  data: [10, 30, 20, 80, 90, 75, 89],
-                },
-              ],
-            }}
-          />
+          <div className="mt-4">
+            <div>
+              <h3 className="text-lg text-gray-600">Total Sales</h3>
+              <select className="select mt-1">
+                <option value="">2022</option>
+                <option value="">2021</option>
+                <option value="">2020</option>
+              </select>
+            </div>
+            <Chart
+              type="line"
+              className="mt-4"
+              data={{
+                labels: [
+                  'January',
+                  'February',
+                  'March',
+                  'April',
+                  'May',
+                  'June',
+                  'July',
+                ],
+                datasets: [
+                  {
+                    label: 'Sales',
+                    borderColor: 'green',
+                    backgroundColor: 'green',
+                    data: [10, 30, 20, 80, 90, 75, 89],
+                  },
+                ],
+              }}
+            />
+          </div>
         </div>
       </div>
 
@@ -156,16 +168,13 @@ const Products = ({ user, categories }) => {
           <AddProductsModal
             open={showAddProducts}
             onClose={() => setShowAddProducts(false)}
+            setCategories={setCategories}
             category={category}
           />
         </div>
 
         {/* TODO: tampilin products pake table mui */}
-        <div className="mt-5">
-          {category.products.map((product) => (
-            <div key={product.id}></div>
-          ))}
-        </div>
+        <ProductsTable products={category.products} />
       </div>
     </AdminContainer>
   )
