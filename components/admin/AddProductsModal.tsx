@@ -7,6 +7,7 @@ import {
   UploadIcon,
 } from '@heroicons/react/outline'
 import { IconButton } from '@mui/material'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import request from '../../lib/request'
 import Dropdown from '../Dropdown'
@@ -29,6 +30,7 @@ const initialNewProducts = (category) => {
 const AddProductsModal = ({ open, onClose, category }) => {
   const [newProducts, setNewProducts] = useState(initialNewProducts(category))
   const [errors, setErrors] = useState({})
+  const router = useRouter()
 
   const validateNewProducts = () => {
     setErrors({})
@@ -48,10 +50,8 @@ const AddProductsModal = ({ open, onClose, category }) => {
 
   const saveNewProducts = async () => {
     try {
-      // TODO: tambahin toast
-      const { data } = await request.post('/products', newProducts)
-      setNewProducts(initialNewProducts(category))
-      onClose()
+      await request.post('/products', newProducts)
+      location.reload()
     } catch (err) {
       console.log(err)
     } finally {
@@ -273,7 +273,7 @@ const AddProductsModal = ({ open, onClose, category }) => {
                                   (c) => c.slug == newProduct.subCategory
                                 )
                               : category
-                            ).logoImg
+                            )?.logoImg
                           }
                           className="w-10 h-10 object-cover rounded-lg mb-1.5"
                         />

@@ -3,6 +3,54 @@ import prisma from '../../../lib/prisma'
 
 const app = apiHandler()
 
+const createNewProduct = async ({ user, product }) => {
+  const { title, price, category, subCategory } = product
+
+  if (!title || !price) {
+    throw { status: 400, message: 'Please provide title, price' }
+  }
+
+  if (typeof price == 'string') {
+    product.price = Number(price)
+  }
+
+  const categoryDb = await prisma.category.findUnique({
+    where: { slug: category },
+    select: { logoImg: true, subCategories: true, isTopup: true },
+  })
+
+  // logic for topup category only
+  if (categoryDb.isTopup) {
+    const hasSubCategories = categoryDb.subCategories.length > 0
+
+    // but subCategory not in req.body, throw 400
+    if (hasSubCategories && !subCategory) {
+      throw {
+        status: 400,
+        message: 'Please provide subCategory for this product',
+      }
+    }
+
+    product.img = (
+      hasSubCategories
+        ? categoryDb.subCategories.find((sc) => sc.slug == subCategory)
+        : categoryDb
+    ).logoImg
+  }
+
+  if (subCategory) {
+    product.subCategory = { connect: { slug: subCategory } }
+  }
+
+  return await prisma.product.create({
+    data: {
+      ...product,
+      category: { connect: { slug: category } },
+      user: { connect: { id: user.id } },
+    },
+  })
+}
+
 export default app
   // get all products
   .get(async (req, res) => {
@@ -20,56 +68,19 @@ export default app
     res.status(200).json({ products, length: products.length })
   })
 
-  //   TODO: atur biar gambar product otomatis ngikutin category / subCategory img
   // create new product
   .post(checkAuth('ADMIN'), async (req, res) => {
     if (Array.isArray(req.body)) {
       const products = await Promise.all(
-        req.body.map((product) => {
-          const { title, price, category, subCategory } = product
-          if (!title || !price) {
-            throw { status: 400, message: 'Please provide title, price' }
-          }
-          if (typeof price == 'string') {
-            product.price = Number(price)
-          }
-          if (subCategory) {
-            product.subCategory = { connect: { slug: subCategory } }
-          }
-          return prisma.product.create({
-            data: {
-              ...product,
-              category: { connect: { slug: category } },
-              user: { connect: { id: req.user.id } },
-            },
-          })
-        })
+        req.body.map((product) => createNewProduct({ user: req.user, product }))
       )
-
       res.status(201).json({ products, count: products.length })
-    } else {
-      const { title, price, category, subCategory } = req.body
-
-      if (!title || !price) {
-        throw { status: 400, message: 'Please provide title, price' }
-      }
-
-      if (typeof price == 'string') {
-        req.body.price = Number(price)
-      }
-
-      if (subCategory) {
-        req.body.subCategory = { connect: { slug: subCategory } }
-      }
-
-      const product = await prisma.product.create({
-        data: {
-          ...req.body,
-          category: { connect: { slug: category } },
-          user: { connect: { id: req.user.id } },
-        },
-      })
-
-      res.status(201).json({ product })
+      return
     }
+
+    const product = await createNewProduct({
+      user: req.user,
+      product: req.body,
+    })
+    res.status(201).json({ product })
   })
