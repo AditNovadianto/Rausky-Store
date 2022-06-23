@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+*:disabled {
+    @apply pointer-events-none opacity-40;
+}
 
 ::-webkit-scrollbar {
     width: 0.4em;
@@ -13,6 +16,7 @@
     border-radius: 100vw;
 }
 
+
 @layer base {
     html {
         -webkit-tap-highlight-color:  rgba(255, 255, 255, 0); 
@@ -21,7 +25,7 @@
 
 @layer components {
     .input {
-        @apply block w-full px-5 py-3 rounded-xl border focus:outline-none border-gray-300 focus:border-green-400;
+        @apply block w-full px-5 py-3 rounded-xl border focus:outline-none focus:border-green-400;
     }
 
     .select {

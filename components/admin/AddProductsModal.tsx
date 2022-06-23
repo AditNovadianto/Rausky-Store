@@ -2,24 +2,27 @@ import {
   DotsVerticalIcon,
   DuplicateIcon,
   PlusSmIcon,
+  RefreshIcon,
   TrashIcon,
   UploadIcon,
 } from '@heroicons/react/outline'
 import { IconButton } from '@mui/material'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Dropdown from '../Dropdown'
 import Modal from '../Modal'
 
+const initialNewProducts = (category) => [
+  {
+    title: '',
+    price: '',
+    img: category.logoImg || '',
+    category: category.slug,
+    subCategory: '',
+  },
+]
+
 const AddProductsModal = ({ open, onClose, category }) => {
-  const [newProducts, setNewProducts] = useState([
-    {
-      title: '',
-      price: '',
-      img: category.logoImg || '',
-      category: category.slug,
-      subCategory: '',
-    },
-  ])
+  const [newProducts, setNewProducts] = useState(initialNewProducts(category))
 
   const inputHandler = (index: number, prop: string, value) => {
     setNewProducts((newProducts) => {
@@ -59,29 +62,59 @@ const AddProductsModal = ({ open, onClose, category }) => {
     ])
   }
 
-  console.log(newProducts)
+  const resetHandler = () => {
+    setNewProducts(initialNewProducts(category))
+  }
+
+  useEffect(() => {
+    resetHandler()
+  }, [category])
+
+  console.log(category)
 
   return (
     <Modal open={open} onClose={onClose}>
-      <header className="sticky top-0 bg-white p-5 flex justify-between items-center shadow-sm">
-        <h2 className="text-2xl font-bold">Add Products</h2>
+      <header className="sticky top-0 z-[100] bg-white p-5 flex justify-between items-center shadow-sm">
+        <div className="flex items-center space-x-3">
+          {category.logoImg && (
+            <img src={category.logoImg} className="w-10 h-10 rounded-2xl" />
+          )}
+          <h2 className="text-2xl font-bold">Add Products</h2>
+        </div>
         <div className="flex items-center space-x-4">
           <button
             type="button"
-            className="flex justify-center items-center bg-green-500 hover:bg-green-400 text-white font-semibold w-full px-4 py-2 rounded-xl"
+            onClick={resetHandler}
+            disabled={newProducts.length <= 1}
+            className="flex justify-center items-center border border-red-600 text-red-600 hover:bg-red-600 hover:text-white transition-colors font-semibold w-full px-4 py-2 rounded-xl"
           >
-            <UploadIcon className="w-5 h-5 mr-1" /> Save
+            <RefreshIcon className="w-5 h-5 mr-1" /> Reset
           </button>
-          <img src={category.logoImg} className="w-10 h-10 rounded-2xl" />
+          <button
+            type="button"
+            disabled={newProducts.length == 0}
+            className="flex justify-center items-center bg-green-500 hover:bg-green-400 text-white transition-colors font-semibold w-full px-4 py-2 rounded-xl"
+          >
+            <UploadIcon className="w-5 h-5 mr-1" />{' '}
+            <span className="whitespace-nowrap">
+              Save ({newProducts.length})
+            </span>
+          </button>
         </div>
       </header>
-      <div className="overflow-auto p-5 space-y-4">
+
+      <div className="overflow-auto p-5 space-y-6">
         {newProducts?.map((newProduct, index) => {
           console.log(index)
           return (
-            <div key={index} className="rounded-xl space-y-4 border p-8">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-medium">product {index + 1}</h3>
+            <div key={index}>
+              <header className="flex items-center justify-between">
+                <h3 className="text-lg font-medium flex items-center space-x-4">
+                  <span className="bg-green-500 text-white w-8 h-8 shadow-lg shadow-green-300/50 flex items-center justify-center rounded-full">
+                    {index + 1}
+                  </span>
+                  <span>{newProduct.title || 'Untitled Product'}</span>
+                </h3>
                 <Dropdown
                   items={[
                     {
@@ -105,59 +138,128 @@ const AddProductsModal = ({ open, onClose, category }) => {
                     <DotsVerticalIcon className="w-5 h-5 text-gray-500" />
                   </IconButton>
                 </Dropdown>
-              </div>
-              <label className="block">
-                <span className="block text-sm text-gray-500 mb-1">Title</span>
-                <input
-                  type="text"
-                  className="input"
-                  value={newProduct.title}
-                  onChange={(e) => inputHandler(index, 'title', e.target.value)}
-                />
-              </label>
-              <label className="block">
-                <span className="block text-sm text-gray-500 mb-1">Price</span>
-                <input
-                  type="number"
-                  className="input"
-                  value={newProduct.price}
-                  onChange={(e) => inputHandler(index, 'price', e.target.value)}
-                />
-              </label>
-              <label className="block w-full">
-                <span className="block text-sm text-gray-500 mb-1">
-                  Sub Category
-                </span>
-                {category.subCategories.length ? (
-                  <select
-                    className="select w-full p-3 rounded-xl"
-                    value={newProduct.subCategory}
-                    onChange={(e) =>
-                      inputHandler(index, 'subCategory', e.target.value)
+              </header>
+              <div className="flex justify-between space-x-4 mt-5">
+                {/* FORM */}
+                <div className="w-full rounded-2xl space-y-4">
+                  {/* TITLE */}
+                  <label className="block">
+                    <span className="block text-sm text-gray-500 mb-1">
+                      Title
+                    </span>
+                    <input
+                      type="text"
+                      className="input"
+                      value={newProduct.title}
+                      onChange={(e) =>
+                        inputHandler(index, 'title', e.target.value)
+                      }
+                    />
+                  </label>
+                  {/* PRICE */}
+                  <label className="block">
+                    <span className="block text-sm text-gray-500 mb-1">
+                      Price
+                    </span>
+                    <input
+                      type="number"
+                      min={0}
+                      className="input"
+                      value={newProduct.price}
+                      onChange={(e) =>
+                        inputHandler(index, 'price', e.target.value)
+                      }
+                    />
+                  </label>
+                  {category.subCategories.length ? (
+                    <label className="block w-full">
+                      <span className="block text-sm text-gray-500 mb-1">
+                        Sub Category
+                      </span>
+                      <select
+                        className="select w-full p-3 rounded-xl"
+                        value={newProduct.subCategory}
+                        onChange={(e) =>
+                          inputHandler(index, 'subCategory', e.target.value)
+                        }
+                      >
+                        <option value=""> --select-- </option>
+                        {category.subCategories.map((subCategory) => (
+                          <option key={subCategory.id} value={subCategory.slug}>
+                            {subCategory.name}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  ) : null}
+                </div>
+
+                {/* PREVIEW */}
+                <div className="w-full">
+                  <span className="block text-sm text-gray-500 mb-1">
+                    Preview
+                  </span>
+
+                  {/* TODO: refactor, bikin komponen topup sendiri */}
+                  <div
+                    className={
+                      'px-4 py-3 border rounded-xl hover:border-green-400'
                     }
                   >
-                    <option value=""> --select-- </option>
-                    {category.subCategories.map((subCategory) => (
-                      <option key={subCategory.id} value={subCategory.slug}>
-                        {subCategory.name}
-                      </option>
-                    ))}
-                  </select>
-                ) : null}
-                <button
-                  type="button"
-                  className="mt-3 flex items-center text-green-500"
-                >
-                  <PlusSmIcon className="w-5 h-5 mr-1" /> Sub Category
-                </button>
-              </label>
+                    <div className="flex items-center">
+                      {category.logoImg && (
+                        <img
+                          src={
+                            (newProduct.subCategory
+                              ? category.subCategories.find(
+                                  (c) => c.slug == newProduct.subCategory
+                                )
+                              : category
+                            ).logoImg
+                          }
+                          className="w-10 h-10 object-cover rounded-lg mb-1.5"
+                        />
+                      )}
+
+                      <button className="block md:hidden p-1.5 bg-gray-200 hover:bg-red-500 text-gray-500 hover:text-gray-100 rounded-xl ml-auto">
+                        <TrashIcon className="w-5 h-5 text-current" />
+                      </button>
+                    </div>
+                    <div>
+                      <p className="font-semibold">
+                        {newProduct.title || 'Untitled Product'}
+                      </p>
+                      <p className="text-gray-500">
+                        Rp {Number(newProduct.price).toLocaleString()}
+                      </p>
+
+                      <div className="flex items-center mt-3">
+                        <div className="flex items-center flex-grow md:flex-grow-0 justify-between text-gray-500">
+                          <button className="w-8 h-8 rounded-xl font-medium border hover:bg-gray-800 hover:text-gray-100">
+                            {' '}
+                            -{' '}
+                          </button>
+                          <div className="px-5">{1}</div>
+                          <button className="w-8 h-8 rounded-xl font-medium border hover:bg-gray-800 hover:text-gray-100">
+                            {' '}
+                            +{' '}
+                          </button>
+                        </div>
+                        <button className="hidden md:block p-1.5 bg-gray-200 hover:bg-red-500 text-gray-500 hover:text-gray-100 rounded-xl ml-auto">
+                          <TrashIcon className="w-5 h-5 text-current" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           )
         })}
         <button
           type="button"
           onClick={addHandler}
-          className="mt-3 flex justify-center items-center border border-green-500 text-green-500 hover:bg-green-500 hover:text-white font-medium w-full py-2 rounded-xl"
+          className="mt-3 text-gray-500 flex justify-center items-center font-medium w-full py-2 rounded-xl"
         >
           <PlusSmIcon className="w-5 h-5 mr-1" /> Product
         </button>
