@@ -97,11 +97,13 @@ const Products = ({ user, categories: categoriesFromServer }) => {
               <h2 className="text-xl font-semibold">{category.name}</h2>
               {/* TODO: bikin edit category detail -> munculin modal buat ngedit name, description, requirements, subcategories */}
               <button className="mt-1 text-green-500 hover:underline font-medium flex items-center">
-                <PencilIcon className="w-5 h-5 mr-2" /> Edit Category Details
+                <PencilIcon className="w-5 h-5 mr-2" /> Edit Category
               </button>
             </div>
           </div>
         </div>
+
+        {/* TODO: ganti hardcoded category chart dengan dynamic data */}
         {/* CATEGORY CHART */}
         <div className="flex-grow w-full">
           <div className="flex justify-between">

@@ -83,7 +83,7 @@ const ProductsTable = ({ setCategories, category }) => {
     })
 
   return (
-    <div className="mt-10 h-screen">
+    <div className="mt-10 h-[90vh]">
       <DataGrid
         disableSelectionOnClick
         rows={rows}

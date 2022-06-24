@@ -1,4 +1,6 @@
 import {
+  DocumentAddIcon,
+  DocumentRemoveIcon,
   DocumentTextIcon,
   DotsVerticalIcon,
   DuplicateIcon,
@@ -9,7 +11,8 @@ import {
   UploadIcon,
 } from '@heroicons/react/outline'
 import { IconButton } from '@mui/material'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { useHotkeys } from 'react-hotkeys-hook'
 import { adminRequestHandler } from '../../../lib/admin'
 import request from '../../../lib/request'
 import Dropdown from '../../Dropdown'
@@ -32,7 +35,45 @@ const initialNewProducts = (category) => {
 const AddProductsModal = ({ open, onClose, category, setCategories }) => {
   const [newProducts, setNewProducts] = useState(initialNewProducts(category))
   const [errors, setErrors] = useState({})
-  const [showDescription, setShowDescription] = useState(false)
+  const modalRef = useRef<HTMLDivElement>(null)
+
+  // add new product
+  useHotkeys(
+    'ctrl+a',
+    (e) => {
+      e.preventDefault()
+      if (newProducts.length == 0) return
+      addHandler()
+    },
+    {
+      enableOnTags: ['INPUT', 'TEXTAREA', 'SELECT'],
+    }
+  )
+
+  // duplicate last product
+  useHotkeys(
+    'ctrl+d',
+    (e) => {
+      e.preventDefault()
+      if (newProducts.length == 0) return
+      duplicateHandler(newProducts.length - 1)
+    },
+    {
+      enableOnTags: ['INPUT', 'TEXTAREA', 'SELECT'],
+    }
+  )
+
+  // delete last product
+  useHotkeys(
+    'del',
+    () => {
+      if (newProducts.length == 0) return
+      deleteHandler(newProducts.length - 1)
+    },
+    {
+      enableOnTags: ['INPUT', 'TEXTAREA', 'SELECT'],
+    }
+  )
 
   const validateNewProducts = () => {
     setErrors({})
@@ -80,8 +121,6 @@ const AddProductsModal = ({ open, onClose, category, setCategories }) => {
     validateNewProducts()
   }, [newProducts])
 
-  console.log(errors)
-
   const inputHandler = (index: number, prop: string, value) => {
     setNewProducts((newProducts) => {
       return [
@@ -103,8 +142,20 @@ const AddProductsModal = ({ open, onClose, category, setCategories }) => {
     })
   }
 
+  const scrollToBottom = () => {
+    setTimeout(() => {
+      if (modalRef) {
+        modalRef.current.scrollTo({
+          top: modalRef.current.scrollHeight,
+          behavior: 'smooth',
+        })
+      }
+    }, 0)
+  }
+
   const addHandler = () => {
     setNewProducts([...newProducts, initialNewProducts(category)[0]])
+    scrollToBottom()
   }
 
   const duplicateHandler = (index: number) => {
@@ -113,6 +164,7 @@ const AddProductsModal = ({ open, onClose, category, setCategories }) => {
       { ...newProducts[index] },
       ...newProducts.slice(index + 1),
     ])
+    scrollToBottom()
   }
 
   const deleteHandler = (index: number) => {
@@ -140,7 +192,7 @@ const AddProductsModal = ({ open, onClose, category, setCategories }) => {
   }, [category])
 
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal open={open} onClose={onClose} ref={modalRef}>
       <header className="sticky top-0 z-[100] bg-white p-5 flex justify-between items-center shadow-sm">
         <div className="flex items-center space-x-3">
           {category.logoImg && (
@@ -161,7 +213,7 @@ const AddProductsModal = ({ open, onClose, category, setCategories }) => {
             type="button"
             onClick={saveNewProducts}
             disabled={newProducts.length == 0 || Object.keys(errors).length > 0}
-            className="flex justify-center items-center bg-green-500 hover:bg-green-400 text-white transition-colors font-semibold w-full px-4 py-2 rounded-xl"
+            className="flex justify-center items-center bg-green-500 hover:bg-green-400 text-white transition-colors font-semibold w-full px-4 py-2 rounded-xl whitespace-nowrap"
           >
             <UploadIcon className="w-5 h-5 mr-1" /> Save ({newProducts.length})
           </button>
@@ -207,7 +259,10 @@ const AddProductsModal = ({ open, onClose, category, setCategories }) => {
                       label: 'Others',
                       more: [
                         {
-                          icon: DocumentTextIcon,
+                          icon:
+                            newProduct.description !== undefined
+                              ? DocumentRemoveIcon
+                              : DocumentAddIcon,
                           label: `${
                             newProduct.description !== undefined
                               ? 'Remove'
@@ -219,6 +274,17 @@ const AddProductsModal = ({ open, onClose, category, setCategories }) => {
                             } else {
                               inputHandler(index, 'description', '')
                             }
+                          },
+                        },
+                        {
+                          icon: DocumentTextIcon,
+                          label: 'Shortcuts',
+                          onClick: () => {
+                            alert(`
+                                ctrl+a : add new product
+                                ctrl+d : duplicate last product
+                                del : delete last product
+                            `)
                           },
                         },
                       ],
@@ -244,6 +310,7 @@ const AddProductsModal = ({ open, onClose, category, setCategories }) => {
                       type="text"
                       className="input"
                       value={newProduct.title}
+                      autoFocus
                       onChange={(e) =>
                         inputHandler(index, 'title', e.target.value)
                       }
