@@ -50,6 +50,10 @@ const Dropdown = ({
     }
   }, deps)
 
+  useEffect(() => {
+    setDropdownItems(items)
+  }, [items])
+
   const resetDropdown = () => {
     setInMore(null)
     setDropdownItems(items)

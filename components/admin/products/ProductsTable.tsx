@@ -54,6 +54,7 @@ const ProductsTable = ({ setCategories, category }) => {
       renderCell: (params) => {
         return (
           <div className="flex space-x-4 text-gray-500">
+            {/* TODO: bikin edit product handler */}
             <button className="hover:text-green-500">
               <PencilIcon className="w-5 h-5" />
             </button>

@@ -1,6 +1,8 @@
 import {
+  DocumentTextIcon,
   DotsVerticalIcon,
   DuplicateIcon,
+  MenuIcon,
   PlusSmIcon,
   RefreshIcon,
   TrashIcon,
@@ -30,6 +32,7 @@ const initialNewProducts = (category) => {
 const AddProductsModal = ({ open, onClose, category, setCategories }) => {
   const [newProducts, setNewProducts] = useState(initialNewProducts(category))
   const [errors, setErrors] = useState({})
+  const [showDescription, setShowDescription] = useState(false)
 
   const validateNewProducts = () => {
     setErrors({})
@@ -84,6 +87,17 @@ const AddProductsModal = ({ open, onClose, category, setCategories }) => {
       return [
         ...newProducts.slice(0, index),
         { ...newProducts[index], [prop]: value },
+        ...newProducts.slice(index + 1),
+      ]
+    })
+  }
+
+  const removePropHandler = (index: number, prop: string) => {
+    setNewProducts((newProducts) => {
+      delete newProducts[index][prop]
+      return [
+        ...newProducts.slice(0, index),
+        { ...newProducts[index] },
         ...newProducts.slice(index + 1),
       ]
     })
@@ -188,6 +202,27 @@ const AddProductsModal = ({ open, onClose, category, setCategories }) => {
                         deleteHandler(index)
                       },
                     },
+                    {
+                      icon: MenuIcon,
+                      label: 'Others',
+                      more: [
+                        {
+                          icon: DocumentTextIcon,
+                          label: `${
+                            newProduct.description !== undefined
+                              ? 'Remove'
+                              : 'Add'
+                          } Description`,
+                          onClick: () => {
+                            if (newProduct.description !== undefined) {
+                              removePropHandler(index, 'description')
+                            } else {
+                              inputHandler(index, 'description', '')
+                            }
+                          },
+                        },
+                      ],
+                    },
                   ]}
                   minWidth={150}
                 >
@@ -196,6 +231,7 @@ const AddProductsModal = ({ open, onClose, category, setCategories }) => {
                   </IconButton>
                 </Dropdown>
               </header>
+
               <div className="flex justify-between space-x-4 mt-5">
                 {/* FORM */}
                 <div className="w-full rounded-2xl space-y-4">
@@ -326,6 +362,16 @@ const AddProductsModal = ({ open, onClose, category, setCategories }) => {
                   </div>
                 </div>
               </div>
+
+              {/* DESCRIPTION */}
+              {newProduct.description !== undefined && (
+                <label className="block w-full mt-4">
+                  <span className="block text-sm text-gray-500 mb-1">
+                    Description
+                  </span>
+                  <textarea className="w-full border focus:outline-none rounded-xl px-5 py-3 text-gray-600 focus:border-green-400"></textarea>
+                </label>
+              )}
             </div>
           )
         })}
