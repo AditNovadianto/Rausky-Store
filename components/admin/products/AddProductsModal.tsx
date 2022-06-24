@@ -17,6 +17,7 @@ import { adminRequestHandler } from '../../../lib/admin'
 import request from '../../../lib/request'
 import Dropdown from '../../Dropdown'
 import Modal from '../../Modal'
+import Product from './Product'
 
 const initialNewProducts = (category) => {
   let newProduct: CustomObject = {
@@ -192,6 +193,63 @@ const AddProductsModal = ({ open, onClose, category, setCategories }) => {
     resetHandler()
   }, [category])
 
+  const dropdownItems = (newProduct, index) => [
+    {
+      icon: DuplicateIcon,
+      label: 'Duplicate',
+      onClick: () => {
+        duplicateHandler(index)
+      },
+    },
+    {
+      icon: RefreshIcon,
+      label: 'Reset',
+      onClick: () => {
+        resetSpecificHandler(index)
+      },
+    },
+    {
+      icon: TrashIcon,
+      label: 'Delete',
+      onClick: () => {
+        deleteHandler(index)
+      },
+    },
+    {
+      icon: MenuIcon,
+      label: 'Others',
+      more: [
+        {
+          icon:
+            newProduct.description !== undefined
+              ? DocumentRemoveIcon
+              : DocumentAddIcon,
+          label: `${
+            newProduct.description !== undefined ? 'Remove' : 'Add'
+          } Description`,
+          onClick: () => {
+            if (newProduct.description !== undefined) {
+              removePropHandler(index, 'description')
+            } else {
+              inputHandler(index, 'description', '')
+            }
+          },
+        },
+        {
+          icon: DocumentTextIcon,
+          label: 'Shortcuts',
+          onClick: () => {
+            alert(`
+              ctrl+a : add new product
+              ctrl+d : duplicate last product
+              del : delete last product
+          `)
+          },
+        },
+      ],
+    },
+  ]
+
   return (
     <Modal open={open} onClose={onClose} ref={modalRef}>
       <header className="sticky top-0 z-[100] bg-white p-5 flex justify-between items-center shadow-sm">
@@ -224,244 +282,35 @@ const AddProductsModal = ({ open, onClose, category, setCategories }) => {
       <div className="overflow-auto p-5 space-y-6">
         {newProducts?.map((newProduct, index) => {
           return (
-            <div key={index}>
-              <header className="flex items-center justify-between">
-                <h3 className="text-lg font-medium flex items-center space-x-4">
-                  <span className="bg-green-500 text-white w-8 h-8 shadow-lg shadow-green-300/50 flex items-center justify-center rounded-full">
-                    {index + 1}
-                  </span>
-                  <span>{newProduct.title || 'Untitled Product'}</span>
-                </h3>
+            <Product
+              key={index}
+              product={newProduct}
+              category={category}
+              dropdown={
                 <Dropdown
-                  items={[
-                    {
-                      icon: DuplicateIcon,
-                      label: 'Duplicate',
-                      onClick: () => {
-                        duplicateHandler(index)
-                      },
-                    },
-                    {
-                      icon: RefreshIcon,
-                      label: 'Reset',
-                      onClick: () => {
-                        resetSpecificHandler(index)
-                      },
-                    },
-                    {
-                      icon: TrashIcon,
-                      label: 'Delete',
-                      onClick: () => {
-                        deleteHandler(index)
-                      },
-                    },
-                    {
-                      icon: MenuIcon,
-                      label: 'Others',
-                      more: [
-                        {
-                          icon:
-                            newProduct.description !== undefined
-                              ? DocumentRemoveIcon
-                              : DocumentAddIcon,
-                          label: `${
-                            newProduct.description !== undefined
-                              ? 'Remove'
-                              : 'Add'
-                          } Description`,
-                          onClick: () => {
-                            if (newProduct.description !== undefined) {
-                              removePropHandler(index, 'description')
-                            } else {
-                              inputHandler(index, 'description', '')
-                            }
-                          },
-                        },
-                        {
-                          icon: DocumentTextIcon,
-                          label: 'Shortcuts',
-                          onClick: () => {
-                            alert(`
-                                ctrl+a : add new product
-                                ctrl+d : duplicate last product
-                                del : delete last product
-                            `)
-                          },
-                        },
-                      ],
-                    },
-                  ]}
+                  items={dropdownItems(newProduct, index)}
                   minWidth={150}
                 >
                   <IconButton>
                     <DotsVerticalIcon className="w-5 h-5 text-gray-500" />
                   </IconButton>
                 </Dropdown>
-              </header>
-
-              <div className="flex justify-between space-x-4 mt-5">
-                {/* FORM */}
-                <div className="w-full rounded-2xl space-y-4">
-                  {/* TITLE */}
-                  <label className="block">
-                    <span className="block text-sm text-gray-500 mb-1">
-                      Title
-                    </span>
-                    <input
-                      type="text"
-                      className="input"
-                      value={newProduct.title}
-                      autoFocus
-                      onChange={(e) =>
-                        inputHandler(index, 'title', e.target.value)
-                      }
-                    />
-                    {errors[index]?.title && (
-                      <span className="text-sm text-red-500 font-medium">
-                        {errors[index].title}
-                      </span>
-                    )}
-                  </label>
-                  {/* PRICE */}
-                  <label className="block">
-                    <span className="block text-sm text-gray-500 mb-1">
-                      Price
-                    </span>
-                    <input
-                      type="number"
-                      min={0}
-                      className="input"
-                      value={newProduct.price}
-                      onWheel={() => {}}
-                      onChange={(e) =>
-                        inputHandler(index, 'price', Number(e.target.value))
-                      }
-                    />
-                    {errors[index]?.price && (
-                      <span className="text-sm text-red-500 font-medium">
-                        {errors[index].price}
-                      </span>
-                    )}
-                  </label>
-                  <div className="flex space-x-2">
-                    {/* STOCK */}
-                    <label className="block w-full">
-                      <span className="block text-sm text-gray-500 mb-1">
-                        Stock
-                      </span>
-                      <input
-                        type="number"
-                        min={0}
-                        className="input"
-                        value={newProduct.stock}
-                        onChange={(e) =>
-                          inputHandler(index, 'stock', Number(e.target.value))
-                        }
-                      />
-                    </label>
-
-                    {/* SUBCATEGORY */}
-                    {category.subCategories.length ? (
-                      <label className="block w-full">
-                        <span className="block text-sm text-gray-500 mb-1">
-                          Sub Category
-                        </span>
-                        <select
-                          className="select w-full p-3 rounded-xl"
-                          value={newProduct.subCategory}
-                          onChange={(e) =>
-                            inputHandler(index, 'subCategory', e.target.value)
-                          }
-                        >
-                          {category.subCategories.map((subCategory) => (
-                            <option
-                              key={subCategory.id}
-                              value={subCategory.slug}
-                            >
-                              {subCategory.name}
-                            </option>
-                          ))}
-                        </select>
-                        {errors[index]?.subCategory && (
-                          <span className="text-sm text-red-500 font-medium">
-                            {errors[index].subCategory}
-                          </span>
-                        )}
-                      </label>
-                    ) : null}
-                  </div>
-                </div>
-
-                {/* PREVIEW */}
-                <div className="w-full">
-                  <span className="block text-sm text-gray-500 mb-1">
-                    Preview
-                  </span>
-
-                  {/* TODO: refactor, bikin komponen topup sendiri */}
-                  <div
-                    className={
-                      'px-4 py-3 border rounded-xl hover:border-green-400'
-                    }
-                  >
-                    <div className="flex items-center">
-                      {category.logoImg && (
-                        <img
-                          src={
-                            (newProduct.subCategory
-                              ? category.subCategories.find(
-                                  (c) => c.slug == newProduct.subCategory
-                                )
-                              : category
-                            )?.logoImg
-                          }
-                          className="w-10 h-10 object-cover rounded-lg mb-1.5"
-                        />
-                      )}
-
-                      <button className="block md:hidden p-1.5 bg-gray-200 hover:bg-red-500 text-gray-500 hover:text-gray-100 rounded-xl ml-auto">
-                        <TrashIcon className="w-5 h-5 text-current" />
-                      </button>
-                    </div>
-                    <div>
-                      <p className="font-semibold">
-                        {newProduct.title || 'Untitled Product'}
-                      </p>
-                      <p className="text-gray-500">
-                        Rp {Number(newProduct.price).toLocaleString()}
-                      </p>
-
-                      <div className="flex items-center mt-3">
-                        <div className="flex items-center flex-grow md:flex-grow-0 justify-between text-gray-500">
-                          <button className="w-8 h-8 rounded-xl font-medium border hover:bg-gray-800 hover:text-gray-100">
-                            {' '}
-                            -{' '}
-                          </button>
-                          <div className="px-5">{1}</div>
-                          <button className="w-8 h-8 rounded-xl font-medium border hover:bg-gray-800 hover:text-gray-100">
-                            {' '}
-                            +{' '}
-                          </button>
-                        </div>
-                        <button className="hidden md:block p-1.5 bg-gray-200 hover:bg-red-500 text-gray-500 hover:text-gray-100 rounded-xl ml-auto">
-                          <TrashIcon className="w-5 h-5 text-current" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* DESCRIPTION */}
-              {newProduct.description !== undefined && (
-                <label className="block w-full mt-4">
-                  <span className="block text-sm text-gray-500 mb-1">
-                    Description
-                  </span>
-                  <textarea className="w-full border focus:outline-none rounded-xl px-5 py-3 text-gray-600 focus:border-green-400"></textarea>
-                </label>
-              )}
-            </div>
+              }
+              index={index}
+              errors={errors}
+              onTitleChange={(e) =>
+                inputHandler(index, 'title', e.target.value)
+              }
+              onPriceChange={(e) =>
+                inputHandler(index, 'price', Number(e.target.value))
+              }
+              onStockChange={(e) =>
+                inputHandler(index, 'stock', Number(e.target.value))
+              }
+              onSubCategoryChange={(e) =>
+                inputHandler(index, 'subCategory', e.target.value)
+              }
+            />
           )
         })}
         <button
