@@ -10,10 +10,6 @@ const createNewProduct = async ({ user, product }) => {
     throw { status: 400, message: 'Please provide title, price' }
   }
 
-  if (typeof price == 'string') {
-    product.price = Number(price)
-  }
-
   const categoryDb = await prisma.category.findUnique({
     where: { slug: category },
     select: { logoImg: true, subCategories: true, isTopup: true },

@@ -21,8 +21,9 @@ import Modal from '../../Modal'
 const initialNewProducts = (category) => {
   let newProduct: CustomObject = {
     title: '',
-    price: '',
+    price: 0,
     category: category.slug,
+    stock: 0,
   }
 
   if (category.subCategories.length > 0) {
@@ -80,7 +81,7 @@ const AddProductsModal = ({ open, onClose, category, setCategories }) => {
     newProducts.forEach((newProduct, index) => {
       let errorFields: CustomObject = {}
       Object.entries(newProduct).forEach(([field, value]) => {
-        if (!value) {
+        if (typeof value == 'string' && value == '') {
           errorFields[field] = `${field} cannot be empty`
         }
       })
@@ -331,8 +332,9 @@ const AddProductsModal = ({ open, onClose, category, setCategories }) => {
                       min={0}
                       className="input"
                       value={newProduct.price}
+                      onWheel={() => {}}
                       onChange={(e) =>
-                        inputHandler(index, 'price', e.target.value)
+                        inputHandler(index, 'price', Number(e.target.value))
                       }
                     />
                     {errors[index]?.price && (
@@ -341,33 +343,53 @@ const AddProductsModal = ({ open, onClose, category, setCategories }) => {
                       </span>
                     )}
                   </label>
-
-                  {/* SUBCATEGORY */}
-                  {category.subCategories.length ? (
+                  <div className="flex space-x-2">
+                    {/* STOCK */}
                     <label className="block w-full">
                       <span className="block text-sm text-gray-500 mb-1">
-                        Sub Category
+                        Stock
                       </span>
-                      <select
-                        className="select w-full p-3 rounded-xl"
-                        value={newProduct.subCategory}
+                      <input
+                        type="number"
+                        min={0}
+                        className="input"
+                        value={newProduct.stock}
                         onChange={(e) =>
-                          inputHandler(index, 'subCategory', e.target.value)
+                          inputHandler(index, 'stock', Number(e.target.value))
                         }
-                      >
-                        {category.subCategories.map((subCategory) => (
-                          <option key={subCategory.id} value={subCategory.slug}>
-                            {subCategory.name}
-                          </option>
-                        ))}
-                      </select>
-                      {errors[index]?.subCategory && (
-                        <span className="text-sm text-red-500 font-medium">
-                          {errors[index].subCategory}
-                        </span>
-                      )}
+                      />
                     </label>
-                  ) : null}
+
+                    {/* SUBCATEGORY */}
+                    {category.subCategories.length ? (
+                      <label className="block w-full">
+                        <span className="block text-sm text-gray-500 mb-1">
+                          Sub Category
+                        </span>
+                        <select
+                          className="select w-full p-3 rounded-xl"
+                          value={newProduct.subCategory}
+                          onChange={(e) =>
+                            inputHandler(index, 'subCategory', e.target.value)
+                          }
+                        >
+                          {category.subCategories.map((subCategory) => (
+                            <option
+                              key={subCategory.id}
+                              value={subCategory.slug}
+                            >
+                              {subCategory.name}
+                            </option>
+                          ))}
+                        </select>
+                        {errors[index]?.subCategory && (
+                          <span className="text-sm text-red-500 font-medium">
+                            {errors[index].subCategory}
+                          </span>
+                        )}
+                      </label>
+                    ) : null}
+                  </div>
                 </div>
 
                 {/* PREVIEW */}
