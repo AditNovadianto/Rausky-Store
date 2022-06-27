@@ -1,4 +1,7 @@
 import { RefreshIcon, UploadIcon } from '@heroicons/react/outline'
+import { useState } from 'react'
+import { adminRequestHandler } from '../../../lib/admin'
+import request from '../../../lib/request'
 import Modal from '../../Modal'
 import ModalHeader from '../ModalHeader'
 import ModalHeaderButton from '../ModalHeaderButton'
@@ -11,6 +14,63 @@ const EditProductModal = ({
   product,
   category,
 }) => {
+  const [editedProduct, setEditedProduct] = useState({
+    title: product.title,
+    price: product.price,
+    stock: product.stock,
+    subCategory: product.subCategory.slug,
+  })
+
+  const onFieldChange = (field, value) => {
+    setEditedProduct({
+      ...editedProduct,
+      [field]: value,
+    })
+  }
+
+  const resetHandler = () => {
+    setEditedProduct({
+      title: product.title,
+      price: product.price,
+      stock: product.stock,
+      subCategory: product.subCategory.slug,
+    })
+  }
+
+  const updateCategoryProducts = (products) => {
+    setCategories((categories) => {
+      const index = categories.findIndex((c) => c.id == category.id)
+      return [
+        ...categories.slice(0, index),
+        { ...category, products },
+        ...categories.slice(index + 1),
+      ]
+    })
+  }
+
+  const saveHandler = () => {
+    adminRequestHandler({
+      loading: 'Saving...',
+      handler: async () => {
+        let body = { ...editedProduct }
+        if (editedProduct.subCategory) {
+          body.subCategory = {
+            connect: { slug: editedProduct.subCategory },
+          }
+        }
+        const { data } = await request.put(`/products/${product.id}`, body)
+        const index = category.products.findIndex((p) => p.id == product.id)
+        updateCategoryProducts([
+          ...category.products.slice(0, index),
+          data.product,
+          ...category.products.slice(index + 1),
+        ])
+        onClose()
+      },
+      success: 'Product saved',
+    })
+  }
+
   return (
     <Modal {...{ open, onClose }}>
       <ModalHeader
@@ -19,8 +79,7 @@ const EditProductModal = ({
         rightMenu={
           <>
             <ModalHeaderButton
-              //   onClick={resetHandler}
-              //   disabled={newProducts.length == 0}
+              onClick={resetHandler}
               variant="red"
               fill="outlined"
               Icon={RefreshIcon}
@@ -28,10 +87,7 @@ const EditProductModal = ({
               Reset
             </ModalHeaderButton>
             <ModalHeaderButton
-              //   onClick={saveNewProducts}
-              //   disabled={
-              //     newProducts.length == 0 || Object.keys(errors).length > 0
-              //   }
+              onClick={saveHandler}
               variant="green"
               fill="solid"
               Icon={UploadIcon}
@@ -43,12 +99,14 @@ const EditProductModal = ({
       />
       <div className="overflow-auto p-5 space-y-6">
         <Product
-          product={product}
           category={category}
-          onTitleChange={() => {}}
-          onPriceChange={() => {}}
-          onStockChange={() => {}}
-          onSubCategoryChange={() => {}}
+          product={editedProduct}
+          onTitleChange={(e) => onFieldChange('title', e.target.value)}
+          onPriceChange={(e) => onFieldChange('price', e.target.value)}
+          onStockChange={(e) => onFieldChange('stock', e.target.value)}
+          onSubCategoryChange={(e) =>
+            onFieldChange('subCategory', e.target.value)
+          }
         />
       </div>
     </Modal>

@@ -108,28 +108,32 @@ const ProductsTable = ({ setCategories, category }) => {
           setSelectedProductsIds(productIds)
         }}
       />
-      <EditProductModal
-        open={showEditProduct}
-        product={selectedProduct}
-        category={category}
-        setCategories={setCategories}
-        onClose={() => {
-          setShowEditProduct(false)
-          setSelectedProductId('')
-        }}
-      />
-      <DeleteProductModal
-        open={showDeleteProduct}
-        product={selectedProduct}
-        products={selectedProducts}
-        category={category}
-        setCategories={setCategories}
-        onClose={() => {
-          setShowDeleteProduct(false)
-          setSelectedProductId('')
-          setSelectedProductsIds([])
-        }}
-      />
+      {selectedProduct && (
+        <EditProductModal
+          open={showEditProduct}
+          product={selectedProduct}
+          category={category}
+          setCategories={setCategories}
+          onClose={() => {
+            setShowEditProduct(false)
+            setSelectedProductId('')
+          }}
+        />
+      )}
+      {(selectedProduct || selectedProducts.length > 0) && (
+        <DeleteProductModal
+          open={showDeleteProduct}
+          product={selectedProduct}
+          products={selectedProducts}
+          category={category}
+          setCategories={setCategories}
+          onClose={() => {
+            setShowDeleteProduct(false)
+            setSelectedProductId('')
+            setSelectedProductsIds([])
+          }}
+        />
+      )}
     </div>
   )
 }

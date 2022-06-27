@@ -73,27 +73,29 @@ const DeleteProductModal = ({
           {products.length > 1 ? (
             <>
               {products.length} products ?
-              <ul className="mt-3 w-full">
+              <ul className="mt-3 w-full space-y-3">
                 {products.map((product) => (
                   <li key={product?.id} className="flex items-center">
                     <img
                       src={product?.img}
                       alt={product?.title}
-                      className="w-5 h-5 mr-1"
+                      className="w-5 h-5 mr-2"
                     />
-                    <b>{product?.title}</b>
+                    <span className="font-medium">{product?.title}</span>
                   </li>
                 ))}
               </ul>
             </>
           ) : (
-            <span className="inline-flex items-center ml-1">
+            <span className="inline-flex items-center ml-2">
               <img
                 src={product?.img || products[0]?.img}
                 alt={product?.title || products[0]?.title}
-                className="w-5 h-5 mr-1"
+                className="w-5 h-5 mr-2"
               />
-              <b>{product?.title || products[0]?.title} ?</b>
+              <span className="font-medium">
+                {product?.title || products[0]?.title} ?
+              </span>
             </span>
           )}
         </p>
