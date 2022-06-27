@@ -3,7 +3,7 @@ import { TrashIcon } from '@heroicons/react/outline'
 interface Props {
   product: any
   category: any
-  index: number
+  index?: number
   errors?: any
   dropdown?: React.ReactNode
   onTitleChange: React.ChangeEventHandler<HTMLInputElement>
@@ -26,12 +26,14 @@ const Product = ({
   return (
     <div>
       <header className="flex items-center justify-between">
-        <h3 className="text-lg font-medium flex items-center space-x-4">
-          <span className="bg-green-500 text-white w-8 h-8 shadow-lg shadow-green-300/50 flex items-center justify-center rounded-full">
-            {index + 1}
-          </span>
-          <span>{product.title || 'Untitled Product'}</span>
-        </h3>
+        {index !== undefined && (
+          <h3 className="text-lg font-medium flex items-center space-x-4">
+            <span className="bg-green-500 text-white w-8 h-8 shadow-lg shadow-green-300/50 flex items-center justify-center rounded-full">
+              {index + 1}
+            </span>
+            <span>{product.title || 'Untitled Product'}</span>
+          </h3>
+        )}
         {dropdown}
       </header>
 
@@ -48,9 +50,9 @@ const Product = ({
               autoFocus
               onChange={onTitleChange}
             />
-            {errors[index]?.title && (
+            {errors?.[index]?.title && (
               <span className="text-sm text-red-500 font-medium">
-                {errors[index].title}
+                {errors?.[index].title}
               </span>
             )}
           </label>
@@ -65,9 +67,9 @@ const Product = ({
               onWheel={() => {}}
               onChange={onPriceChange}
             />
-            {errors[index]?.price && (
+            {errors?.[index]?.price && (
               <span className="text-sm text-red-500 font-medium">
-                {errors[index].price}
+                {errors?.[index].price}
               </span>
             )}
           </label>
@@ -92,7 +94,7 @@ const Product = ({
                 </span>
                 <select
                   className="select w-full p-3 rounded-xl"
-                  value={product.subCategory}
+                  value={product.subCategory?.slug || product.subCategory}
                   onChange={onSubCategoryChange}
                 >
                   {category.subCategories.map((subCategory) => (
@@ -101,9 +103,9 @@ const Product = ({
                     </option>
                   ))}
                 </select>
-                {errors[index]?.subCategory && (
+                {errors?.[index]?.subCategory && (
                   <span className="text-sm text-red-500 font-medium">
-                    {errors[index].subCategory}
+                    {errors?.[index].subCategory}
                   </span>
                 )}
               </label>
@@ -123,7 +125,9 @@ const Product = ({
                   src={
                     (product.subCategory
                       ? category.subCategories.find(
-                          (c) => c.slug == product.subCategory
+                          (c) =>
+                            c.slug == product.subCategory ||
+                            c.slug == product.subCategory.slug
                         )
                       : category
                     )?.logoImg

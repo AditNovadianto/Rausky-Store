@@ -1,36 +1,26 @@
 import { PencilIcon, TrashIcon } from '@heroicons/react/outline'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
-import { adminRequestHandler } from '../../../lib/admin'
-import request from '../../../lib/request'
+import { useMemo, useState } from 'react'
+import DeleteProductModal from './DeleteProductModal'
+import EditProductModal from './EditProductModal'
 
 const ProductsTable = ({ setCategories, category }) => {
   const { products } = category
+  const [showEditProduct, setShowEditProduct] = useState(false)
+  const [showDeleteProduct, setShowDeleteProduct] = useState(false)
 
-  const updateCategoryProducts = (products) => {
-    setCategories((categories) => {
-      const index = categories.findIndex((c) => c.id == category.id)
-      return [
-        ...categories.slice(0, index),
-        { ...category, products },
-        ...categories.slice(index + 1),
-      ]
-    })
+  const [selectedProductId, setSelectedProductId] = useState('')
+
+  const [selectedProductIds, setSelectedProductsIds] = useState([])
+
+  const editHandler = (productId) => {
+    setSelectedProductId(productId)
+    setShowEditProduct(true)
   }
 
   const deleteHandler = async (productId) => {
-    if (!confirm('Are you sure want to delete ?')) return
-    adminRequestHandler({
-      loading: 'Deleting...',
-      handler: async () => {
-        await request.delete(`/products/${productId}`)
-        const index = category.products.findIndex((p) => p.id == productId)
-        updateCategoryProducts([
-          ...category.products.slice(0, index),
-          ...category.products.slice(index + 1),
-        ])
-      },
-      success: 'Delete Success',
-    })
+    setSelectedProductId(productId)
+    setShowDeleteProduct(true)
   }
 
   const columns: GridColDef[] = [
@@ -55,7 +45,10 @@ const ProductsTable = ({ setCategories, category }) => {
         return (
           <div className="flex space-x-4 text-gray-500">
             {/* TODO: bikin edit product handler */}
-            <button className="hover:text-green-500">
+            <button
+              onClick={() => editHandler(params.row.id)}
+              className="hover:text-green-500"
+            >
               <PencilIcon className="w-5 h-5" />
             </button>
             <button
@@ -82,13 +75,60 @@ const ProductsTable = ({ setCategories, category }) => {
       return data
     })
 
+  const selectedProduct = useMemo(
+    () => products.find((p) => p.id == selectedProductId),
+    [selectedProductId, products]
+  )
+
+  const selectedProducts = useMemo(
+    () => selectedProductIds.map((id) => products.find((p) => p.id == id)),
+    [selectedProductIds, products]
+  )
+
   return (
     <div className="mt-10 h-[90vh]">
+      {selectedProductIds.length > 0 && (
+        <div className="mb-5">
+          <button
+            onClick={() => setShowDeleteProduct(true)}
+            className="text-red-500 hover:underline font-medium flex items-center"
+          >
+            <TrashIcon className="w-5 h-5 mr-1" /> Delete (
+            {selectedProductIds.length})
+          </button>
+        </div>
+      )}
       <DataGrid
         disableSelectionOnClick
         rows={rows}
         columns={columns}
         checkboxSelection
+        selectionModel={selectedProductIds}
+        onSelectionModelChange={(productIds) => {
+          setSelectedProductsIds(productIds)
+        }}
+      />
+      <EditProductModal
+        open={showEditProduct}
+        product={selectedProduct}
+        category={category}
+        setCategories={setCategories}
+        onClose={() => {
+          setShowEditProduct(false)
+          setSelectedProductId('')
+        }}
+      />
+      <DeleteProductModal
+        open={showDeleteProduct}
+        product={selectedProduct}
+        products={selectedProducts}
+        category={category}
+        setCategories={setCategories}
+        onClose={() => {
+          setShowDeleteProduct(false)
+          setSelectedProductId('')
+          setSelectedProductsIds([])
+        }}
       />
     </div>
   )

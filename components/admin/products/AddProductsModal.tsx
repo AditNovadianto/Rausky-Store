@@ -17,6 +17,8 @@ import { adminRequestHandler } from '../../../lib/admin'
 import request from '../../../lib/request'
 import Dropdown from '../../Dropdown'
 import Modal from '../../Modal'
+import ModalHeader from '../ModalHeader'
+import ModalHeaderButton from '../ModalHeaderButton'
 import Product from './Product'
 
 const initialNewProducts = (category) => {
@@ -252,67 +254,62 @@ const AddProductsModal = ({ open, onClose, category, setCategories }) => {
 
   return (
     <Modal open={open} onClose={onClose} ref={modalRef}>
-      <header className="sticky top-0 z-[100] bg-white p-5 flex justify-between items-center shadow-sm">
-        <div className="flex items-center space-x-3">
-          {category.logoImg && (
-            <img src={category.logoImg} className="w-10 h-10 rounded-2xl" />
-          )}
-          <h2 className="text-2xl font-bold">Add Products</h2>
-        </div>
-        <div className="flex items-center space-x-4">
-          <button
-            type="button"
-            onClick={resetHandler}
-            disabled={newProducts.length == 0}
-            className="flex justify-center items-center border border-red-600 text-red-600 hover:bg-red-600 hover:text-white transition-colors font-semibold w-full px-4 py-2 rounded-xl whitespace-nowrap"
-          >
-            <RefreshIcon className="w-5 h-5 mr-1" /> Reset All
-          </button>
-          <button
-            type="button"
-            onClick={saveNewProducts}
-            disabled={newProducts.length == 0 || Object.keys(errors).length > 0}
-            className="flex justify-center items-center bg-green-500 hover:bg-green-400 text-white transition-colors font-semibold w-full px-4 py-2 rounded-xl whitespace-nowrap"
-          >
-            <UploadIcon className="w-5 h-5 mr-1" /> Save ({newProducts.length})
-          </button>
-        </div>
-      </header>
+      <ModalHeader
+        title="Add Products"
+        logo={category.logoImg}
+        rightMenu={
+          <>
+            <ModalHeaderButton
+              onClick={resetHandler}
+              disabled={newProducts.length == 0}
+              variant="red"
+              fill="outlined"
+              Icon={RefreshIcon}
+            >
+              Reset All
+            </ModalHeaderButton>
+            <ModalHeaderButton
+              onClick={saveNewProducts}
+              disabled={
+                newProducts.length == 0 || Object.keys(errors).length > 0
+              }
+              variant="green"
+              fill="solid"
+              Icon={UploadIcon}
+            >
+              Save ({newProducts.length})
+            </ModalHeaderButton>
+          </>
+        }
+      />
 
       <div className="overflow-auto p-5 space-y-6">
-        {newProducts?.map((newProduct, index) => {
-          return (
-            <Product
-              key={index}
-              product={newProduct}
-              category={category}
-              dropdown={
-                <Dropdown
-                  items={dropdownItems(newProduct, index)}
-                  minWidth={150}
-                >
-                  <IconButton>
-                    <DotsVerticalIcon className="w-5 h-5 text-gray-500" />
-                  </IconButton>
-                </Dropdown>
-              }
-              index={index}
-              errors={errors}
-              onTitleChange={(e) =>
-                inputHandler(index, 'title', e.target.value)
-              }
-              onPriceChange={(e) =>
-                inputHandler(index, 'price', Number(e.target.value))
-              }
-              onStockChange={(e) =>
-                inputHandler(index, 'stock', Number(e.target.value))
-              }
-              onSubCategoryChange={(e) =>
-                inputHandler(index, 'subCategory', e.target.value)
-              }
-            />
-          )
-        })}
+        {newProducts?.map((newProduct, index) => (
+          <Product
+            key={index}
+            product={newProduct}
+            category={category}
+            dropdown={
+              <Dropdown items={dropdownItems(newProduct, index)} minWidth={150}>
+                <IconButton>
+                  <DotsVerticalIcon className="w-5 h-5 text-gray-500" />
+                </IconButton>
+              </Dropdown>
+            }
+            index={index}
+            errors={errors}
+            onTitleChange={(e) => inputHandler(index, 'title', e.target.value)}
+            onPriceChange={(e) =>
+              inputHandler(index, 'price', Number(e.target.value))
+            }
+            onStockChange={(e) =>
+              inputHandler(index, 'stock', Number(e.target.value))
+            }
+            onSubCategoryChange={(e) =>
+              inputHandler(index, 'subCategory', e.target.value)
+            }
+          />
+        ))}
         <button
           type="button"
           onClick={addHandler}

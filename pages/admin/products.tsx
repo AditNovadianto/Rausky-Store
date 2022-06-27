@@ -191,6 +191,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   const categories = await getAllCategories({
     include: 'subCategories,products',
+    productInclude: 'subCategory',
   })
 
   return parseData({

@@ -6,7 +6,7 @@ const app = apiHandler()
 const createNewProduct = async ({ user, product }) => {
   const { title, price, category, subCategory } = product
 
-  if (!title || !price) {
+  if (title == undefined || price == undefined) {
     throw { status: 400, message: 'Please provide title, price' }
   }
 
@@ -43,6 +43,9 @@ const createNewProduct = async ({ user, product }) => {
       ...product,
       category: { connect: { slug: category } },
       user: { connect: { id: user.id } },
+    },
+    include: {
+      subCategory: true,
     },
   })
 }

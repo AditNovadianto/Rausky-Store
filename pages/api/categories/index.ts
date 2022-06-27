@@ -2,24 +2,35 @@ import apiHandler, { checkAuth } from '../../../lib/apiHandler'
 import prisma from '../../../lib/prisma'
 
 export const getAllCategories = async (
-  { select, include }: { select?: string; include?: string } = null
+  {
+    select,
+    include,
+    productInclude,
+  }: { select?: string; include?: string; productInclude?: string } = null
 ) => {
   let query: CustomObject = {}
 
   if (select) {
-    let selectFields: any = select.split(',').reduce((acc, field) => {
+    query.select = select.split(',').reduce((acc, field) => {
       acc[field] = true
       return acc
     }, {})
-    query.select = { ...selectFields }
   }
 
   if (include) {
-    let includeFields: any = include.split(',').reduce((acc, field) => {
+    query.include = include.split(',').reduce((acc, field) => {
       acc[field] = true
       return acc
     }, {})
-    query.include = { ...includeFields }
+  }
+
+  if (productInclude && query.include.products) {
+    query.include.products = {
+      include: productInclude.split(',').reduce((acc, field) => {
+        acc[field] = true
+        return acc
+      }, {}),
+    }
   }
 
   //   @ts-ignore
