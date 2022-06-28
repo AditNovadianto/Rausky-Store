@@ -68,8 +68,8 @@ const Profile = ({ user }: Props) => {
 
   return (
     <Container title={`${user.name}'s profile`}>
-      <Wrapper className="flex flex-col md:flex-row">
-        <header className="md:flex-[1] md:pr-12">
+      <Wrapper className="flex flex-col md:flex-row md:items-start">
+        <header className="md:flex-[1] md:pr-12 md:sticky md:top-[80px]">
           {/* USER PROFILE */}
           <div className="flex flex-col md:flex-row items-center justify-center md:justify-start">
             {/* USER IMAGE */}

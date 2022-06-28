@@ -2,15 +2,44 @@ import { CheckCircleIcon, ClockIcon } from '@heroicons/react/outline'
 import Skeleton from 'react-loading-skeleton'
 import useSWR from 'swr'
 import request from '../../lib/request'
+import {
+  attachMidtransScript,
+  removeMidtransScript,
+  checkout,
+  handleSuccessPayment,
+  handleUnfinishPayment,
+} from '../../lib/payment'
 import Link from '../Link'
 import ProductItem from '../ProductItem'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 
 const fetcher = (url: string) => request.get(url)
 
 const OrderHistory = () => {
   const { data, error } = useSWR('/orders/me', fetcher)
+  const router = useRouter()
 
   const loading = !data && !error
+
+  useEffect(() => {
+    attachMidtransScript()
+    return () => removeMidtransScript()
+  })
+
+  // this useEffect use to fix weird bug after payment finish
+  // where users are not redirected to /order
+  useEffect(() => {
+    const { order_id } = router.query
+    if (order_id) {
+      router.push({
+        pathname: '/order',
+        query: {
+          orderId: order_id,
+        },
+      })
+    }
+  }, [router])
 
   if (loading)
     return (
@@ -23,7 +52,26 @@ const OrderHistory = () => {
     )
 
   const { orders } = data.data
-  console.log({ orders, loading })
+
+  console.log(orders)
+
+  const reorder = async (order) => {
+    const newOrder = await checkout({
+      products: order.products,
+      order,
+      user: order.user,
+    })
+
+    // @ts-ignore
+    window.snap.pay(newOrder.paymentToken, {
+      onPending: (result) => {
+        handleSuccessPayment({ result })
+      },
+      onClose: () => {
+        handleUnfinishPayment({ orderId: newOrder.id })
+      },
+    })
+  }
 
   return (
     <div className="space-y-5">
@@ -68,7 +116,10 @@ const OrderHistory = () => {
 
             {/* REORDER BTN */}
             {/* TODO: bikin function reorder, nanti langsung ngebuka midtransnya */}
-            <button className="w-full bg-green-500 hover:bg-green-400 transition-colors text-white font-semibold py-2">
+            <button
+              onClick={() => reorder(order)}
+              className="w-full bg-green-500 hover:bg-green-400 transition-colors text-white font-semibold py-2"
+            >
               Reorder
             </button>
           </div>

@@ -10,7 +10,7 @@ npm run dev
 
 ## Todo
 
-1. [] Bikin function buat reorder
+1. [x] Bikin function buat reorder
 1. [] Bikin halaman topup information buat ganti topup requirements
 1. [] Bikin function buat edit display name
 1. [] Bikin display 'no rating' di rating modal

@@ -9,28 +9,19 @@ import { useEffect } from 'react'
 import { useStateMachine } from 'little-state-machine'
 import Link from '../components/Link'
 import { addToCart, removeFromCart, decrementAmount } from '../lib/cartHandler'
-import request from '../lib/request'
 import RequirementField from '../components/RequirementField'
 import { signIn, useSession } from 'next-auth/react'
 import Skeleton from 'react-loading-skeleton'
 import ProductItem from '../components/ProductItem'
 import { useRouter } from 'next/router'
-
-const attachMidtransScript = () => {
-  let scriptTag = document.createElement('script')
-  scriptTag.type = 'text/javascript'
-  scriptTag.src = 'https://app.sandbox.midtrans.com/snap/snap.js'
-  scriptTag.id = 'midtrans-script'
-
-  const myMidtransClientKey = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY
-  scriptTag.setAttribute('data-client-key', myMidtransClientKey)
-
-  document.body.appendChild(scriptTag)
-}
-
-const removeMidtransScript = () => {
-  document.getElementById('midtrans-script').remove()
-}
+import {
+  checkout,
+  attachMidtransScript,
+  removeMidtransScript,
+  clearOrder,
+  handleSuccessPayment,
+  handleUnfinishPayment,
+} from '../lib/payment'
 
 const Cart = () => {
   const router = useRouter()
@@ -41,28 +32,7 @@ const Cart = () => {
     addToCart,
     removeFromCart,
     decrementAmount,
-    setOrderFinish: (state, payload) => {
-      return {
-        ...state,
-        orderFinish: payload,
-      }
-    },
-    clearOrder: (state) => {
-      request.delete('/carts/me')
-      return {
-        ...state,
-        cart: [],
-        order: {
-          ...state.order,
-          categoryRequirements: [],
-          missingRequirements: {},
-          subtotal: 0,
-          tax: 0,
-          discount: 0,
-          total: 0,
-        },
-      }
-    },
+    clearOrder,
     setUser: (state, payload: { fieldName: string; fieldValue: string }) => {
       const newUser = { ...state.order.user }
       newUser[payload.fieldName] = payload.fieldValue
@@ -99,49 +69,22 @@ const Cart = () => {
     }
   }, [router])
 
-  const checkout = async () => {
-    try {
-      const { data } = await request.post('/orders', {
-        products: cart.map((product) => ({
-          id: product.id,
-          amount: product.amount,
-        })),
-        requirements: order.requirements,
-        user: !user ? order.user : null,
-      })
-
-      // @ts-ignore
-      window.snap.pay(data.order.paymentToken, {
-        onPending: (result) => {
-          handleSuccessPayment({ result })
-        },
-        onClose: (result) => {
-          handleUnfinishPayment({ orderId: data.order.id })
-        },
-      })
-    } catch (err) {
-      console.log(err)
-    }
-  }
-
-  const handleSuccessPayment = async ({ result }) => {
-    const { data } = await request.put(`/orders/${result.order_id}`, {
-      paymentMethod: result.payment_type,
-      status: 'PAID',
-      paidAt: new Date(result.transaction_time).toISOString(),
+  const checkoutHandler = async () => {
+    const newOrder = await checkout({
+      products: cart,
+      order,
+      user,
     })
-    actions.setOrderFinish(data.order)
-    actions.clearOrder()
-    router.push({
-      pathname: '/order',
-      query: {
-        orderId: data.order.id,
+
+    // @ts-ignore
+    window.snap.pay(newOrder.paymentToken, {
+      onPending: (result) => {
+        handleSuccessPayment({ result })
+      },
+      onClose: () => {
+        handleUnfinishPayment({ orderId: newOrder.id })
       },
     })
-  }
-
-  const handleUnfinishPayment = async ({ orderId }) => {
-    await request.delete(`/orders/${orderId}`)
   }
 
   const isFieldError = ({ requirement, field }) => {
@@ -365,7 +308,7 @@ const Cart = () => {
                     </p>
                   )}
                   <button
-                    onClick={checkout}
+                    onClick={checkoutHandler}
                     disabled={isAnyError}
                     className="w-full py-4 bg-green-500 hover:bg-green-400 transition-all font-semibold text-white rounded-2xl shadow-xl shadow-green-300 disabled:bg-gray-400/40 disabled:shadow-gray-200"
                   >
