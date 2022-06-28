@@ -10,6 +10,7 @@ import {
   ArrowLeftIcon,
   DesktopComputerIcon,
   DotsVerticalIcon,
+  HomeIcon,
   LoginIcon,
   LogoutIcon,
   MailIcon,
@@ -59,7 +60,14 @@ const Navbar = () => {
   const user = session?.user
   const totalItemsInCart = cart.length
 
+  const homeItem: DropdownItem = {
+    icon: HomeIcon,
+    label: 'Home',
+    onClick: () => router.push('/'),
+  }
+
   let menuItems: DropdownItem[] = [
+    homeItem,
     {
       icon: themes.find((theme) => theme.name == currentTheme).Icon,
       label: 'Theme',
@@ -123,6 +131,7 @@ const Navbar = () => {
   }
 
   let menuItemsWithUser: DropdownItem[] = [
+    homeItem,
     {
       icon: UserIcon,
       label: 'Your Profile',
@@ -138,7 +147,7 @@ const Navbar = () => {
         open('/admin', '_blank')
       },
     },
-    ...menuItems,
+    ...menuItems.slice(1),
     {
       icon: LogoutIcon,
       label: 'Sign Out',
@@ -186,10 +195,13 @@ const Navbar = () => {
               <span className="text-black">Rausky</span>
             </Link>
           ) : (
-            <Link href="/" className="flex items-center space-x-2">
+            <button
+              onClick={router.back}
+              className="flex items-center space-x-2"
+            >
               <ArrowLeftIcon className="w-5 h-5" />
               <span className="font-medium hidden md:block">Back</span>
-            </Link>
+            </button>
           )}
 
           <div className="items-center hidden md:flex">

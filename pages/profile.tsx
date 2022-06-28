@@ -8,6 +8,7 @@ import toast from 'react-hot-toast'
 import Container from '../components/Container'
 import Modal from '../components/Modal'
 import { CustomTab, CustomTabs } from '../components/mui/Tabs'
+import OrderHistory from '../components/profile/OrderHistory'
 import UserBadge from '../components/UserBadge'
 import Wrapper from '../components/Wrapper'
 import request from '../lib/request'
@@ -198,7 +199,7 @@ const Profile = ({ user }: Props) => {
           </CustomTabs>
           <div className="mt-5">
             <TabPanel value={tabIndex} index={0}>
-              order history
+              <OrderHistory />
             </TabPanel>
             <TabPanel value={tabIndex} index={1}>
               topup information

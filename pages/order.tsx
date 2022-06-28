@@ -22,8 +22,7 @@ import toast from 'react-hot-toast'
 import cn from 'classnames'
 import { socialMedia } from '../lib/data'
 
-// TODO: tambahin animasi confetti
-const PayFinish = () => {
+const Order = () => {
   const { state, actions } = useStateMachine({
     setOrderFinish: (state, payload) => {
       return {
@@ -56,10 +55,12 @@ const PayFinish = () => {
           const { data } = await request.get(`/orders/${orderId}`)
           const { order } = data
           actions.setOrderFinish(order)
-          setStar(order.rating.star)
-          setComment(order.rating.comment)
+
+          order.rating?.star && setStar(order.rating.star)
+          order.rating?.comment && setComment(order.rating.comment)
         } catch (err) {
-          router.replace('/')
+          console.log(err)
+          //   router.replace('/')
           return
         }
       }
@@ -98,6 +99,8 @@ const PayFinish = () => {
       setSendingRating(false)
     }
   }
+
+  console.log(orderFinish)
 
   return (
     <Container>
@@ -308,7 +311,7 @@ const PayFinish = () => {
   )
 }
 
-export default PayFinish
+export default Order
 
 const LoadingSkeletons = () => (
   <Wrapper className="max-w-2xl mx-auto">

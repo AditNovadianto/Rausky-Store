@@ -1,27 +1,54 @@
 import { TrashIcon } from '@heroicons/react/outline'
+import cn from 'classnames'
 
 interface Props {
   item: any
   actions?: any
+  size?: 'normal' | 'small'
 }
 
-const ProductItem = ({ item, actions }: Props) => {
+const ProductItem = ({ item, actions, size = 'normal' }: Props) => {
   return (
     <div key={item.id} className="flex flex-col md:flex-row">
       <img
-        className="w-[80px] h-[80px] object-cover rounded-2xl"
+        className={cn(
+          'object-cover rounded-2xl',
+          size == 'small' ? 'w-[40px] h-[40px]' : 'w-[80px] h-[80px]'
+        )}
         src={item.img ?? item.category.logoImg}
         alt={item.title}
       />
-      <div className="mt-4 md:mt-0 md:ml-4 flex-grow">
-        <p className="text-sm text-green-500">{item.category.name}</p>
-        <h3 className="font-semibold text-lg">
+      <div
+        className={cn(
+          'flex-grow md:mt-0',
+          size == 'small' ? 'mt-2 md:ml-2' : 'mt-4 md:ml-4'
+        )}
+      >
+        <p
+          className={cn(
+            'text-green-500',
+            size == 'small' ? 'text-xs' : 'text-sm'
+          )}
+        >
+          {item.category.name}
+        </p>
+        <h3
+          className={cn(
+            'font-semibold',
+            size == 'small' ? 'text-base' : 'text-lg'
+          )}
+        >
           {item.title}{' '}
           {item.amount && item.amount > 1 && (
             <span className="ml-2 text-gray-500">x{item.amount}</span>
           )}
         </h3>
-        <p className="text-gray-500 font-semibold">
+        <p
+          className={cn(
+            'text-gray-500 font-semibold',
+            size == 'small' ? 'text-sm' : ''
+          )}
+        >
           Rp {item.price.toLocaleString()}
         </p>
       </div>
