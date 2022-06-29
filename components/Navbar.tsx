@@ -217,7 +217,7 @@ const Navbar = () => {
                   <img src="/images/Union.svg" alt="" />
                 </span>
                 <input
-                  className="placeholder:italic placeholder:text-slate-400 block bg-white w-full rounded-md py-2 pl-12 pr-3 focus:outline-none focus:ring-2 focus:ring-opacity-50 focus:ring-green-400"
+                  className="placeholder:italic placeholder:text-slate-400 block bg-transparent w-full rounded-md py-2 pl-12 pr-3 focus:outline-none focus:ring-2 focus:ring-opacity-50 focus:ring-green-400"
                   placeholder="Search for anything..."
                   type="text"
                   name="search"

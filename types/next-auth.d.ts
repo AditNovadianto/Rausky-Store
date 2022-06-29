@@ -9,6 +9,8 @@ declare module 'next-auth' {
     user: {
       id?: string
       role?: Role
+      displayName?: string
+      displayName?: string
     } & DefaultSession['user']
   }
 }
@@ -16,9 +18,9 @@ declare module 'next-auth' {
 export type User = {
   id?: string
   role?: Role
+  displayName?: string
 } & {
   name?: string
   email?: string
   image?: string
-  displayName?: string
 }
