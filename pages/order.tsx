@@ -101,6 +101,9 @@ const Order = () => {
   }
 
   console.log(orderFinish)
+  const paidAt = new Date(orderFinish.paidAt)
+  const paidAtDay = paidAt.toDateString()
+  const paidAtTime = paidAt.toLocaleTimeString()
 
   return (
     <Container>
@@ -127,7 +130,7 @@ const Order = () => {
             </div>
           )}
 
-          <div className="flex-[1] max-w-2xl mx-auto print:max-w-none print:mx-0">
+          <div className="flex-[1] max-w-3xl mx-auto print:max-w-none print:mx-0">
             <h3 className="font-semibold text-2xl flex items-center">
               <span>
                 Thanks for your order
@@ -171,7 +174,7 @@ const Order = () => {
                   Paid At <ClockIcon className="w-4 h-4 ml-1" />
                 </h3>
                 <p className="text-gray-500">
-                  {new Date(orderFinish.paidAt).toLocaleString()}
+                  {paidAtDay} at {paidAtTime}
                 </p>
               </div>
             </div>
@@ -314,7 +317,7 @@ const Order = () => {
 export default Order
 
 const LoadingSkeletons = () => (
-  <Wrapper className="max-w-2xl mx-auto">
+  <Wrapper className="max-w-3xl mx-auto">
     <div className="w-full">
       <Skeleton height={30} width="80%" />
       <div className="my-5">
