@@ -172,6 +172,7 @@ export default app
             product: { include: { category: true } },
           },
         },
+        rating: true,
       },
     })
 

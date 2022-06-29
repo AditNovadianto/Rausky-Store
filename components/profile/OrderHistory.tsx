@@ -13,6 +13,7 @@ import Link from '../Link'
 import ProductItem from '../ProductItem'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
+import { StarIcon } from '@heroicons/react/solid'
 
 const fetcher = (url: string) => request.get(url)
 
@@ -104,13 +105,19 @@ const OrderHistory = () => {
                 )}
               </div>
               {/* TOTAL */}
-              <div className="px-5 py-3">
+              <div className="px-5 py-3 flex justify-between items-center">
                 <div className="text-sm text-gray-500 flex">
                   <p className="mr-2">Total</p>
                   <h3 className="font-semibold text-green-500">
                     Rp {order.total.toLocaleString()}
                   </h3>
                 </div>
+                {order.rating && (
+                  <div className="flex items-center">
+                    <StarIcon className="w-5 h-5 text-yellow-500" />{' '}
+                    <span className="font-semibold">{order.rating.star}</span>
+                  </div>
+                )}
               </div>
             </Link>
 
