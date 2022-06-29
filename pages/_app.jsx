@@ -76,13 +76,6 @@ const MyComponent = ({ Component, pageProps }) => {
     getUserData()
   }, [])
 
-  const spring = {
-    type: 'spring',
-    damping: 20,
-    stiffness: 100,
-    when: 'afterChildren',
-  }
-
   return (
     <>
       <NextNProgress color="#90EE90" options={{ showSpinner: false }} />
