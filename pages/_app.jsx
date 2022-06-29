@@ -13,6 +13,7 @@ import { useEffect } from 'react'
 import request from '../lib/request'
 import { setRequirements, setCart } from '../lib/cartHandler'
 import { Toaster } from 'react-hot-toast'
+import { AnimatePresence, motion } from 'framer-motion'
 
 createStore(
   {
@@ -75,10 +76,31 @@ const MyComponent = ({ Component, pageProps }) => {
     getUserData()
   }, [])
 
+  const spring = {
+    type: 'spring',
+    damping: 20,
+    stiffness: 100,
+    when: 'afterChildren',
+  }
+
   return (
     <>
       <NextNProgress color="#90EE90" options={{ showSpinner: false }} />
-      <Component {...pageProps} />
+      {/* TODO: make animation smoother */}
+      <AnimatePresence exitBeforeEnter initial={false}>
+        <div className="page-transition-wrapper">
+          <motion.div
+            key={router.pathname}
+            initial={{ y: -50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 50, opacity: 0 }}
+            id="page-transition-container"
+          >
+            <Component {...pageProps} />
+          </motion.div>
+        </div>
+      </AnimatePresence>
+
       {!['/cart', '/signin'].includes(router.route) && <ContinuePayBtn />}
       <Toaster />
     </>
