@@ -1,4 +1,3 @@
-import { PencilIcon } from '@heroicons/react/outline'
 import { useMediaQuery } from '@mui/material'
 import { GetServerSideProps } from 'next'
 import { getSession } from 'next-auth/react'
@@ -112,11 +111,6 @@ const Profile = ({ user }: Props) => {
                 <div className="text-gray-500 mt-1">{user.email}</div>
               </div>
 
-              {/* EDIT PROFILE BTN */}
-              {/* <button className="md:hidden flex items-center justify-center md:justify-start mt-3 w-full text-gray-500 hover:text-green-500">
-                <PencilIcon className="w-5 h-5 mr-2" /> Edit Profile
-              </button> */}
-
               {user.role == 'USER' && (
                 <button
                   onClick={() => setShowFakeAdminModal(true)}
@@ -134,33 +128,6 @@ const Profile = ({ user }: Props) => {
                   Remove fake admin
                 </button>
               )}
-
-              <Modal
-                open={showFakeAdminModal}
-                onClose={() => setShowFakeAdminModal(false)}
-              >
-                <h2 className="p-5 text-xl font-medium">Fake Admin ?</h2>
-                <div className="p-5 pt-0">
-                  <p>
-                    By being a fake admin, you can access admin dashboard page{' '}
-                    <br /> BUT you can&apos;t do all admin operations
-                  </p>
-                  <div className="mt-5 space-x-3">
-                    <button
-                      onClick={beFakeAdminHandler}
-                      className="bg-green-500 hover:bg-green-400 text-white font-medium px-3 py-1 rounded-md"
-                    >
-                      Continue
-                    </button>
-                    <button
-                      onClick={() => setShowFakeAdminModal(false)}
-                      className="bg-red-500 hover:bg-red-400 text-white font-medium px-3 py-1 rounded-md"
-                    >
-                      Nevermind
-                    </button>
-                  </div>
-                </div>
-              </Modal>
             </div>
           </div>
           <div className="mt-8">
@@ -219,6 +186,32 @@ const Profile = ({ user }: Props) => {
           </div>
         </div>
       </Wrapper>
+      <Modal
+        open={showFakeAdminModal}
+        onClose={() => setShowFakeAdminModal(false)}
+      >
+        <h2 className="p-5 text-xl font-medium">Fake Admin ?</h2>
+        <div className="p-5 pt-0">
+          <p>
+            By being a fake admin, you can access admin dashboard page <br />{' '}
+            BUT you can&apos;t do all admin operations
+          </p>
+          <div className="mt-5 space-x-3">
+            <button
+              onClick={beFakeAdminHandler}
+              className="bg-green-500 hover:bg-green-400 text-white font-medium px-3 py-1 rounded-md"
+            >
+              Continue
+            </button>
+            <button
+              onClick={() => setShowFakeAdminModal(false)}
+              className="bg-red-500 hover:bg-red-400 text-white font-medium px-3 py-1 rounded-md"
+            >
+              Nevermind
+            </button>
+          </div>
+        </div>
+      </Modal>
     </Container>
   )
 }
