@@ -26,7 +26,11 @@ const Rating = ({ rating }) => {
               src={rating.order.user?.image || defaultAvatar}
               alt={rating.order.user?.name || 'Guest'}
             />
-            <b className="text-sm">{rating.order.user?.name || 'Guest'}</b>{' '}
+            <b className="text-sm">
+              {rating.order.user?.displayName ||
+                rating.order.user?.name ||
+                'Guest'}
+            </b>{' '}
             {rating.order.user && <UserBadge role={rating.order.user.role} />}
           </span>
         </div>

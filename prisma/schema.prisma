@@ -46,7 +46,6 @@ model VerificationToken {
     @@unique([identifier, token])
 }
 
-// TODO: bikin role fake admin buat ngeliat tampilan admin dashboard, tapi ga bisa diinteraksi
 enum Role {
     USER
     FAKE_ADMIN
@@ -56,6 +55,7 @@ enum Role {
 model User {
     id                String        @id @default(auto()) @map("_id") @db.ObjectId
     name              String?
+    displayName       String?
     email             String?       @unique
     emailVerified     DateTime?
     image             String?
@@ -157,7 +157,6 @@ model ProductsOnOrders {
     order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }
 
-// TODO: refactor cart model buat nyimpen product categories
 model Cart {
     id       String @id @default(auto()) @map("_id") @db.ObjectId
     products Json[]

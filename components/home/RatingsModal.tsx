@@ -81,9 +81,20 @@ const RatingsModal = ({ open, onClose, ratings }) => {
         </div>
       </header>
       <div className="overflow-auto p-5 space-y-4">
-        {filteredRatings.map((rating) => (
-          <Rating key={rating.id} rating={rating} />
-        ))}
+        {filteredRatings.length > 0 ? (
+          filteredRatings.map((rating) => (
+            <Rating key={rating.id} rating={rating} />
+          ))
+        ) : (
+          <div className="text-center">
+            <img
+              src="/images/empty-rating.svg"
+              alt="empty-rating"
+              className="mx-auto w-[100px] h-[100px]"
+            />
+            <h3 className="font-bold text-xl mt-2">No ratings.</h3>
+          </div>
+        )}
       </div>
     </Modal>
   )

@@ -1,6 +1,5 @@
 import { PencilIcon } from '@heroicons/react/outline'
 import { useMediaQuery } from '@mui/material'
-import { Role } from '@prisma/client'
 import { GetServerSideProps } from 'next'
 import { getSession } from 'next-auth/react'
 import { useState } from 'react'
@@ -13,16 +12,10 @@ import TopUpInformation from '../components/profile/TopUpInformation'
 import UserBadge from '../components/UserBadge'
 import Wrapper from '../components/Wrapper'
 import request from '../lib/request'
+import { User } from '../types/next-auth'
 
 interface Props {
-  user: {
-    id?: string
-    role?: Role
-  } & {
-    name?: string
-    email?: string
-    image?: string
-  }
+  user: User
 }
 
 const TabPanel = ({ children, value, index, ...other }) => {
@@ -41,11 +34,13 @@ const Profile = ({ user }: Props) => {
   }
   const onSmallScreen = useMediaQuery('(max-width: 420px)')
 
+  const [displayName, setDisplayName] = useState(user.displayName ?? '')
+
   const beFakeAdminHandler = async () => {
     let toastId: string
     try {
       toastId = toast.loading('Processing...')
-      await request.put(`/users/${user.id}/fakeAdmin`)
+      await request.put(`/users/fakeAdmin`)
       toast.success("Congrats. Now you're a fake admin 🎉", { id: toastId })
       location.reload()
     } catch (err) {
@@ -58,12 +53,25 @@ const Profile = ({ user }: Props) => {
     let toastId: string
     try {
       toastId = toast.loading('Processing...')
-      await request.put(`/users/${user.id}/fakeAdmin`)
+      await request.put(`/users/fakeAdmin`)
       toast.success("Success, Now you're a normal user", { id: toastId })
       location.reload()
     } catch (err) {
       console.log(err)
       toast.error('Failed. Check console for details', { id: toastId })
+    }
+  }
+
+  const saveUserDisplayName = async () => {
+    let toastId: string
+    try {
+      toastId = toast.loading('Saving...')
+      await request.put('/users/displayName', { displayName })
+      toast.success('Saved', { id: toastId })
+      location.reload()
+    } catch (err) {
+      toast.error('Failed. Check console for details', { id: toastId })
+      console.log(err)
     }
   }
 
@@ -88,20 +96,26 @@ const Profile = ({ user }: Props) => {
             <div className="mt-3 md:mt-0 md:ml-10 text-center md:text-left">
               {/* USER NAME */}
               <h2 className="text-4xl font-bold flex items-center justify-center md:justify-start">
-                {user.name}
+                {user.displayName || user.name}
                 {/* USER ROLE BADGE (DESKTOP) */}
                 <UserBadge
                   role={user.role}
                   className="hidden md:block ml-3 text-xs py-1"
                 />
               </h2>
-              {/* USER EMAIL */}
-              <div className="text-gray-500 mt-1">{user.email}</div>
+
+              <div>
+                {user.displayName && (
+                  <div className="text-gray-500 mt-1">{user.name}</div>
+                )}
+                {/* USER EMAIL */}
+                <div className="text-gray-500 mt-1">{user.email}</div>
+              </div>
 
               {/* EDIT PROFILE BTN */}
-              <button className="md:hidden flex items-center justify-center md:justify-start mt-3 w-full text-gray-500 hover:text-green-500">
+              {/* <button className="md:hidden flex items-center justify-center md:justify-start mt-3 w-full text-gray-500 hover:text-green-500">
                 <PencilIcon className="w-5 h-5 mr-2" /> Edit Profile
-              </button>
+              </button> */}
 
               {user.role == 'USER' && (
                 <button
@@ -160,20 +174,28 @@ const Profile = ({ user }: Props) => {
               </a>
             )}
 
-            <div className="hidden md:block">
+            <div className="text-center md:text-left">
               <h3 className="text-xl font-semibold">Edit Profile</h3>
-              <form className="mt-3 space-y-3">
+              <div className="mt-3 space-y-3">
                 <label className="block">
                   <span className="block text-gray-600 text-sm mb-1">
                     Display Name
                   </span>
                   <input
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
                     type="text"
-                    className="w-full focus:outline-none px-3 py-2 border rounded-xl"
+                    className="input"
                     placeholder=""
                   />
                 </label>
-              </form>
+              </div>
+              <button
+                className="mt-5 text-green-500 font-semibold hover:underline"
+                onClick={saveUserDisplayName}
+              >
+                Save
+              </button>
             </div>
           </div>
         </header>

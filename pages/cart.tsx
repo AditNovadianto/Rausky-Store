@@ -105,14 +105,12 @@ const Cart = () => {
               src="/images/empty-cart.svg"
               alt="empty cart"
             />
-            <h2 className="font-bold text-3xl mt-1">
-              Keranjang kosong ni gan...
-            </h2>
+            <h2 className="font-bold text-3xl mt-1">Your cart is empty.</h2>
             <Link
               href="/"
               className="block mt-8 text-green-500 text-lg hover:underline font-medium"
             >
-              Balik ke halaman utama &rarr;
+              Back to home &rarr;
             </Link>
           </div>
           {/* TODO: tampilin rekomendasi produk */}

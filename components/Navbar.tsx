@@ -24,6 +24,7 @@ import { useMediaQuery } from '@mui/material'
 import cn from 'classnames'
 import { StarIcon } from '@heroicons/react/solid'
 import UserBadge from './UserBadge'
+import { User } from '../types/next-auth'
 
 // TODO: simpen theme di global state
 const currentTheme = 'light'
@@ -57,7 +58,7 @@ const Navbar = () => {
     setSearch(!search)
   }
 
-  const user = session?.user
+  const user = session?.user as User
   const totalItemsInCart = cart.length
 
   const homeItem: DropdownItem = {
@@ -267,7 +268,7 @@ const Navbar = () => {
                         alt={user?.name}
                       />
                       <span className="hidden md:block font-medium max-w-[10ch] truncate ml-2">
-                        {user?.name}
+                        {user?.displayName || user?.name}
                       </span>
                       <UserBadge role={user?.role} />
                     </Dropdown>
