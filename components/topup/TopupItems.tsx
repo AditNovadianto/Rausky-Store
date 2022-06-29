@@ -16,6 +16,7 @@ import {
 } from '../../lib/cartHandler'
 import { signIn } from 'next-auth/react'
 import RequirementField from '../RequirementField'
+import TopupRequirements from './TopupRequirements'
 
 const filterProductsBySubCategory = (subCategory, products) => {
   return subCategory
@@ -87,28 +88,7 @@ const TopupItems = ({ category, user }) => {
               />
             ))}
           </form>
-          {(category.requirement.img || category.requirement.description) && (
-            <details className="mt-4">
-              <summary className="cursor-pointer text-gray-500">
-                Details
-              </summary>
-              <div className="mt-4">
-                {category.requirement.img && (
-                  <img
-                    className="rounded-xl lg:hover:scale-[1.5] hover:scale-[1.2] lg:hover:-translate-x-[35%] transition-all"
-                    src={category.requirement.img}
-                    alt={category.requirement.title}
-                  />
-                )}
-
-                {category.requirement.description && (
-                  <p className="mt-3 pb-2 text-gray-500">
-                    {category.requirement.description}
-                  </p>
-                )}
-              </div>
-            </details>
-          )}
+          <TopupRequirements category={category} />
         </div>
       )}
 

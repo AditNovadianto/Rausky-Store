@@ -6,9 +6,19 @@ export const getAllCategories = async (
     select,
     include,
     productInclude,
-  }: { select?: string; include?: string; productInclude?: string } = null
+    topupOnly,
+    hasRequirementOnly,
+  }: {
+    select?: string
+    include?: string
+    productInclude?: string
+    topupOnly?: boolean
+    hasRequirementOnly?: boolean
+  } = null
 ) => {
-  let query: CustomObject = {}
+  let query: CustomObject = {
+    where: {},
+  }
 
   if (select) {
     query.select = select.split(',').reduce((acc, field) => {
@@ -33,10 +43,16 @@ export const getAllCategories = async (
     }
   }
 
+  if (topupOnly) {
+    query.where.isTopup = true
+  }
+
+  if (hasRequirementOnly) {
+    query.where.requirement = { isNot: null }
+  }
+
   //   @ts-ignore
-  let categories = await prisma.category.findMany({
-    ...query,
-  })
+  let categories = await prisma.category.findMany(query)
 
   return categories
 }
@@ -46,11 +62,15 @@ const app = apiHandler()
 export default app
   // get all categories
   .get(async (req, res) => {
-    const { select } = req.query as {
+    const { select, topupOnly, hasRequirementOnly } = req.query as {
       [key: string]: string
     }
 
-    const categories = await getAllCategories({ select })
+    const categories = await getAllCategories({
+      select,
+      topupOnly: topupOnly == 'true' ? true : false,
+      hasRequirementOnly: hasRequirementOnly == 'true' ? true : false,
+    })
     res.status(200).json({ categories, length: categories.length })
   })
   // create new category

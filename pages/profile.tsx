@@ -9,6 +9,7 @@ import Container from '../components/Container'
 import Modal from '../components/Modal'
 import { CustomTab, CustomTabs } from '../components/mui/Tabs'
 import OrderHistory from '../components/profile/OrderHistory'
+import TopUpInformation from '../components/profile/TopUpInformation'
 import UserBadge from '../components/UserBadge'
 import Wrapper from '../components/Wrapper'
 import request from '../lib/request'
@@ -185,29 +186,14 @@ const Profile = ({ user }: Props) => {
           >
             <CustomTab label="Order History" />
             <CustomTab label="Topup Information" />
-            {/* <CustomTab
-              icon={
-                user.role != 'ADMIN' ? (
-                  <LockClosedIcon className="w-4 h-4" />
-                ) : null
-              }
-              iconPosition="start"
-              label="Admin Dashboard"
-              title={user.role != 'ADMIN' ? 'You are not an Admin' : undefined}
-              disabled={user.role != 'ADMIN'}
-            /> */}
           </CustomTabs>
           <div className="mt-5">
             <TabPanel value={tabIndex} index={0}>
               <OrderHistory />
             </TabPanel>
             <TabPanel value={tabIndex} index={1}>
-              topup information
+              <TopUpInformation user={user} />
             </TabPanel>
-            {/* ADMIN DASHBOARD */}
-            {/* <TabPanel value={tabIndex} index={2}>
-              <AdminDashboard />
-            </TabPanel> */}
           </div>
         </div>
       </Wrapper>

@@ -1,7 +1,5 @@
 import { CheckCircleIcon, ClockIcon } from '@heroicons/react/outline'
 import Skeleton from 'react-loading-skeleton'
-import useSWR from 'swr'
-import request from '../../lib/request'
 import {
   attachMidtransScript,
   removeMidtransScript,
@@ -14,14 +12,11 @@ import ProductItem from '../ProductItem'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { StarIcon } from '@heroicons/react/solid'
-
-const fetcher = (url: string) => request.get(url)
+import useGetRequest from '../../hooks/useGetRequest'
 
 const OrderHistory = () => {
-  const { data, error } = useSWR('/orders/me', fetcher)
+  const { data, loading } = useGetRequest('/orders/me')
   const router = useRouter()
-
-  const loading = !data && !error
 
   useEffect(() => {
     attachMidtransScript()
@@ -52,7 +47,7 @@ const OrderHistory = () => {
       />
     )
 
-  const { orders } = data.data
+  const { orders } = data
 
   console.log(orders)
 
