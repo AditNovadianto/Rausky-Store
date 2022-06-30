@@ -23,10 +23,8 @@ export default app
       where: { id: productId },
     })
 
-    res
-      .status(200)
-      .json({
-        message: `Success delete productId ${productId}`,
-        id: product.id,
-      })
+    res.status(200).json({
+      message: `Success delete productId ${productId}`,
+      id: product.id,
+    })
   })

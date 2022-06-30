@@ -27,26 +27,36 @@ export default app
   })
   .put(async (req, res) => {
     const { paymentMethod, status, paidAt } = req.body
-    const order = await prisma.order.update({
-      where: {
-        id: req.query.orderId as string,
-      },
-      data: {
-        paymentMethod,
-        status,
-        paidAt,
-      },
-      include: {
-        user: true,
-        rating: true,
-        products: {
-          select: {
-            product: { include: { category: true } },
-            amount: true,
-          },
+
+    const where = { id: req.query.orderId as string }
+
+    const include = {
+      user: true,
+      rating: true,
+      products: {
+        select: {
+          product: { include: { category: true } },
+          amount: true,
         },
       },
+    }
+
+    let order = await prisma.order.findUnique({
+      where,
+      include,
     })
+
+    if (order.status == 'WAITING_PAYMENT') {
+      order = await prisma.order.update({
+        where,
+        data: {
+          paymentMethod,
+          status,
+          paidAt,
+        },
+        include,
+      })
+    }
 
     //   @ts-ignore
     order.products = order.products.map(({ product, amount }) => ({
