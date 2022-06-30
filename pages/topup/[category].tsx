@@ -4,8 +4,7 @@ import { parseData } from '../../lib/utils'
 import { getSpecificCategory } from '../api/categories/[categoryId]'
 import TopupInfo from '../../components/topup/TopupInfo'
 import TopupItems from '../../components/topup/TopupItems'
-import { GetStaticPaths, GetStaticProps } from 'next'
-import { getAllCategories } from '../api/categories'
+import { GetServerSideProps } from 'next'
 import { useSession } from 'next-auth/react'
 
 const Topup = ({ category }) => {
@@ -31,25 +30,7 @@ const Topup = ({ category }) => {
 
 export default Topup
 
-export const getStaticPaths: GetStaticPaths = async () => {
-  const paths = (
-    await getAllCategories({
-      topupOnly: true,
-      select: 'slug',
-    })
-  ).map(({ slug }) => ({
-    params: {
-      category: slug,
-    },
-  }))
-
-  return {
-    paths,
-    fallback: 'blocking',
-  }
-}
-
-export const getStaticProps: GetStaticProps = async ({ params }) => {
+export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const category = await getSpecificCategory({
     categorySlug: params.category as string,
     includeProducts: true,
@@ -63,6 +44,5 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   return {
     props: parseData({ category }),
-    revalidate: 1,
   }
 }
