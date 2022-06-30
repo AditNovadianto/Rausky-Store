@@ -28,7 +28,6 @@ createStore(
       discount: 0,
       total: 0,
     },
-    orderFinish: {},
   },
   {
     name: 'state',
@@ -94,7 +93,9 @@ const MyComponent = ({ Component, pageProps }) => {
         </div>
       </AnimatePresence>
 
-      {!['/cart', '/signin'].includes(router.route) && <ContinuePayBtn />}
+      {!['/cart', '/signin', '/order'].includes(router.route) && (
+        <ContinuePayBtn />
+      )}
       <Toaster />
     </>
   )

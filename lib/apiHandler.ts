@@ -4,8 +4,8 @@ import { getSession } from 'next-auth/react'
 import { User } from 'next-auth'
 import { Role } from '@prisma/client'
 
-export default () =>
-  nc<NextApiRequest, NextApiResponse>({
+const apiHandler = () => {
+  return nc<NextApiRequest, NextApiResponse>({
     onError: (err, req, res, next) => {
       console.error(err)
       res
@@ -16,6 +16,9 @@ export default () =>
       res.status(404).json({ message: `${req.method} ${req.url} not found` })
     },
   })
+}
+
+export default apiHandler
 
 interface ExtendedRequest extends NextApiRequest {
   user: User

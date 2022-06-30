@@ -17,13 +17,6 @@ declare module 'little-state-machine' {
       discount: number
       total: number
     }
-    orderFinish: Order & {
-      products: (Product & {
-        category: Category
-      })[]
-      user: User
-      rating: Rating
-    }
     updatingDB: boolean
     updatedDB: boolean
   }

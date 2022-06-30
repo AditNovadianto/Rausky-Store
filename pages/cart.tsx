@@ -5,7 +5,6 @@ import {
   CloudUploadIcon,
   ExclamationCircleIcon,
 } from '@heroicons/react/outline'
-import { useEffect } from 'react'
 import { useStateMachine } from 'little-state-machine'
 import Link from '../components/Link'
 import { addToCart, removeFromCart, decrementAmount } from '../lib/cartHandler'
@@ -13,18 +12,10 @@ import RequirementField from '../components/RequirementField'
 import { signIn, useSession } from 'next-auth/react'
 import Skeleton from 'react-loading-skeleton'
 import ProductItem from '../components/ProductItem'
-import { useRouter } from 'next/router'
-import {
-  checkout,
-  attachMidtransScript,
-  removeMidtransScript,
-  clearOrder,
-  handleSuccessPayment,
-  handleUnfinishPayment,
-} from '../lib/payment'
+import { GetServerSideProps } from 'next'
+import usePayHandler from '../hooks/usePayHandler'
 
 const Cart = () => {
-  const router = useRouter()
   const { data: session, status } = useSession()
   const user = session?.user
   const isLoggedIn = status != 'loading' && user
@@ -32,7 +23,6 @@ const Cart = () => {
     addToCart,
     removeFromCart,
     decrementAmount,
-    clearOrder,
     setUser: (state, payload: { fieldName: string; fieldValue: string }) => {
       const newUser = { ...state.order.user }
       newUser[payload.fieldName] = payload.fieldValue
@@ -47,45 +37,7 @@ const Cart = () => {
   })
   const { cart, order, updatedDB, updatingDB } = state
 
-  useEffect(() => {
-    attachMidtransScript()
-    return () => {
-      removeMidtransScript()
-    }
-  }, [])
-
-  // this useEffect use to fix weird bug after payment finish
-  // where users are not redirected to /order
-  useEffect(() => {
-    const { order_id } = router.query
-    if (order_id) {
-      actions.clearOrder()
-      router.push({
-        pathname: '/order',
-        query: {
-          orderId: order_id,
-        },
-      })
-    }
-  }, [router])
-
-  const checkoutHandler = async () => {
-    const newOrder = await checkout({
-      products: cart,
-      order,
-      user,
-    })
-
-    // @ts-ignore
-    window.snap.pay(newOrder.paymentToken, {
-      onPending: (result) => {
-        handleSuccessPayment({ result })
-      },
-      onClose: () => {
-        handleUnfinishPayment({ orderId: newOrder.id })
-      },
-    })
-  }
+  const [payHandler, launching] = usePayHandler()
 
   const isFieldError = ({ requirement, field }) => {
     return order.missingRequirements[requirement.categorySlug]?.[field.value]
@@ -306,8 +258,8 @@ const Cart = () => {
                     </p>
                   )}
                   <button
-                    onClick={checkoutHandler}
-                    disabled={isAnyError}
+                    onClick={() => payHandler({ products: cart, user })}
+                    disabled={isAnyError || launching}
                     className="w-full py-4 bg-green-500 hover:bg-green-400 transition-all font-semibold text-white rounded-2xl shadow-xl shadow-green-300 disabled:bg-gray-400/40 disabled:shadow-gray-200"
                   >
                     Pay (Rp {order.total.toLocaleString()})
@@ -323,3 +275,19 @@ const Cart = () => {
 }
 
 export default Cart
+
+export const getServerSideProps: GetServerSideProps = async ({ query }) => {
+  const { order_id } = query
+  if (order_id) {
+    return {
+      redirect: {
+        destination: `/order?orderId=${order_id}`,
+        permanent: false,
+      },
+    }
+  }
+
+  return {
+    props: {},
+  }
+}

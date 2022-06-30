@@ -218,8 +218,11 @@ const Profile = ({ user }: Props) => {
 
 export default Profile
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const session = await getSession(ctx)
+export const getServerSideProps: GetServerSideProps = async ({
+  req,
+  query,
+}) => {
+  const session = await getSession({ req })
   if (!session) {
     return {
       redirect: {
@@ -228,6 +231,17 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       },
     }
   }
+
+  const { order_id } = query
+  if (order_id) {
+    return {
+      redirect: {
+        destination: `/order?orderId=${order_id}`,
+        permanent: false,
+      },
+    }
+  }
+
   return {
     props: {
       user: session.user,

@@ -1,41 +1,14 @@
 import { CheckCircleIcon, ClockIcon } from '@heroicons/react/outline'
 import Skeleton from 'react-loading-skeleton'
-import {
-  attachMidtransScript,
-  removeMidtransScript,
-  checkout,
-  handleSuccessPayment,
-  handleUnfinishPayment,
-} from '../../lib/payment'
 import Link from '../Link'
 import ProductItem from '../ProductItem'
-import { useRouter } from 'next/router'
-import { useEffect } from 'react'
 import { StarIcon } from '@heroicons/react/solid'
 import useGetRequest from '../../hooks/useGetRequest'
+import usePayHandler from '../../hooks/usePayHandler'
 
 const OrderHistory = () => {
   const { data, loading } = useGetRequest('/orders/me')
-  const router = useRouter()
-
-  useEffect(() => {
-    attachMidtransScript()
-    return () => removeMidtransScript()
-  })
-
-  // this useEffect use to fix weird bug after payment finish
-  // where users are not redirected to /order
-  useEffect(() => {
-    const { order_id } = router.query
-    if (order_id) {
-      router.push({
-        pathname: '/order',
-        query: {
-          orderId: order_id,
-        },
-      })
-    }
-  }, [router])
+  const [reorderHandler, launching] = usePayHandler()
 
   if (loading)
     return (
@@ -51,24 +24,6 @@ const OrderHistory = () => {
 
   console.log(orders)
 
-  const reorder = async (order) => {
-    const newOrder = await checkout({
-      products: order.products,
-      order,
-      user: order.user,
-    })
-
-    // @ts-ignore
-    window.snap.pay(newOrder.paymentToken, {
-      onPending: (result) => {
-        handleSuccessPayment({ result })
-      },
-      onClose: () => {
-        handleUnfinishPayment({ orderId: newOrder.id })
-      },
-    })
-  }
-
   return (
     <div className="space-y-5">
       {orders.length > 0 ? (
@@ -82,7 +37,8 @@ const OrderHistory = () => {
               <div className="px-5 py-3 border-b flex items-center justify-between">
                 <p className="text-sm text-gray-500 font-medium flex items-center">
                   <ClockIcon className="w-4 h-4 mr-1" />
-                  {new Date(order.paidAt).toDateString()}
+                  {new Date(order.paidAt).toDateString()} at{' '}
+                  {new Date(order.paidAt).toLocaleTimeString()}
                 </p>
                 <span className="text-xs bg-green-100 text-green-500 px-2 py-1 rounded-lg font-semibold flex items-center">
                   <CheckCircleIcon className="w-4 h-4 mr-1" />
@@ -118,9 +74,11 @@ const OrderHistory = () => {
               </Link>
 
               {/* REORDER BTN */}
-              {/* TODO: bikin function reorder, nanti langsung ngebuka midtransnya */}
               <button
-                onClick={() => reorder(order)}
+                onClick={() =>
+                  reorderHandler({ products: order.products, user: order.user })
+                }
+                disabled={launching}
                 className="w-full bg-green-500 hover:bg-green-400 transition-colors text-white font-semibold py-2"
               >
                 Reorder

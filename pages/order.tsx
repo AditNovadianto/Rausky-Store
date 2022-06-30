@@ -3,7 +3,6 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import Container from '../components/Container'
 import Wrapper from '../components/Wrapper'
-import { isObjectEmpty } from '../lib/utils'
 import {
   CreditCardIcon,
   ClockIcon,
@@ -23,59 +22,83 @@ import Confetti from 'react-confetti'
 import toast from 'react-hot-toast'
 import cn from 'classnames'
 import { socialMedia } from '../lib/data'
-import Link from '../components/Link'
+import { Category, Order, Product, Rating } from '@prisma/client'
+import { User } from '../types/next-auth'
+import { GetServerSideProps } from 'next'
+
+type FinishedOrder = Order & {
+  products: (Product & {
+    category: Category
+  })[]
+  user: User
+  rating: Rating
+}
 
 const Order = () => {
-  const { state, actions } = useStateMachine({
-    setOrderFinish: (state, payload) => {
-      return {
-        ...state,
-        orderFinish: payload,
-      }
-    },
-  })
+  const [finishedOrder, setFinishedOrder] = useState({} as FinishedOrder)
   const [loading, setLoading] = useState(true)
   const [showOrderPreview, setShowOrderPreview] = useState(false)
-  const { orderFinish } = state
   const router = useRouter()
-
   const [comment, setComment] = useState('')
   const [star, setStar] = useState(0)
   const [sendingRating, setSendingRating] = useState(false)
 
+  const { actions } = useStateMachine({
+    clearOrder: (state) => {
+      request.delete('/carts/me')
+      return {
+        ...state,
+        cart: [],
+        order: {
+          ...state.order,
+          categoryRequirements: [],
+          missingRequirements: {},
+          subtotal: 0,
+          tax: 0,
+          discount: 0,
+          total: 0,
+        },
+      }
+    },
+  })
+
   useEffect(() => {
-    const checkOrder = async () => {
-      if (isObjectEmpty(orderFinish)) {
-        const orderId = new URLSearchParams(window.location.search).get(
-          'orderId'
-        )
-        if (!orderId) {
-          router.replace('/')
+    const run = async () => {
+      try {
+        const { isNewOrder, orderId, paymentMethod, status, paidAt } =
+          router.query
+
+        if (isNewOrder == 'true') {
+          // update new order from payment result
+          const { data } = await request.put(`/orders/${orderId}`, {
+            paymentMethod,
+            status,
+            paidAt,
+          })
+
+          actions.clearOrder()
+          setFinishedOrder(data.order)
           return
         }
 
-        try {
+        if (orderId) {
           const { data } = await request.get(`/orders/${orderId}`)
           const { order } = data
-          actions.setOrderFinish(order)
+          setFinishedOrder(order)
 
           order.rating?.star && setStar(order.rating.star)
           order.rating?.comment && setComment(order.rating.comment)
-        } catch (err) {
-          console.log(err)
-          //   router.replace('/')
-          return
         }
+      } catch (err) {
+        console.log(err)
+        router.replace('/')
+      } finally {
+        setLoading(false)
       }
-      setLoading(false)
     }
-    checkOrder()
-    return () => {
-      actions.setOrderFinish({})
-    }
-  }, [])
 
-  console.log(orderFinish)
+    run()
+  }, [actions, router.query])
 
   const sendRating = async () => {
     let toastId
@@ -85,13 +108,12 @@ const Order = () => {
       const { data } = await request.post('/ratings', {
         star,
         comment,
-        orderId: orderFinish.id,
+        orderId: finishedOrder.id,
       })
-      console.log(data.rating)
-      actions.setOrderFinish({ ...orderFinish, rating: data.rating })
+      setFinishedOrder({ ...finishedOrder, rating: data.rating })
       toast.success(
         `Thank you for your feedback${
-          orderFinish.user ? `, ${orderFinish.user.name}` : ''
+          finishedOrder.user ? `, ${finishedOrder.user.name}` : ''
         }`,
         { id: toastId }
       )
@@ -103,8 +125,8 @@ const Order = () => {
     }
   }
 
-  console.log(orderFinish)
-  const paidAt = new Date(orderFinish.paidAt)
+  console.log(finishedOrder)
+  const paidAt = new Date(finishedOrder.paidAt)
   const paidAtDay = paidAt.toDateString()
   const paidAtTime = paidAt.toLocaleTimeString()
 
@@ -114,7 +136,7 @@ const Order = () => {
         <LoadingSkeletons />
       ) : (
         <>
-          <header className="z-50 sticky mb-5 top-0 py-4 bg-white/70 backdrop-blur-sm shadow-sm">
+          <header className="print:hidden z-50 sticky mb-5 top-0 py-4 bg-white/70 backdrop-blur-sm shadow-sm">
             <Wrapper>
               <div className="max-w-3xl mx-auto">
                 <button
@@ -150,7 +172,7 @@ const Order = () => {
                     </button>
                   </h2>
                   <pre className="mt-2 overflow-auto max-h-[70vh] bg-gray-800 text-green-500 rounded-2xl p-5">
-                    {JSON.stringify(orderFinish, null, 2)}
+                    {JSON.stringify(finishedOrder, null, 2)}
                   </pre>
                 </div>
               )}
@@ -159,7 +181,9 @@ const Order = () => {
                 <h3 className="font-semibold text-2xl flex items-center">
                   <span>
                     Thanks for your order
-                    {orderFinish.user?.name ? `, ${orderFinish.user.name}` : ''}
+                    {finishedOrder.user?.name
+                      ? `, ${finishedOrder.user.name}`
+                      : ''}
                     ! ✅
                   </span>
                   {!showOrderPreview && (
@@ -177,7 +201,7 @@ const Order = () => {
                     Your order has been processed
                   </p>
                   <p className="text-sm text-gray-400">
-                    Order ID: {orderFinish.id}
+                    Order ID: {finishedOrder.id}
                   </p>
                 </div>
 
@@ -187,13 +211,15 @@ const Order = () => {
                     <h3 className="flex items-center">
                       Payment method <CreditCardIcon className="w-4 h-4 ml-1" />
                     </h3>
-                    <p className="text-gray-500">{orderFinish.paymentMethod}</p>
+                    <p className="text-gray-500">
+                      {finishedOrder.paymentMethod}
+                    </p>
                   </div>
                   <div className="w-full font-medium text-sm p-2 border border-l-2 border-l-green-500 md:border-l md:border-l-gray-200 md:border-t-4 md:border-t-green-500 print:border-l print:border-l-gray-200 print:border-t-4 print:border-t-green-500 rounded-xl">
                     <h3 className="flex items-center">
                       Status <CheckCircleIcon className="w-4 h-4 ml-1" />
                     </h3>
-                    <p className="text-gray-500">{orderFinish.status}</p>
+                    <p className="text-gray-500">{finishedOrder.status}</p>
                   </div>
                   <div className="w-full font-medium text-sm p-2 border border-l-2 border-l-green-500 md:border-l md:border-l-gray-200 md:border-t-4 md:border-t-green-500 print:border-l print:border-l-gray-200 print:border-t-4 print:border-t-green-500 rounded-xl">
                     <h3 className="flex items-center">
@@ -208,12 +234,12 @@ const Order = () => {
                 {/* ORDER RATING */}
                 <div className="mt-10 print:hidden">
                   <h3 className="font-semibold text-xl">Rating</h3>
-                  {orderFinish.rating && (
+                  {finishedOrder.rating && (
                     <div className="mt-3 p-2 rounded-xl border border-green-300 bg-green-100">
                       Thank you
-                      {orderFinish.user && (
+                      {finishedOrder.user && (
                         <>
-                          , <b>{orderFinish.user.name}</b>
+                          , <b>{finishedOrder.user.name}</b>
                         </>
                       )}{' '}
                       😊. Your rating has been sent.
@@ -222,7 +248,7 @@ const Order = () => {
                   <div
                     className={cn(
                       'mt-3 flex flex-col',
-                      orderFinish.rating && 'pointer-events-none'
+                      finishedOrder.rating && 'pointer-events-none'
                     )}
                   >
                     <div>
@@ -247,7 +273,7 @@ const Order = () => {
                       cols={30}
                       rows={3}
                     ></textarea>
-                    {!orderFinish.rating && (
+                    {!finishedOrder.rating && (
                       <button
                         disabled={star == 0 || sendingRating}
                         onClick={sendRating}
@@ -269,7 +295,7 @@ const Order = () => {
                 <div className="mt-10">
                   <h3 className="font-semibold text-xl">Products</h3>
                   <div className="mt-8 space-y-8">
-                    {orderFinish.products?.map((item) => (
+                    {finishedOrder.products?.map((item) => (
                       <ProductItem key={item.id} item={item} />
                     ))}
                   </div>
@@ -281,15 +307,15 @@ const Order = () => {
                     <h3 className="font-semibold text-xl">Summary</h3>
                     <div className="mt-2 flex justify-between text-gray-500">
                       <p>Pajak</p>
-                      <p>Rp {orderFinish.tax?.toLocaleString()}</p>
+                      <p>Rp {finishedOrder.tax?.toLocaleString()}</p>
                     </div>
                     <div className="mt-2 flex justify-between text-gray-500">
                       <p>Diskon</p>
-                      <p>Rp {orderFinish.discount?.toLocaleString()}</p>
+                      <p>Rp {finishedOrder.discount?.toLocaleString()}</p>
                     </div>
                     <div className="flex mt-4 p-4 print:p-0 rounded-2xl justify-between text-xl font-semibold bg-green-500 text-white print:text-black print:shadow-none shadow-xl shadow-green-300">
                       <p className="">Total</p>
-                      <p>Rp {orderFinish.total?.toLocaleString()}</p>
+                      <p>Rp {finishedOrder.total?.toLocaleString()}</p>
                     </div>
                   </div>
                   {/* CONTACT */}
@@ -347,7 +373,7 @@ const Order = () => {
 export default Order
 
 const LoadingSkeletons = () => (
-  <Wrapper className="max-w-3xl mx-auto">
+  <Wrapper className="max-w-3xl mx-auto mt-3">
     <div className="w-full">
       <Skeleton height={30} width="80%" />
       <div className="my-5">
@@ -361,3 +387,17 @@ const LoadingSkeletons = () => (
     </div>
   </Wrapper>
 )
+
+export const getServerSideProps: GetServerSideProps = async ({ query }) => {
+  const { orderId } = query
+  if (!orderId) {
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    }
+  }
+
+  return { props: {} }
+}

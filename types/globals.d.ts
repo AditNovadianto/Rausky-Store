@@ -1,1 +1,7 @@
-type CustomObject = { [key: string]: any }
+export type CustomObject = { [key: string]: any }
+
+declare global {
+  interface Window {
+    snap: any
+  }
+}
