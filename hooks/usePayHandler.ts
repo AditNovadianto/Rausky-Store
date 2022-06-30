@@ -11,17 +11,17 @@ const usePayHandler = () => {
   const [launching, setLaunching] = useState(false)
 
   useEffect(() => {
+    if (document.getElementById('snap-midtrans-js') != undefined) return
+
     const midtransScriptUrl = 'https://app.sandbox.midtrans.com/snap/snap.js'
     const myMidtransClientKey = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY
 
     let scriptTag = document.createElement('script')
     scriptTag.src = midtransScriptUrl
+    scriptTag.id = 'snap-midtrans-js'
     scriptTag.setAttribute('data-client-key', myMidtransClientKey)
 
     document.body.appendChild(scriptTag)
-    return () => {
-      document.body.removeChild(scriptTag)
-    }
   }, [])
 
   const payHandler = async ({ products, user }) => {
