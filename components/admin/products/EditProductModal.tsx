@@ -2,6 +2,7 @@ import { RefreshIcon, UploadIcon } from '@heroicons/react/outline'
 import { useState } from 'react'
 import { adminRequestHandler } from '../../../lib/admin'
 import request from '../../../lib/request'
+import { CustomObject } from '../../../types/globals'
 import Modal from '../../Modal'
 import ModalHeader from '../ModalHeader'
 import ModalHeaderButton from '../ModalHeaderButton'
@@ -14,11 +15,10 @@ const EditProductModal = ({
   product,
   category,
 }) => {
-  const [editedProduct, setEditedProduct] = useState({
+  const [editedProduct, setEditedProduct] = useState<CustomObject>({
     title: product.title,
     price: product.price,
     stock: product.stock,
-    subCategory: product.subCategory.slug,
   })
 
   const onFieldChange = (field, value) => {
@@ -29,12 +29,15 @@ const EditProductModal = ({
   }
 
   const resetHandler = () => {
-    setEditedProduct({
+    let obj: CustomObject = {
       title: product.title,
       price: product.price,
       stock: product.stock,
-      subCategory: product.subCategory.slug,
-    })
+    }
+    if (product.subCategory?.slug) {
+      obj.subCategory = product.subCategory.slug
+    }
+    setEditedProduct(obj)
   }
 
   const updateCategoryProducts = (products) => {
