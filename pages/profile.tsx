@@ -135,7 +135,7 @@ const Profile = ({ user }: Props) => {
               <a
                 href="/admin"
                 target="_blank"
-                className="block w-full md:max-w-[350px] md:mb-6 p-4 rounded-2xl border border-green-400 font-semibold bg-green-200 text-green-600 hover:bg-green-500 hover:text-white hover:shadow-xl hover:shadow-green-300 hover:-translate-y-1.5 transition-all"
+                className="block w-full md:max-w-[350px] mb-6 p-4 rounded-2xl border border-green-400 font-semibold bg-green-200 text-green-600 hover:bg-green-500 hover:text-white hover:shadow-xl hover:shadow-green-300 hover:-translate-y-1.5 transition-all"
               >
                 Go to Admin Dashboard &rarr;
               </a>

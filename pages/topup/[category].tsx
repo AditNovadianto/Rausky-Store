@@ -63,5 +63,6 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   return {
     props: parseData({ category }),
+    revalidate: 1,
   }
 }
