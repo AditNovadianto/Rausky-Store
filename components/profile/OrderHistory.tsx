@@ -46,7 +46,7 @@ const OrderHistory = () => {
                 </span>
               </div>
               {/* BODY */}
-              <Link href={`/order?orderId=${order.id}&back=/profile`}>
+              <Link href={`/order?orderId=${order.id}&back=true`}>
                 {/* PRODUCT */}
                 <div className="px-5 py-3">
                   <ProductItem item={order.products[0]} size="small" />

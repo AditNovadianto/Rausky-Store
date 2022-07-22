@@ -43,43 +43,12 @@ const Order = () => {
   const [star, setStar] = useState(0)
   const [sendingRating, setSendingRating] = useState(false)
 
-  const { actions } = useStateMachine({
-    clearOrder: (state) => {
-      request.delete('/carts/me')
-      return {
-        ...state,
-        cart: [],
-        order: {
-          ...state.order,
-          categoryRequirements: [],
-          missingRequirements: {},
-          subtotal: 0,
-          tax: 0,
-          discount: 0,
-          total: 0,
-        },
-      }
-    },
-  })
+  const { actions } = useStateMachine()
 
   useEffect(() => {
     const run = async () => {
       try {
-        const { isNewOrder, orderId, paymentMethod, status, paidAt } =
-          router.query
-
-        if (isNewOrder == 'true') {
-          // update new order from payment result
-          const { data } = await request.put(`/orders/${orderId}`, {
-            paymentMethod,
-            status,
-            paidAt,
-          })
-
-          actions.clearOrder()
-          setFinishedOrder(data.order)
-          return
-        }
+        const { orderId } = router.query
 
         if (orderId) {
           const { data } = await request.get(`/orders/${orderId}`)
@@ -141,7 +110,11 @@ const Order = () => {
               <div className="max-w-3xl mx-auto">
                 <button
                   onClick={() => {
-                    router.push((router.query.back as string) || '/')
+                    if (router.query.back === 'true') {
+                      router.back()
+                    } else {
+                      router.push('/')
+                    }
                   }}
                   className="text-sm flex items-center hover:text-green-500"
                 >

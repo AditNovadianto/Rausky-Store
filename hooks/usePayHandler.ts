@@ -6,7 +6,24 @@ import request from '../lib/request'
 
 const usePayHandler = () => {
   const router = useRouter()
-  const { state } = useStateMachine()
+  const { state, actions } = useStateMachine({
+    clearOrder: (state) => {
+        request.delete('/carts/me')
+        return {
+          ...state,
+          cart: [],
+          order: {
+            ...state.order,
+            categoryRequirements: [],
+            missingRequirements: {},
+            subtotal: 0,
+            tax: 0,
+            discount: 0,
+            total: 0,
+          },
+        }
+      },
+  })
   const { order } = state
   const [launching, setLaunching] = useState(false)
 
@@ -44,16 +61,19 @@ const usePayHandler = () => {
 
       // pay with midtrans snap api
       window.snap.pay(paymentToken, {
-        onPending: (result) => {
+        onPending: async (result) => {
           const paidAt = new Date(result.transaction_time).toISOString()
+          const { data } = await request.put(`/orders/${result.order_id}`, {
+            paymentMethod: result.payment_type,
+            status: 'PAID',
+            paidAt,
+          })
+          actions.clearOrder()
+
           router.push({
             pathname: '/order',
             query: {
-              isNewOrder: 'true',
               orderId: result.order_id,
-              paymentMethod: result.payment_type,
-              status: 'PAID',
-              paidAt,
             },
           })
         },
