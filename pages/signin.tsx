@@ -29,7 +29,7 @@ const SignIn = ({ providers }: Props) => {
     <Container title="Sign In" noNavbar>
       <Wrapper className="py-20 text-center flex flex-col items-center max-w-xs md:max-w-4xl">
         <Link href="/">
-          <img src="/images/rausky-logo.png" alt="" />
+          <img src="/images/logo/rausky-logo.png" alt="" />
         </Link>
         <h3 className="font-bold text-3xl">Sign In to Rausky Gamestore</h3>
         <div className="w-full mt-10 space-y-5 flex flex-col md:flex-row md:space-y-0 md:space-x-5">

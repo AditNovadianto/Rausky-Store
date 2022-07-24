@@ -90,7 +90,7 @@ const RatingsModal = ({ open, onClose, ratings }) => {
         ) : (
           <div className="text-center">
             <img
-              src="/images/empty-rating.svg"
+              src="/images/illustration/empty-rating.svg"
               alt="empty-rating"
               className="mx-auto w-[100px] h-[100px]"
             />

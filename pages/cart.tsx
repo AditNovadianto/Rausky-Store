@@ -54,7 +54,7 @@ const Cart = () => {
           <div>
             <img
               className="w-[300px] h-[300px] mx-auto"
-              src="/images/empty-cart.svg"
+              src="/images/illustration/empty-cart.svg"
               alt="empty cart"
             />
             <h2 className="font-bold text-3xl mt-1">Your cart is empty.</h2>
@@ -66,9 +66,6 @@ const Cart = () => {
             </Link>
           </div>
           {/* TODO: tampilin rekomendasi produk */}
-          {/* <div>
-            <h2 className="text-2xl font-bold mb-4">Rekomendasi Produk</h2>
-          </div> */}
         </Wrapper>
       ) : (
         <Wrapper className="flex flex-col lg:flex-row justify-between lg:space-x-20">
@@ -249,7 +246,6 @@ const Cart = () => {
                   </div>
                 </div>
 
-                {/* TODO: handle missing requirements */}
                 <div className="my-8">
                   {isAnyError && (
                     <p className="mt-2 text-red-500 mb-3 font-medium flex items-center justify-center">

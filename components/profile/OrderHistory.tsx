@@ -90,7 +90,7 @@ const OrderHistory = () => {
         <div className="text-center mt-20">
           <img
             className="mx-auto w-[100px] h-[100px]"
-            src="/images/empty-order.svg"
+            src="/images/illustration/empty-order.svg"
             alt="empty order"
           />
           <h3 className="font-bold text-xl">You have no orders yet.</h3>

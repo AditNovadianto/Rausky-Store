@@ -280,7 +280,7 @@ const Navbar = () => {
               className="flex font-semibold items-center text-xl -ml-2"
             >
               <img
-                src="/images/rausky-logo.png"
+                src="/images/logo/rausky-logo.png"
                 alt="rausky-logo"
                 className="w-[40px]"
               />
@@ -296,15 +296,15 @@ const Navbar = () => {
             </button>
           )}
 
-          {/* SEARCH BUTTON */}
           <div className="flex items-center">
+            {/* SEARCH BUTTON */}
             <button
               className="flex-shrink-0 p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
               onClick={toggleSearch}
             >
               <img
-                src="/images/Union.svg"
-                alt="Union"
+                src="/images/icon/union.svg"
+                alt="union"
                 className="dark:invert-[90%]"
               />
             </button>
@@ -317,8 +317,8 @@ const Navbar = () => {
               {totalItemsInCart > 0 && <Badge>{totalItemsInCart}</Badge>}
 
               <img
-                src="/images/Bag.svg"
-                alt="Bag-icon"
+                src="/images/icon/bag.svg"
+                alt="bag-icon"
                 className="dark:invert-[90%]"
               />
             </Link>
@@ -379,8 +379,8 @@ const Navbar = () => {
       <Modal open={search} onClose={toggleSearch}>
         <header className="sticky w-full top-0 flex items-center px-5 shadow-sm bg-inherit dark:bg-gray-800">
           <img
-            src="/images/Union.svg"
-            alt="Union"
+            src="/images/icon/union.svg"
+            alt="union"
             className="w-4 h-4 dark:invert"
           />
           <input

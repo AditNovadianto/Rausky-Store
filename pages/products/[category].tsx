@@ -1,5 +1,7 @@
+import UnderDevelopment from '../../components/UnderDevelopment'
+
 const OtherProducts = () => {
-  return <div>OtherProducts</div>
+  return <UnderDevelopment />
 }
 
 export default OtherProducts
