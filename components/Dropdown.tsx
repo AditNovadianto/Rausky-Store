@@ -96,7 +96,7 @@ const Dropdown = ({
         {show && (
           <div
             className={cn(
-              'bg-white border shadow-xl absolute top-full right-full p-1 rounded-xl flex flex-col'
+              'bg-white dark:bg-gray-800 border dark:border-gray-700 shadow-xl absolute top-full right-full p-1 rounded-xl flex flex-col'
             )}
             style={{
               transform: `translate(${containerWidth}px, ${translateY}px)`,
@@ -108,7 +108,7 @@ const Dropdown = ({
                 <header className="flex items-center">
                   <button
                     onClick={resetDropdown}
-                    className="p-2 hover:bg-gray-100 rounded-lg mr-2"
+                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg mr-2"
                   >
                     <ChevronLeftIcon className="w-5 h-5" />
                   </button>
@@ -126,7 +126,7 @@ const Dropdown = ({
                   className={cn(
                     'w-full p-2 rounded-lg text-left truncate',
                     item.className ||
-                      'hover:bg-gray-100 text-gray-500 hover:text-gray-800',
+                      'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 hover:text-gray-800 dark:text-gray-200 dark:hover:text-gray-50',
                     'disabled:hover:bg-transparent disabled:opacity-30 disabled:text-current'
                   )}
                   onClick={() => {

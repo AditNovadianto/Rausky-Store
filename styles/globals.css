@@ -3,33 +3,36 @@
 @tailwind utilities;
 
 *:disabled {
-    @apply pointer-events-none opacity-40;
+  @apply pointer-events-none opacity-40;
 }
 
 ::-webkit-scrollbar {
-    width: 0.4em;
-    height: 0.4em;
-}
-  
-::-webkit-scrollbar-thumb {
-    @apply bg-gray-400 hover:bg-green-500;
-    border-radius: 100vw;
+  width: 0.3em;
+  height: 0.3em;
 }
 
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-400 hover:bg-green-500 dark:bg-gray-700 dark:hover:bg-green-500;
+  border-radius: 100vw;
+}
 
 @layer base {
-    html {
-        -webkit-tap-highlight-color:  rgba(255, 255, 255, 0); 
-        @apply scroll-smooth;
-    }
+  html {
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply antialiased bg-white dark:bg-gray-900 dark:text-gray-200;
+  }
 }
 
 @layer components {
-    .input {
-        @apply block w-full px-5 py-3 rounded-xl border focus:outline-none focus:border-green-400;
-    }
+  .input {
+    @apply block w-full px-5 py-3 rounded-xl border focus:outline-none focus:border-green-400;
+  }
 
-    .select {
-        @apply border focus:outline-none focus:border-green-400 focus:ring focus:ring-green-200 focus:ring-opacity-70 px-2 py-1 rounded-md cursor-pointer text-gray-600;
-    }
+  .select {
+    @apply border focus:outline-none focus:border-green-400 focus:ring focus:ring-green-200 focus:ring-opacity-70 px-2 py-1 rounded-md cursor-pointer text-gray-600;
+  }
 }

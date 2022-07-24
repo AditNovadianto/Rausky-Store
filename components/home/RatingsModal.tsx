@@ -33,11 +33,11 @@ const RatingsModal = ({ open, onClose, ratings }) => {
 
   return (
     <Modal open={open} onClose={onClose}>
-      <header className="sticky w-full top-0 p-5 text-2xl font-bold bg-white z-10 shadow-sm">
+      <header className="sticky w-full top-0 p-5 text-2xl font-bold bg-inherit dark:bg-gray-800 z-10 shadow-sm">
         <h2 className="flex justify-between items-center">
           <div>
             Ratings{' '}
-            <span className="text-gray-500 font-normal">
+            <span className="text-gray-500 dark:text-gray-400 font-normal">
               ({ratings.ratings.length})
             </span>
           </div>
@@ -56,8 +56,8 @@ const RatingsModal = ({ open, onClose, ratings }) => {
               className={cn(
                 buttonClassname,
                 filter == star
-                  ? 'bg-green-100 border-green-300'
-                  : 'border-gray-300'
+                  ? 'bg-green-100 border-green-300 dark:bg-transparent'
+                  : 'border-gray-300 dark:border-gray-700'
               )}
             >
               <StarIconSolid className="text-yellow-500 w-5 h-5 mr-1" />
@@ -71,8 +71,8 @@ const RatingsModal = ({ open, onClose, ratings }) => {
               className={cn(
                 buttonClassname,
                 filter == sortTo
-                  ? 'bg-green-100 border-green-300'
-                  : 'border-gray-300'
+                  ? 'bg-green-100 border-green-300 dark:bg-transparent'
+                  : 'border-gray-300 dark:border-gray-700'
               )}
             >
               {sortTo}

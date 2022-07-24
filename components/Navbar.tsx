@@ -150,12 +150,9 @@ const Navbar = () => {
       more: themes.map((theme) => ({
         icon: theme.Icon,
         label: theme.label,
-        className: cn(
-          'p-2 text-left w-full flex items-center hover:bg-gray-100 rounded-lg',
-          currentTheme === theme.name
-            ? 'font-semibold text-green-500'
-            : 'font-normal text-gray-600'
-        ),
+        className:
+          currentTheme === theme.name &&
+          'font-semibold text-green-500 hover:bg-gray-100 dark:hover:bg-gray-700',
         onClick: () => {
           setCurrentTheme(theme.name)
         },
@@ -236,7 +233,7 @@ const Navbar = () => {
 
   return (
     <>
-      <div className="print:hidden bg-yellow-100 py-1.5">
+      <div className="print:hidden bg-gray-900 dark:bg-black text-white py-1.5">
         <Wrapper>
           <p className="text-sm font-medium text-center">
             For now, all payments and transactions are not real (still in
@@ -251,7 +248,7 @@ const Navbar = () => {
         </Wrapper>
       </div>
 
-      <nav className="print:hidden sticky top-0 z-50 bg-white shadow-sm">
+      <nav className="print:hidden sticky top-0 z-50 bg-white dark:bg-gray-900 dark:border-b dark:border-b-gray-800 shadow-sm">
         <Wrapper className="flex items-center w-full justify-between py-2.5 lg:py-2">
           {router.route == '/' ? (
             <Link
@@ -263,7 +260,7 @@ const Navbar = () => {
                 alt="rausky-logo"
                 className="w-[40px]"
               />
-              <span className="text-black">Rausky</span>
+              <span>Rausky</span>
             </Link>
           ) : (
             <button
@@ -275,29 +272,31 @@ const Navbar = () => {
             </button>
           )}
 
-          <div className="items-center hidden md:flex">
-            <button
-              className="hidden ml-10 flex-shrink-0"
-              onClick={toggleSearch}
-            >
-              <img src="/images/Union.svg" alt="Union" />
-            </button>
-          </div>
-
           {/* SEARCH BUTTON */}
           <div className="flex items-center">
-            <button className="flex-shrink-0 p-2" onClick={toggleSearch}>
-              <img src="/images/Union.svg" alt="Union" />
+            <button
+              className="flex-shrink-0 p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
+              onClick={toggleSearch}
+            >
+              <img
+                src="/images/Union.svg"
+                alt="Union"
+                className="dark:invert-[90%]"
+              />
             </button>
 
             {/* CART BUTTON */}
             <Link
               href="/cart"
-              className="relative flex-shrink-0 rounded-md p-2 hover:bg-gray-100"
+              className="relative flex-shrink-0 rounded-md p-2 hover:bg-gray-100 dark:hover:bg-gray-800"
             >
               {totalItemsInCart > 0 && <Badge>{totalItemsInCart}</Badge>}
 
-              <img src="/images/Bag.svg" alt="Bag-icon" />
+              <img
+                src="/images/Bag.svg"
+                alt="Bag-icon"
+                className="dark:invert-[90%]"
+              />
             </Link>
 
             {/* PROFILE BUTTON */}
@@ -313,7 +312,7 @@ const Navbar = () => {
                     // USER DROPDOWN
                     <Dropdown
                       items={menuItemsWithUser}
-                      className="flex items-center flex-shrink-0 rounded-md -mr-2 p-2 hover:bg-gray-100"
+                      className="flex items-center flex-shrink-0 rounded-md -mr-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-800"
                       deps={[session]}
                       minWidth={280}
                     >
@@ -354,11 +353,15 @@ const Navbar = () => {
 
       {/* SEARCH MODAL */}
       <Modal open={search} onClose={toggleSearch}>
-        <header className="sticky w-full top-0 flex items-center px-5 shadow-sm bg-white">
-          <img src="/images/Union.svg" alt="Union" className="w-4 h-4" />
+        <header className="sticky w-full top-0 flex items-center px-5 shadow-sm bg-inherit dark:bg-gray-800">
+          <img
+            src="/images/Union.svg"
+            alt="Union"
+            className="w-4 h-4 dark:invert"
+          />
           <input
             autoFocus
-            className="focus:outline-none py-3 px-4 w-full"
+            className="focus:outline-none py-3 px-4 w-full bg-inherit"
             placeholder="Search for anything..."
             type="text"
             autoComplete="off"
@@ -390,7 +393,7 @@ const Navbar = () => {
             {/* PRODUCTS RESULTS */}
             {productsSearchResults.length > 0 && (
               <div>
-                <h3 className="text-xs font-medium bg-white text-gray-500 py-1">
+                <h3 className="text-xs font-medium text-gray-500 dark:text-gray-400 py-1">
                   PRODUCTS ({productsSearchResults.length})
                 </h3>
                 <div onClick={toggleSearch}>
@@ -406,7 +409,7 @@ const Navbar = () => {
                           : ''
                       }`}
                       key={product.id}
-                      className="w-full flex items-center p-2 rounded-lg hover:bg-gray-100"
+                      className="w-full flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
                     >
                       <img
                         className="w-5 h-5 object-cover mr-1"
@@ -424,7 +427,7 @@ const Navbar = () => {
             {/* CATEGORY RESULTS */}
             {categorySearchResults.length > 0 && (
               <div>
-                <h3 className="text-xs font-medium sticky top-0 bg-white text-gray-500 py-1">
+                <h3 className="text-xs font-medium sticky top-0 text-gray-500 dark:text-gray-400 py-1">
                   CATEGORIES ({categorySearchResults.length})
                 </h3>
                 <div onClick={toggleSearch}>
@@ -432,7 +435,7 @@ const Navbar = () => {
                     <Link
                       href={`/topup/${category.slug}`}
                       key={category.id}
-                      className="w-full flex items-center p-2 rounded-lg hover:bg-gray-100"
+                      className="w-full flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
                     >
                       {category.logoImg ? (
                         <img

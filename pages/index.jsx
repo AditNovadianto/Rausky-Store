@@ -42,7 +42,7 @@ const Home = ({ categories }) => {
           <div className="flex flex-col space-y-4">
             {topupCategories.map((category) => (
               <Link
-                className="flex items-center group border p-3 rounded-xl hover:border-green-400"
+                className="flex items-center group border dark:bg-gray-800 dark:border-gray-700 p-3 rounded-xl hover:border-green-400 dark:hover:border-green-400"
                 key={category.id}
                 href={`/topup/${category.slug}`}
               >
@@ -62,15 +62,25 @@ const Home = ({ categories }) => {
         <div className="lg:mt-0 space-y-8 lg:flex-[3] lg:px-20">
           {/* DISCOUNTS */}
           <section className="space-y-4">
-            <Link className="relative block bg-green-200 rounded-2xl" href="/">
+            <Link
+              className="relative block overflow-hidden rounded-2xl"
+              href="/"
+            >
               <img
-                src="/images/pattern-discount-1.png"
+                src="https://images.unsplash.com/photo-1639656333400-ee5240f757a0?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80"
                 alt="discount"
-                className="w-full"
+                className="w-full h-[200px] object-cover rounded-2xl"
               />
-              <h3 className="font-bold text-2xl absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap">
-                GET UP TO 50%
-              </h3>
+              <div className="absolute inset-0 flex items-end p-4 bg-gradient-to-t from-black to-transparent">
+                <div>
+                  <h3 className="font-medium text-xl text-white">
+                    GET UP TO 50 %
+                  </h3>
+                  <button className="bg-green-500 text-white font-semibold px-4 py-1 rounded-lg text-sm mt-2">
+                    Learn More
+                  </button>
+                </div>
+              </div>
             </Link>
           </section>
 
@@ -102,7 +112,7 @@ const Home = ({ categories }) => {
             <h2 className="text-2xl font-bold mb-4 flex items-center">
               Ratings{' '}
               {ratings ? (
-                <span className="text-gray-500 font-normal text-lg ml-2">
+                <span className="text-gray-500 dark:text-gray-400 font-normal text-lg ml-2">
                   ({ratings.count.toLocaleString()})
                 </span>
               ) : (
@@ -133,7 +143,7 @@ const Home = ({ categories }) => {
                       <div
                         role="progress"
                         title={ratingCount.toLocaleString()}
-                        className="w-full h-2 rounded-full bg-gray-200 overflow-hidden"
+                        className="w-full h-2 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden"
                       >
                         <div
                           className="h-full bg-yellow-500 rounded-full"

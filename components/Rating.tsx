@@ -6,7 +6,7 @@ import UserBadge from './UserBadge'
 
 const Rating = ({ rating }) => {
   return (
-    <div className="p-3 rounded-xl border">
+    <div className="p-3 rounded-xl border dark:border-gray-700 dark:bg-gray-800">
       <div className="pointer-events-none -ml-1 flex justify-between items-center">
         <ReactStars
           count={5}
@@ -35,7 +35,9 @@ const Rating = ({ rating }) => {
           </span>
         </div>
         {/* TODO: tanya WPU cara bikin truncate */}
-        <p className="text-gray-600 max-h-[80px]">{rating.comment}</p>
+        <p className="text-gray-600 dark:text-gray-400 max-h-[80px]">
+          {rating.comment}
+        </p>
       </div>
     </div>
   )
