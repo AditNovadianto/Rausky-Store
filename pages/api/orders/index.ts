@@ -1,7 +1,6 @@
 import apiHandler from '../../../lib/apiHandler'
 import midtransClient from 'midtrans-client'
 import { getSession } from 'next-auth/react'
-import { CustomObject } from '../../../types/globals'
 
 const app = apiHandler()
 

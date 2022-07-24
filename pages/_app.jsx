@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect } from 'react'
 import { SessionProvider } from 'next-auth/react'
 import NextNProgress from 'nextjs-progressbar'
 import '../styles/globals.css'
@@ -14,7 +14,6 @@ import request from '../lib/request'
 import { setRequirements, setCart } from '../lib/cartHandler'
 import { Toaster } from 'react-hot-toast'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ThemeProvider, createTheme } from '@mui/material/styles'
 
 createStore(
   {
@@ -50,12 +49,11 @@ export default MyApp
 
 const MyComponent = ({ Component, pageProps }) => {
   const router = useRouter()
-  const { state, actions } = useStateMachine({
+  const { actions } = useStateMachine({
     setRequirements,
     setCart,
     setGlobalTheme: (state, payload) => ({ ...state, globalTheme: payload }),
   })
-  const { globalTheme } = state
 
   useEffect(() => {
     const setMyCart = async () => {
@@ -81,14 +79,8 @@ const MyComponent = ({ Component, pageProps }) => {
     actions.setGlobalTheme(html.classList.contains('dark') ? 'dark' : 'light')
   }, [])
 
-  const theme = useMemo(() => {
-    return createTheme({
-      palette: { mode: globalTheme },
-    })
-  }, [globalTheme])
-
   return (
-    <ThemeProvider theme={theme}>
+    <>
       <NextNProgress color="#90EE90" options={{ showSpinner: false }} />
       {/* TODO: make animation smoother */}
       <AnimatePresence exitBeforeEnter initial={false}>
@@ -113,6 +105,6 @@ const MyComponent = ({ Component, pageProps }) => {
           className: 'dark:bg-gray-700 dark:text-gray-100',
         }}
       />
-    </ThemeProvider>
+    </>
   )
 }
