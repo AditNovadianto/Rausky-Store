@@ -180,7 +180,7 @@ const TopupItems = ({ category, user }) => {
                   id={product.title}
                   className={cn(
                     'px-4 py-3 border rounded-xl hover:border-green-400 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-green-400',
-                    isProductInCart && 'border-green-400'
+                    isProductInCart && 'border-green-400 dark:border-green-400'
                   )}
                 >
                   <div className="flex items-center">

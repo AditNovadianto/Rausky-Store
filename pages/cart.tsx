@@ -260,7 +260,7 @@ const Cart = () => {
                   <button
                     onClick={() => payHandler({ products: cart, user })}
                     disabled={isAnyError || launching}
-                    className="w-full py-4 bg-green-500 hover:bg-green-400 transition-all font-semibold text-white rounded-2xl shadow-xl shadow-green-300 disabled:bg-gray-400/40 disabled:shadow-gray-200 dark:shadow-green-300/20"
+                    className="w-full py-4 bg-green-500 hover:bg-green-400 transition-all font-semibold text-white rounded-2xl shadow-xl shadow-green-300 disabled:bg-gray-400/40 disabled:shadow-gray-200 dark:disabled:shadow-none dark:shadow-green-300/20"
                   >
                     Pay (Rp {order.total.toLocaleString()})
                   </button>

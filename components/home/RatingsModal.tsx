@@ -33,7 +33,7 @@ const RatingsModal = ({ open, onClose, ratings }) => {
 
   return (
     <Modal open={open} onClose={onClose}>
-      <header className="sticky w-full top-0 p-5 text-2xl font-bold bg-inherit dark:bg-gray-800 z-10 shadow-sm">
+      <header className="sticky w-full top-0 p-5 text-2xl font-bold bg-inherit dark:bg-gray-900 dark:border-b dark:border-b-gray-700 z-10 shadow-sm">
         <h2 className="flex justify-between items-center">
           <div>
             Ratings{' '}
@@ -55,9 +55,10 @@ const RatingsModal = ({ open, onClose, ratings }) => {
               onClick={() => setFilter(star)}
               className={cn(
                 buttonClassname,
+                'hover:border-green-300 dark:hover:border-green-300',
                 filter == star
-                  ? 'bg-green-100 border-green-300 dark:bg-transparent'
-                  : 'border-gray-300 dark:border-gray-700'
+                  ? 'bg-green-100 border-green-300 dark:bg-gray-800'
+                  : 'border-gray-300 dark:border-gray-700 dark:bg-gray-800'
               )}
             >
               <StarIconSolid className="text-yellow-500 w-5 h-5 mr-1" />
@@ -70,9 +71,10 @@ const RatingsModal = ({ open, onClose, ratings }) => {
               onClick={() => setFilter(sortTo)}
               className={cn(
                 buttonClassname,
+                'hover:border-green-300 dark:hover:border-green-300',
                 filter == sortTo
-                  ? 'bg-green-100 border-green-300 dark:bg-transparent'
-                  : 'border-gray-300 dark:border-gray-700'
+                  ? 'bg-green-100 border-green-300 dark:bg-gray-800'
+                  : 'border-gray-300 dark:border-gray-700 dark:bg-gray-800'
               )}
             >
               {sortTo}
