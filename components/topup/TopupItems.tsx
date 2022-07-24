@@ -1,5 +1,5 @@
 import { useStateMachine } from 'little-state-machine'
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import cn from 'classnames'
 import {
   CheckIcon,
@@ -17,10 +17,13 @@ import {
 import { signIn } from 'next-auth/react'
 import RequirementField from '../RequirementField'
 import TopupRequirements from './TopupRequirements'
+import { useRouter } from 'next/router'
+import { useUpdateEffect } from 'usehooks-ts'
+import { isObjectEmpty } from '../../lib/utils'
 
 const filterProductsBySubCategory = (subCategory, products) => {
   return subCategory
-    ? products.filter((product) => product.subCategory.slug == subCategory)
+    ? products.filter((product) => product.subCategory?.slug == subCategory)
     : products
 }
 
@@ -36,11 +39,33 @@ const TopupItems = ({ category, user }) => {
   const [currentSubCategory, setCurrentSubCategory] = useState(
     category.subCategories[0]?.slug
   )
+  const router = useRouter()
 
-  const products = filterProductsBySubCategory(
-    currentSubCategory,
-    category.products
-  )
+  // reset state on dynamic route changes
+  useEffect(() => {
+    setCurrentSubCategory(category.subCategories[0]?.slug)
+  }, [router.asPath])
+
+  const products = useMemo(() => {
+    return filterProductsBySubCategory(currentSubCategory, category.products)
+  }, [currentSubCategory, category])
+
+  useEffect(() => {
+    const { subCategory, title } = router.query
+    if (subCategory) {
+      setCurrentSubCategory(subCategory)
+    }
+    if (title) {
+      document.getElementById(title as string)?.scrollIntoView()
+    }
+  }, [router.query])
+
+  useUpdateEffect(() => {
+    const { title } = router.query
+    if (title) {
+      document.getElementById(title as string)?.scrollIntoView()
+    }
+  }, [currentSubCategory, router.query])
 
   return (
     <div className="md:w-[60%] md:mt-0 mt-10 w-full md:ml-5 space-y-8">
@@ -107,7 +132,15 @@ const TopupItems = ({ category, user }) => {
               {category.subCategories.map((subCategory) => (
                 <button
                   key={subCategory.id}
-                  onClick={() => setCurrentSubCategory(subCategory.slug)}
+                  onClick={() => {
+                    setCurrentSubCategory(subCategory.slug)
+                    const { category, ...queries } = router.query
+                    if (!isObjectEmpty(queries)) {
+                      router.replace(router.asPath.split('?')[0], null, {
+                        shallow: true,
+                      })
+                    }
+                  }}
                   className={cn(
                     'w-full flex items-center px-2 py-3 border rounded-xl hover:border-green-400',
                     currentSubCategory == subCategory.slug &&
@@ -143,6 +176,7 @@ const TopupItems = ({ category, user }) => {
                     if (isProductInCart) return
                     actions.addToCart({ product, category })
                   }}
+                  id={product.title}
                   className={cn(
                     'px-4 py-3 border rounded-xl hover:border-green-400',
                     isProductInCart && 'border-green-400'

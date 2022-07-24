@@ -21,7 +21,10 @@ const Modal = forwardRef(
       open && (
         <div className="fixed z-50 inset-0">
           {/* OVERLAY */}
-          <div onClick={onClose} className="fixed inset-0 bg-black/75"></div>
+          <div
+            onClick={onClose}
+            className="fixed inset-0 bg-black/75 backdrop-blur-sm"
+          ></div>
           {/* MODAL BODY */}
           <div
             ref={ref}

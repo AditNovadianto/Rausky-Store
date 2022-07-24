@@ -53,17 +53,33 @@ const createNewProduct = async ({ user, product }) => {
 export default app
   // get all products
   .get(async (req, res) => {
-    const { category, from, to, discount } = req.query as {
+    const { category, from, to, discount, search, include } = req.query as {
       [key: string]: string
     }
 
-    const products = await prisma.product.findMany({
+    let includeQuery = {}
+    if (include) {
+      includeQuery = include.split(',').reduce((obj, prop) => {
+        obj[prop] = true
+        return obj
+      }, {})
+    }
+
+    let products = await prisma.product.findMany({
       where: {
         price: { gte: from && +from, lte: to && +to },
         discount: { gt: discount == 'true' ? 0 : undefined },
         category: { slug: category },
       },
+      include: includeQuery,
     })
+
+    if (search) {
+      products = products.filter((product) =>
+        product.title.toLowerCase().includes(search.toLowerCase())
+      )
+    }
+
     res.status(200).json({ products, length: products.length })
   })
 

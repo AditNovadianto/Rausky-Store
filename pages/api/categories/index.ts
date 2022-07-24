@@ -1,21 +1,23 @@
 import apiHandler, { checkAuth } from '../../../lib/apiHandler'
 import prisma from '../../../lib/prisma'
 
-export const getAllCategories = async (
-  {
-    select,
-    include,
-    productInclude,
-    topupOnly,
-    hasRequirementOnly,
-  }: {
-    select?: string
-    include?: string
-    productInclude?: string
-    topupOnly?: boolean
-    hasRequirementOnly?: boolean
-  } = null
-) => {
+interface GetAllCategoriesProps {
+  select?: string
+  include?: string
+  productInclude?: string
+  topupOnly?: boolean
+  hasRequirementOnly?: boolean
+  search?: string
+}
+
+export const getAllCategories = async ({
+  select,
+  include,
+  productInclude,
+  topupOnly,
+  hasRequirementOnly,
+  search,
+}: GetAllCategoriesProps) => {
   let query: CustomObject = {
     where: {},
   }
@@ -51,8 +53,14 @@ export const getAllCategories = async (
     query.where.requirement = { isNot: null }
   }
 
-  //   @ts-ignore
+  // @ts-ignore
   let categories = await prisma.category.findMany(query)
+
+  if (search) {
+    categories = categories.filter((category) =>
+      category.name.toLowerCase().includes(search.toLowerCase())
+    )
+  }
 
   return categories
 }
@@ -62,7 +70,7 @@ const app = apiHandler()
 export default app
   // get all categories
   .get(async (req, res) => {
-    const { select, topupOnly, hasRequirementOnly } = req.query as {
+    const { select, topupOnly, hasRequirementOnly, search } = req.query as {
       [key: string]: string
     }
 
@@ -70,6 +78,7 @@ export default app
       select,
       topupOnly: topupOnly == 'true' ? true : false,
       hasRequirementOnly: hasRequirementOnly == 'true' ? true : false,
+      search,
     })
     res.status(200).json({ categories, length: categories.length })
   })

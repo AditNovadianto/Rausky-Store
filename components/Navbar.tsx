@@ -17,6 +17,7 @@ import {
   MenuIcon,
   SunIcon,
   UserIcon,
+  XIcon,
 } from '@heroicons/react/outline'
 import Dropdown, { DropdownItem } from './Dropdown'
 import { InformationCircleIcon, MoonIcon } from '@heroicons/react/outline'
@@ -25,6 +26,9 @@ import cn from 'classnames'
 import { StarIcon } from '@heroicons/react/solid'
 import UserBadge from './UserBadge'
 import { User } from '../types/next-auth'
+import { useDebounce, useUpdateEffect } from 'usehooks-ts'
+import request from '../lib/request'
+import Modal from './Modal'
 
 // TODO: simpen theme di global state
 const currentTheme = 'light'
@@ -47,19 +51,68 @@ const themes = [
 ]
 
 const Navbar = () => {
-  const [search, setSearch] = useState(false)
   const { data: session, status } = useSession()
-  const { state } = useStateMachine()
-  const { cart } = state
   const router = useRouter()
   const onMobile = useMediaQuery('(max-width: 640px)')
 
-  const showSearch = () => {
-    setSearch(!search)
-  }
-
+  const { state } = useStateMachine()
+  const { cart } = state
   const user = session?.user as User
   const totalItemsInCart = cart.length
+
+  const [search, setSearch] = useState(false)
+  const [categorySearchResults, setCategorySearchResults] = useState([])
+  const [productsSearchResults, setProductsSearchResults] = useState([])
+  const [searchInput, setSearchInput] = useState('')
+  const debouncedSearchInput = useDebounce(searchInput, 500)
+  const [isSearchNotFound, setIsSearchNotFound] = useState(false)
+
+  const showSearchResults =
+    categorySearchResults.length > 0 || productsSearchResults.length > 0
+
+  // SEARCH HANDLER
+  useUpdateEffect(() => {
+    setSearchInput('')
+  }, [search])
+
+  useUpdateEffect(() => {
+    if (!searchInput) {
+      setIsSearchNotFound(false)
+      setCategorySearchResults([])
+      setProductsSearchResults([])
+    }
+  }, [searchInput])
+
+  useUpdateEffect(() => {
+    if (!searchInput) return
+
+    const searchHandler = async () => {
+      // search products
+      const [productsResponse, categoriesResponse] = await Promise.all([
+        await request.get(
+          `/products?search=${searchInput}&include=category,subCategory`
+        ),
+        await request.get(`/categories?search=${searchInput}`),
+      ])
+
+      const productsResults = productsResponse.data.products
+      const categoriesResults = categoriesResponse.data.categories
+
+      if (productsResults.length === 0 && categoriesResults.length === 0) {
+        setIsSearchNotFound(true)
+      }
+
+      setProductsSearchResults(productsResponse.data.products)
+      setCategorySearchResults(categoriesResponse.data.categories)
+    }
+
+    searchHandler()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearchInput])
+
+  const toggleSearch = () => {
+    setSearch(!search)
+  }
 
   const homeItem: DropdownItem = {
     icon: HomeIcon,
@@ -206,32 +259,17 @@ const Navbar = () => {
           )}
 
           <div className="items-center hidden md:flex">
-            <button className="hidden ml-10 flex-shrink-0" onClick={showSearch}>
+            <button
+              className="hidden ml-10 flex-shrink-0"
+              onClick={toggleSearch}
+            >
               <img src="/images/Union.svg" alt="Union" />
             </button>
-
-            <form className="md:block hidden px-5 w-full">
-              <label className="relative block w-full">
-                <span className="sr-only">Search</span>
-                <span className="absolute inset-y-0 left-0 flex items-center pl-2">
-                  <img src="/images/Union.svg" alt="" />
-                </span>
-                <input
-                  className="placeholder:italic placeholder:text-slate-400 block bg-transparent w-full rounded-md py-2 pl-12 pr-3 focus:outline-none focus:ring-2 focus:ring-opacity-50 focus:ring-green-400"
-                  placeholder="Search for anything..."
-                  type="text"
-                  name="search"
-                />
-              </label>
-            </form>
           </div>
 
-          {/* SEARCH BUTTON (MOBILE) */}
+          {/* SEARCH BUTTON */}
           <div className="flex items-center">
-            <button
-              className="flex-shrink-0 p-2 md:hidden"
-              onClick={showSearch}
-            >
+            <button className="flex-shrink-0 p-2" onClick={toggleSearch}>
               <img src="/images/Union.svg" alt="Union" />
             </button>
 
@@ -295,27 +333,106 @@ const Navbar = () => {
             </div>
           </div>
         </Wrapper>
-
-        {search && (
-          <form className="md:hidden flex items-center pb-5 justify-center w-full">
-            <Wrapper>
-              <label className="relative block w-full">
-                <span className="sr-only">Search</span>
-                <span className="absolute inset-y-0 left-0 flex items-center pl-2">
-                  <img src="/images/Union.svg" alt="" />
-                </span>
-                <input
-                  autoFocus
-                  className="placeholder:italic placeholder:text-slate-400 block bg-white w-full rounded-md py-2 pl-12 pr-3 focus:outline-none focus:ring-2 focus:ring-opacity-50 focus:ring-green-400"
-                  placeholder="Search for anything..."
-                  type="text"
-                  name="search"
-                />
-              </label>
-            </Wrapper>
-          </form>
-        )}
       </nav>
+
+      {/* TODO: make search modal */}
+
+      {/* SEARCH MODAL */}
+      <Modal open={search} onClose={toggleSearch}>
+        <header className="sticky w-full top-0 flex items-center px-5 shadow-sm bg-white">
+          <img src="/images/Union.svg" alt="Union" className="w-4 h-4" />
+          <input
+            autoFocus
+            className="focus:outline-none py-3 px-4 w-full"
+            placeholder="Search for anything..."
+            type="text"
+            autoComplete="off"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+          />
+          <button className="mt-1 hover:text-green-500" onClick={toggleSearch}>
+            <XIcon className="w-5 h-5" />
+          </button>
+        </header>
+        {/* SHOW SEARCH RESULTS */}
+
+        {showSearchResults ? (
+          <div className="p-5 pt-0 mt-4">
+            {/* PRODUCTS RESULTS */}
+            {productsSearchResults.length > 0 && (
+              <div>
+                <h3 className="text-xs font-medium bg-white text-gray-500 py-1">
+                  PRODUCTS ({productsSearchResults.length})
+                </h3>
+                <div onClick={toggleSearch}>
+                  {productsSearchResults.map((product) => (
+                    <Link
+                      href={`/topup/${
+                        product.category.slug
+                      }?title=${encodeURIComponent(product.title)}${
+                        product.subCategory
+                          ? `&subCategory=${encodeURIComponent(
+                              product.subCategory.slug
+                            )}`
+                          : ''
+                      }`}
+                      key={product.id}
+                      className="w-full flex items-center p-2 rounded-lg hover:bg-gray-100"
+                    >
+                      <img
+                        className="w-5 h-5 object-cover mr-1"
+                        src={product.img}
+                        alt={product.title}
+                      />
+                      <span className="truncate font-medium">
+                        {product.title}
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+            {/* CATEGORY RESULTS */}
+            {categorySearchResults.length > 0 && (
+              <div>
+                <h3 className="text-xs font-medium sticky top-0 bg-white text-gray-500 py-1">
+                  CATEGORIES ({categorySearchResults.length})
+                </h3>
+                <div onClick={toggleSearch}>
+                  {categorySearchResults.map((category) => (
+                    <Link
+                      href={`/topup/${category.slug}`}
+                      key={category.id}
+                      className="w-full flex items-center p-2 rounded-lg hover:bg-gray-100"
+                    >
+                      {category.logoImg ? (
+                        <img
+                          className="w-5 h-5 object-cover mr-1"
+                          src={category.logoImg}
+                          alt={category.name}
+                        />
+                      ) : (
+                        <div className="w-5 h-5 rounded-full bg-gray-700 mr-1"></div>
+                      )}
+                      <span className="truncate font-medium">
+                        {category.name}
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="p-5 text-center">
+            <h3 className="my-4 text-gray-500">
+              {isSearchNotFound
+                ? `${searchInput} not found`
+                : 'Search results empty'}
+            </h3>
+          </div>
+        )}
+      </Modal>
     </>
   )
 }
