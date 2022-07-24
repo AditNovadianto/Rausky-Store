@@ -1,6 +1,7 @@
 import apiHandler from '../../../lib/apiHandler'
 import midtransClient from 'midtrans-client'
 import { getSession } from 'next-auth/react'
+import prisma from '../../../lib/prisma'
 
 const app = apiHandler()
 
