@@ -14,6 +14,7 @@ import request from '../lib/request'
 import { setRequirements, setCart } from '../lib/cartHandler'
 import { Toaster } from 'react-hot-toast'
 import { AnimatePresence, motion } from 'framer-motion'
+import { SkeletonTheme } from 'react-loading-skeleton'
 
 createStore(
   {
@@ -38,7 +39,9 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }) {
   return (
     <SessionProvider session={session}>
       <StateMachineProvider>
-        <MyComponent Component={Component} pageProps={pageProps} />
+        <SkeletonTheme>
+          <MyComponent Component={Component} pageProps={pageProps} />
+        </SkeletonTheme>
       </StateMachineProvider>
     </SessionProvider>
   )
@@ -67,7 +70,6 @@ const MyComponent = ({ Component, pageProps }) => {
       } catch (err) {}
     }
 
-    // TODO: simpen loading di global state
     const getUserData = async () => {
       await setMyRequirements()
       await setMyCart()
@@ -96,7 +98,11 @@ const MyComponent = ({ Component, pageProps }) => {
       {!['/cart', '/signin', '/order'].includes(router.route) && (
         <ContinuePayBtn />
       )}
-      <Toaster />
+      <Toaster
+        toastOptions={{
+          className: 'dark:bg-gray-700 dark:text-gray-100',
+        }}
+      />
     </>
   )
 }
