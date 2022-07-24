@@ -15,7 +15,8 @@ import { setRequirements, setCart } from '../lib/cartHandler'
 import { Toaster } from 'react-hot-toast'
 import { AnimatePresence, motion } from 'framer-motion'
 import { SkeletonTheme } from 'react-loading-skeleton'
-import { createTheme, ThemeProvider } from '@mui/material'
+import { ThemeProvider } from '@mui/material'
+import { createTheme } from '@mui/material/styles'
 import { useMemo } from 'react'
 
 createStore(

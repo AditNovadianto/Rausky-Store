@@ -1,6 +1,7 @@
 import { useMediaQuery } from '@mui/material'
 import { GetServerSideProps } from 'next'
 import { getSession } from 'next-auth/react'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 import Container from '../components/Container'
@@ -34,6 +35,7 @@ const Profile = ({ user }: Props) => {
   const onSmallScreen = useMediaQuery('(max-width: 420px)')
 
   const [displayName, setDisplayName] = useState(user.displayName ?? '')
+  const router = useRouter()
 
   const beFakeAdminHandler = async () => {
     let toastId: string
@@ -41,7 +43,7 @@ const Profile = ({ user }: Props) => {
       toastId = toast.loading('Processing...')
       await request.put(`/users/fakeAdmin`)
       toast.success("Congrats. Now you're a fake admin 🎉", { id: toastId })
-      location.reload()
+      window.location.href = '/'
     } catch (err) {
       console.log(err)
       toast.error('Failed. Check console for details', { id: toastId })
@@ -54,7 +56,7 @@ const Profile = ({ user }: Props) => {
       toastId = toast.loading('Processing...')
       await request.put(`/users/fakeAdmin`)
       toast.success("Success, Now you're a normal user", { id: toastId })
-      location.reload()
+      window.location.href = '/'
     } catch (err) {
       console.log(err)
       toast.error('Failed. Check console for details', { id: toastId })

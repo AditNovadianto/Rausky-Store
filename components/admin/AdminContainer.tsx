@@ -72,7 +72,7 @@ const AdminContainer = ({ children, user }) => {
         <div className="flex items-center">
           <img
             className="w-20 -ml-5"
-            src="/images/rausky-logo.png"
+            src="/images/logo/rausky-logo.png"
             alt="rausky logo"
           />
           <div>
