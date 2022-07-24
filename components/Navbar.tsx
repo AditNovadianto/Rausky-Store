@@ -1,6 +1,6 @@
 import Link from './Link'
 import Wrapper from './Wrapper'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { signIn, signOut, useSession } from 'next-auth/react'
 import Skeleton from 'react-loading-skeleton'
 import { useStateMachine } from 'little-state-machine'
@@ -26,13 +26,13 @@ import cn from 'classnames'
 import { StarIcon } from '@heroicons/react/solid'
 import UserBadge from './UserBadge'
 import { User } from '../types/next-auth'
-import { useDebounce, useUpdateEffect } from 'usehooks-ts'
+import { useDebounce, useLocalStorage, useUpdateEffect } from 'usehooks-ts'
 import request from '../lib/request'
 import Modal from './Modal'
 
-// TODO: simpen theme di global state
-const currentTheme = 'light'
-const themes = [
+type Theme = 'device' | 'light' | 'dark'
+
+const themes: { name: Theme; Icon: any; label: string }[] = [
   {
     name: 'device',
     Icon: DesktopComputerIcon,
@@ -52,6 +52,23 @@ const themes = [
 
 const Navbar = () => {
   const { data: session, status } = useSession()
+
+  const [currentTheme, setCurrentTheme] = useLocalStorage<Theme>(
+    'currentTheme',
+    'device'
+  )
+  useEffect(() => {
+    if (
+      currentTheme === 'dark' ||
+      (currentTheme === 'device' &&
+        window.matchMedia('(prefers-color-scheme: dark)').matches)
+    ) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  }, [currentTheme])
+
   const router = useRouter()
   const onMobile = useMediaQuery('(max-width: 640px)')
 
@@ -130,24 +147,19 @@ const Navbar = () => {
     {
       icon: themes.find((theme) => theme.name == currentTheme).Icon,
       label: 'Theme',
-      customMore: (
-        <div className="flex flex-col">
-          {themes.map((theme) => (
-            <button
-              key={theme.name}
-              className={cn(
-                'p-2 text-left w-full flex items-center hover:bg-gray-100 rounded-lg',
-                theme.name == currentTheme
-                  ? 'font-semibold text-green-500'
-                  : 'font-normal text-gray-600'
-              )}
-            >
-              <theme.Icon className="w-5 h-5 mr-2" />
-              {theme.label}
-            </button>
-          ))}
-        </div>
-      ),
+      more: themes.map((theme) => ({
+        icon: theme.Icon,
+        label: theme.label,
+        className: cn(
+          'p-2 text-left w-full flex items-center hover:bg-gray-100 rounded-lg',
+          currentTheme === theme.name
+            ? 'font-semibold text-green-500'
+            : 'font-normal text-gray-600'
+        ),
+        onClick: () => {
+          setCurrentTheme(theme.name)
+        },
+      })),
     },
     {
       icon: 'https://cdn-icons-png.flaticon.com/512/25/25231.png',

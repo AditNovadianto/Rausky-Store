@@ -11,7 +11,6 @@ export interface DropdownItem {
   className?: string
   label: string
   more?: DropdownItem[]
-  customMore?: any
   onClick?: () => void
   disabled?: boolean
 }
@@ -131,11 +130,6 @@ const Dropdown = ({
                     'disabled:hover:bg-transparent disabled:opacity-30 disabled:text-current'
                   )}
                   onClick={() => {
-                    if (item.customMore) {
-                      setInMore(item)
-                      setDropdownItems([])
-                      return
-                    }
                     if (item.more) {
                       setInMore(item)
                       setDropdownItems(item.more)
@@ -160,9 +154,7 @@ const Dropdown = ({
                     {item.disabled ? (
                       <LockClosedIcon className="w-5 h-5" />
                     ) : (
-                      (item.more || item.customMore) && (
-                        <ChevronRightIcon className="w-5 h-5" />
-                      )
+                      item.more && <ChevronRightIcon className="w-5 h-5" />
                     )}
                   </div>
                 </button>
