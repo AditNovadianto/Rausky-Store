@@ -248,7 +248,7 @@ const Navbar = () => {
         </Wrapper>
       </div>
 
-      <nav className="print:hidden sticky top-0 z-50 bg-white dark:bg-gray-900 dark:border-b dark:border-b-gray-800 shadow-sm">
+      <nav className="print:hidden sticky top-0 z-50 bg-white dark:bg-gray-900/10 dark:backdrop-blur dark:border-b dark:border-b-gray-800 shadow-sm">
         <Wrapper className="flex items-center w-full justify-between py-2.5 lg:py-2">
           {router.route == '/' ? (
             <Link
