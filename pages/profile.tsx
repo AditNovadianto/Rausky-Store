@@ -43,7 +43,8 @@ const Profile = ({ user }: Props) => {
       toastId = toast.loading('Processing...')
       await request.put(`/users/fakeAdmin`)
       toast.success("Congrats. Now you're a fake admin 🎉", { id: toastId })
-      window.location.href = '/'
+      router.push(router.asPath, undefined, { shallow: false })
+      setShowFakeAdminModal(false)
     } catch (err) {
       console.log(err)
       toast.error('Failed. Check console for details', { id: toastId })
@@ -56,7 +57,7 @@ const Profile = ({ user }: Props) => {
       toastId = toast.loading('Processing...')
       await request.put(`/users/fakeAdmin`)
       toast.success("Success, Now you're a normal user", { id: toastId })
-      window.location.href = '/'
+      router.push(router.asPath, undefined, { shallow: false })
     } catch (err) {
       console.log(err)
       toast.error('Failed. Check console for details', { id: toastId })
@@ -69,7 +70,7 @@ const Profile = ({ user }: Props) => {
       toastId = toast.loading('Saving...')
       await request.put('/users/displayName', { displayName })
       toast.success('Saved', { id: toastId })
-      location.reload()
+      router.push(router.asPath, undefined, { shallow: false })
     } catch (err) {
       toast.error('Failed. Check console for details', { id: toastId })
       console.log(err)

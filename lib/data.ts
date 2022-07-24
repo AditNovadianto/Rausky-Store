@@ -3,13 +3,13 @@ export const socialMedia = [
   {
     id: 'ig',
     name: 'Instagram',
-    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Instagram-Icon.png/1025px-Instagram-Icon.png',
+    img: '/images/icon/instagram.png',
     href: 'https://www.instagram.com/rausky.gamestore/',
   },
   {
     id: 'line',
     name: 'LINE',
-    img: 'http://assets.stickpng.com/images/580b57fcd9996e24bc43c523.png',
+    img: '/images/icon/line.png',
     href: 'https://line.me/R/ti/p/%40983nqcnr',
   },
 ]

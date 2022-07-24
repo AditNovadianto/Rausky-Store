@@ -1,4 +1,6 @@
-import { styled, Tab, Tabs } from '@mui/material'
+import { styled } from '@mui/material/styles'
+import Tab from '@mui/material/Tab'
+import Tabs from '@mui/material/Tabs'
 
 export const CustomTabs = styled(Tabs)({
   '& .MuiTabs-indicator': {

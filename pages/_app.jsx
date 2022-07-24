@@ -1,3 +1,4 @@
+import { useEffect, useMemo } from 'react'
 import { SessionProvider } from 'next-auth/react'
 import NextNProgress from 'nextjs-progressbar'
 import '../styles/globals.css'
@@ -9,15 +10,11 @@ import {
 import ContinuePayBtn from '../components/ContinuePayBtn'
 import 'react-loading-skeleton/dist/skeleton.css'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
 import request from '../lib/request'
 import { setRequirements, setCart } from '../lib/cartHandler'
 import { Toaster } from 'react-hot-toast'
 import { AnimatePresence, motion } from 'framer-motion'
-import { SkeletonTheme } from 'react-loading-skeleton'
-import { ThemeProvider } from '@mui/material'
-import { createTheme } from '@mui/material/styles'
-import { useMemo } from 'react'
+import { ThemeProvider, createTheme } from '@mui/material/styles'
 
 createStore(
   {
@@ -91,7 +88,7 @@ const MyComponent = ({ Component, pageProps }) => {
   }, [globalTheme])
 
   return (
-    <>
+    <ThemeProvider theme={theme}>
       <NextNProgress color="#90EE90" options={{ showSpinner: false }} />
       {/* TODO: make animation smoother */}
       <AnimatePresence exitBeforeEnter initial={false}>
@@ -103,9 +100,7 @@ const MyComponent = ({ Component, pageProps }) => {
             exit={{ y: 50, opacity: 0 }}
             id="page-transition-container"
           >
-            <ThemeProvider theme={theme}>
-              <Component {...pageProps} />
-            </ThemeProvider>
+            <Component {...pageProps} />
           </motion.div>
         </div>
       </AnimatePresence>
@@ -118,6 +113,6 @@ const MyComponent = ({ Component, pageProps }) => {
           className: 'dark:bg-gray-700 dark:text-gray-100',
         }}
       />
-    </>
+    </ThemeProvider>
   )
 }
