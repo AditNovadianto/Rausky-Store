@@ -14,7 +14,7 @@ const Rating = ({ rating }) => {
           filledIcon={<StarIconSolid className="w-5 h-5 text-yellow-500" />}
           value={rating.star}
         />
-        <span className="text-gray-600 text-xs">
+        <span className="text-gray-600 dark:text-gray-500 text-xs">
           {new Date(rating.createdAt).toLocaleDateString()}
         </span>
       </div>
@@ -26,7 +26,7 @@ const Rating = ({ rating }) => {
               src={rating.order.user?.image || defaultAvatar}
               alt={rating.order.user?.name || 'Guest'}
             />
-            <b className="text-sm">
+            <b className="text-sm truncate">
               {rating.order.user?.displayName ||
                 rating.order.user?.name ||
                 'Guest'}
@@ -34,8 +34,20 @@ const Rating = ({ rating }) => {
             {rating.order.user && <UserBadge role={rating.order.user.role} />}
           </span>
         </div>
-        {/* TODO: tanya WPU cara bikin truncate */}
-        <p className="text-gray-600 dark:text-gray-400 max-h-[80px]">
+
+        <div className="text-xs flex justify-between">
+          <p className="text-green-500 truncate">
+            {rating.order.products[0].product.title}
+          </p>
+          {rating.order.products.length > 1 && (
+            <p className="text-gray-600 dark:text-gray-500">
+              + {rating.order.products.length - 1} other
+            </p>
+          )}
+        </div>
+
+        {/* TODO: cari tau cara bikin truncate */}
+        <p className="mt-2 text-gray-600 dark:text-gray-400 max-h-[80px]">
           {rating.comment}
         </p>
       </div>

@@ -21,7 +21,7 @@ const Home = ({ categories }) => {
   const [ratings, setRatings] = useState(null)
   const [showAllRatings, setShowAllRatings] = useState(false)
 
-  console.log(ratings)
+  console.log({ ratings })
 
   useEffect(() => {
     const fetchAppRatings = async () => {

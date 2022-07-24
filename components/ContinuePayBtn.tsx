@@ -32,7 +32,7 @@ const ContinuePayBtn = () => {
             <Wrapper className="max-w-md">
               <Link
                 href="/cart"
-                className="block w-full -mt-4 py-4 text-center bg-green-500 hover:bg-green-400 transition-all font-semibold text-white rounded-2xl shadow-xl shadow-green-300/50 dark:shadow-green-300/10"
+                className="block w-full -mt-4 py-4 text-center bg-green-500 hover:bg-green-400 transition-all font-semibold text-white rounded-2xl shadow-xl shadow-green-300/50 dark:shadow-green-300/10 pointer-events-auto"
               >
                 Continue to payment (Rp {order.subtotal.toLocaleString()})
               </Link>

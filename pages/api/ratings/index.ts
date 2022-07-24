@@ -13,7 +13,19 @@ export const getRatings = async () => {
     orderBy: { updatedAt: 'desc' },
     include: {
       order: {
-        select: { user: true },
+        select: {
+          user: true,
+          products: {
+            select: {
+              amount: true,
+              product: {
+                select: {
+                  title: true,
+                },
+              },
+            },
+          },
+        },
       },
     },
   })

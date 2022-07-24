@@ -103,18 +103,9 @@ const MyComponent = ({ Component, pageProps }) => {
             exit={{ y: 50, opacity: 0 }}
             id="page-transition-container"
           >
-            <SkeletonTheme
-              baseColor={
-                globalTheme === 'dark' ? 'rgb(31 41 55)' : 'rgb(229 231 235)'
-              }
-              highlightColor={
-                globalTheme === 'dark' ? 'rgb(55 65 81)' : 'rgb(243 244 246)'
-              }
-            >
-              <ThemeProvider theme={theme}>
-                <Component {...pageProps} />
-              </ThemeProvider>
-            </SkeletonTheme>
+            <ThemeProvider theme={theme}>
+              <Component {...pageProps} />
+            </ThemeProvider>
           </motion.div>
         </div>
       </AnimatePresence>

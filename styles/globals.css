@@ -28,6 +28,16 @@
   @apply !text-green-500;
 }
 
+.react-loading-skeleton {
+  --base-color: rgb(229 231 235);
+  --highlight-color: rgb(243 244 246);
+}
+
+html.dark .react-loading-skeleton {
+  --base-color: rgb(31 41 55);
+  --highlight-color: rgb(55 65 81);
+}
+
 @layer base {
   html {
     -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
