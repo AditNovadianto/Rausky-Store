@@ -64,7 +64,7 @@ const Home = ({ categories }) => {
           <section className="space-y-4">
             <Link
               className="relative block overflow-hidden rounded-2xl"
-              href="/"
+              href="/blog/discount"
             >
               <img
                 src="https://images.unsplash.com/photo-1639656333400-ee5240f757a0?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80"

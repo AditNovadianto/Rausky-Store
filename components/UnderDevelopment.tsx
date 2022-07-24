@@ -7,7 +7,7 @@ const UnderDevelopment = () => {
   return (
     <Container title={router.asPath}>
       <Wrapper>
-        <div className="flex space-x-8 mt-20">
+        <div className="flex flex-col space-y-8 md:flex-row md:space-y-0 space-x-8 mt-20">
           <img
             src="/images/illustration/under-development.svg"
             alt="under development"
