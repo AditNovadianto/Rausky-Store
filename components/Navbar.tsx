@@ -21,7 +21,7 @@ import {
 } from '@heroicons/react/outline'
 import Dropdown, { DropdownItem } from './Dropdown'
 import { InformationCircleIcon, MoonIcon } from '@heroicons/react/outline'
-import { useMediaQuery } from '@mui/material'
+import { CircularProgress, useMediaQuery } from '@mui/material'
 import cn from 'classnames'
 import { StarIcon } from '@heroicons/react/solid'
 import UserBadge from './UserBadge'
@@ -65,6 +65,7 @@ const Navbar = () => {
   const [productsSearchResults, setProductsSearchResults] = useState([])
   const [searchInput, setSearchInput] = useState('')
   const debouncedSearchInput = useDebounce(searchInput, 500)
+  const [isSearching, setIsSearching] = useState(false)
   const [isSearchNotFound, setIsSearchNotFound] = useState(false)
 
   const showSearchResults =
@@ -76,7 +77,9 @@ const Navbar = () => {
   }, [search])
 
   useUpdateEffect(() => {
+    setIsSearching(true)
     if (!searchInput) {
+      setIsSearching(false)
       setIsSearchNotFound(false)
       setCategorySearchResults([])
       setProductsSearchResults([])
@@ -94,6 +97,8 @@ const Navbar = () => {
         ),
         await request.get(`/categories?search=${searchInput}`),
       ])
+
+      setIsSearching(false)
 
       const productsResults = productsResponse.data.products
       const categoriesResults = categoriesResponse.data.categories
@@ -335,8 +340,6 @@ const Navbar = () => {
         </Wrapper>
       </nav>
 
-      {/* TODO: make search modal */}
-
       {/* SEARCH MODAL */}
       <Modal open={search} onClose={toggleSearch}>
         <header className="sticky w-full top-0 flex items-center px-5 shadow-sm bg-white">
@@ -350,8 +353,22 @@ const Navbar = () => {
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
           />
-          <button className="mt-1 hover:text-green-500" onClick={toggleSearch}>
-            <XIcon className="w-5 h-5" />
+          <button
+            className={cn(
+              'mt-1 hover:text-green-500',
+              isSearching && 'pointer-events-none'
+            )}
+            onClick={toggleSearch}
+          >
+            {isSearching ? (
+              <CircularProgress
+                className="text-green-500"
+                size={20}
+                color="inherit"
+              />
+            ) : (
+              <XIcon className="w-5 h-5" />
+            )}
           </button>
         </header>
         {/* SHOW SEARCH RESULTS */}
