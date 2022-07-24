@@ -92,7 +92,7 @@ const Cart = () => {
           </div>
 
           {/* ORDER INFO */}
-          <div className="lg:flex-grow mt-8 lg:mt-0 lg:max-w-sm lg:sticky lg:top-[80px] lg:self-start border dark:border-gray-700 rounded-2xl divide-y dark:divide-gray-700">
+          <div className="lg:flex-grow mt-8 lg:mt-0 lg:max-w-sm lg:sticky lg:top-[80px] lg:self-start border dark:border-gray-700 rounded-2xl dark:bg-gray-800 divide-y dark:divide-gray-700">
             <h2 className="text-2xl font-bold p-6 flex items-center justify-between">
               Order Info
               {updatingDB && (
