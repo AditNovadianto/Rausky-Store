@@ -331,10 +331,10 @@ const Navbar = () => {
                       {/* NO USER DROPDOWN */}
                       <Dropdown
                         items={menuItems}
-                        className="flex items-center p-2 rounded-md hover:bg-gray-100 md:mr-2"
+                        className="flex items-center p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 md:mr-2"
                         minWidth={280}
                       >
-                        <DotsVerticalIcon className="w-5 text-gray-500" />
+                        <DotsVerticalIcon className="w-5 text-gray-500 dark:text-gray-300" />
                       </Dropdown>
                       <button
                         onClick={() => signIn()}

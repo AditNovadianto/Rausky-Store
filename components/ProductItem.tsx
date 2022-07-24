@@ -45,7 +45,7 @@ const ProductItem = ({ item, actions, size = 'normal' }: Props) => {
         </h3>
         <p
           className={cn(
-            'text-gray-500 font-semibold',
+            'text-gray-500 dark:text-gray-300 font-semibold',
             size == 'small' ? 'text-sm' : ''
           )}
         >
@@ -56,10 +56,10 @@ const ProductItem = ({ item, actions, size = 'normal' }: Props) => {
       {actions ? (
         <div className="flex justify-between lg:justify-start items-center mt-4">
           {/* SET QUANTITY */}
-          <div className="flex items-center text-gray-500">
+          <div className="flex items-center text-gray-500 dark:text-gray-300">
             <button
               onClick={() => actions.decrementAmount({ product: item })}
-              className="w-8 h-8 rounded-xl font-medium border hover:bg-gray-800 hover:text-gray-100"
+              className="w-8 h-8 rounded-xl font-medium border dark:border-gray-500 dark:hover:bg-gray-600 hover:bg-gray-800 hover:text-gray-100"
             >
               {' '}
               -{' '}
@@ -67,7 +67,7 @@ const ProductItem = ({ item, actions, size = 'normal' }: Props) => {
             <div className="px-5">{item.amount}</div>
             <button
               onClick={() => actions.addToCart({ product: item })}
-              className="w-8 h-8 rounded-xl font-medium border hover:bg-gray-800 hover:text-gray-100"
+              className="w-8 h-8 rounded-xl font-medium border dark:border-gray-500 dark:hover:bg-gray-600 hover:bg-gray-800 hover:text-gray-100"
             >
               {' '}
               +{' '}
@@ -77,7 +77,7 @@ const ProductItem = ({ item, actions, size = 'normal' }: Props) => {
           {/* DELETE */}
           <button
             onClick={() => actions.removeFromCart(item)}
-            className="p-1.5 bg-gray-200 hover:bg-red-500 text-gray-500 hover:text-gray-100 rounded-xl lg:ml-5"
+            className="p-1.5 bg-gray-200 dark:bg-gray-600 dark:hover:bg-red-500 hover:bg-red-500 text-gray-500 hover:text-gray-100 dark:text-gray-300 dark:hover:text-gray-50 rounded-xl ml-5"
           >
             <TrashIcon className="w-5 h-5 text-current" />
           </button>

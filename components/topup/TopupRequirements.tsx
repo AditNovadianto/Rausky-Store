@@ -15,8 +15,8 @@ const TopupRequirements = ({
   }
 
   return category?.requirement.img || category?.requirement.description ? (
-    <details className="mt-4" open={isOpen}>
-      <summary className="cursor-pointer text-gray-500">Details</summary>
+    <details className="mt-4 text-gray-500" open={isOpen}>
+      <summary className="cursor-pointer">Details</summary>
       <div className="mt-4">
         {category.requirement.img && (
           <div
@@ -35,9 +35,7 @@ const TopupRequirements = ({
         )}
 
         {category?.requirement.description && (
-          <p className="mt-3 pb-2 text-gray-500">
-            {category.requirement.description}
-          </p>
+          <p className="mt-3 pb-2">{category.requirement.description}</p>
         )}
       </div>
     </details>

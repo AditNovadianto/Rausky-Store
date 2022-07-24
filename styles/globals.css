@@ -16,6 +16,10 @@
   border-radius: 100vw;
 }
 
+.text-gray-500 {
+  @apply dark:text-gray-400;
+}
+
 @layer base {
   html {
     -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
@@ -29,7 +33,7 @@
 
 @layer components {
   .input {
-    @apply block w-full px-5 py-3 rounded-xl border focus:outline-none focus:border-green-400;
+    @apply block w-full px-5 py-3 rounded-xl border border-gray-300 focus:outline-none focus:border-green-400 bg-inherit dark:bg-gray-700 dark:border-gray-600 dark:focus:border-green-400;
   }
 
   .select {

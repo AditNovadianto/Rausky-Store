@@ -71,8 +71,8 @@ const TopupItems = ({ category, user }) => {
     <div className="md:w-[60%] md:mt-0 mt-10 w-full md:ml-5 space-y-8">
       {/* REQUIREMENT */}
       {category.requirement && (
-        <div className="border rounded-2xl px-5 pb-5 w-full">
-          <div className="w-[40px] h-[40px] text-center -mt-5 leading-[32px] border-4 border-green-100 rounded-full bg-green-500 text-white font-bold">
+        <div className="border dark:border-gray-700 dark:bg-gray-800 rounded-2xl px-5 pb-5 w-full">
+          <div className="w-[40px] h-[40px] text-center -mt-5 leading-[32px] border-4 border-green-100 dark:border-green-600 rounded-full bg-green-500 text-white font-bold">
             1
           </div>
           <h1 className="text-2xl font-bold mt-2 flex justify-between">
@@ -89,7 +89,7 @@ const TopupItems = ({ category, user }) => {
             )}
           </h1>
           {!user && (
-            <p className="text-gray-500 text-sm flex items-center">
+            <p className="text-gray-500 dark:text-gray-400 text-sm flex items-center">
               <InformationCircleIcon className="w-4 h-4 mr-1" />
               <span>
                 <button
@@ -118,8 +118,8 @@ const TopupItems = ({ category, user }) => {
       )}
 
       {/* CHOOSE */}
-      <div className="border rounded-2xl px-5 pb-5 w-full">
-        <div className="w-[40px] h-[40px] text-center -mt-5 leading-[32px] border-4 border-green-100 rounded-full bg-green-500 text-white font-bold">
+      <div className="border dark:border-gray-700 dark:bg-gray-800 rounded-2xl px-5 pb-5 w-full">
+        <div className="w-[40px] h-[40px] text-center -mt-5 leading-[32px] border-4 border-green-100 rounded-full bg-green-500 dark:border-green-600 text-white font-bold">
           {category.requirement ? 2 : 1}
         </div>
         <h1 className="text-2xl font-bold mt-2">Pilih Nominal Topup</h1>
@@ -142,9 +142,10 @@ const TopupItems = ({ category, user }) => {
                     }
                   }}
                   className={cn(
-                    'w-full flex items-center px-2 py-3 border rounded-xl hover:border-green-400',
-                    currentSubCategory == subCategory.slug &&
-                      'border-green-400 bg-green-100'
+                    'w-full flex items-center px-2 py-3 border rounded-xl',
+                    currentSubCategory == subCategory.slug
+                      ? 'border-green-400 bg-green-100 dark:bg-gray-700'
+                      : 'border-gray-300 dark:border-gray-600 hover:border-green-400 dark:bg-gray-700 dark:hover:border-green-400'
                   )}
                 >
                   <img
@@ -178,7 +179,7 @@ const TopupItems = ({ category, user }) => {
                   }}
                   id={product.title}
                   className={cn(
-                    'px-4 py-3 border rounded-xl hover:border-green-400',
+                    'px-4 py-3 border rounded-xl hover:border-green-400 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-green-400',
                     isProductInCart && 'border-green-400'
                   )}
                 >
@@ -192,7 +193,7 @@ const TopupItems = ({ category, user }) => {
                     {isProductInCart && (
                       <button
                         onClick={() => actions.removeFromCart(product)}
-                        className="block md:hidden p-1.5 bg-gray-200 hover:bg-red-500 text-gray-500 hover:text-gray-100 rounded-xl ml-auto"
+                        className="block md:hidden p-1.5 bg-gray-200 dark:bg-gray-600 dark:hover:bg-red-500 hover:bg-red-500 text-gray-500 hover:text-gray-100 dark:text-gray-300 dark:hover:text-gray-50 rounded-xl ml-auto"
                       >
                         <TrashIcon className="w-5 h-5 text-current" />
                       </button>
@@ -200,15 +201,15 @@ const TopupItems = ({ category, user }) => {
                   </div>
                   <div>
                     <p className="font-semibold">{product.title}</p>
-                    <p className="text-gray-500">
+                    <p className="text-gray-500 dark:text-gray-300">
                       Rp {product.price.toLocaleString()}
                     </p>
                     {isProductInCart && (
                       <div className="flex items-center mt-3">
-                        <div className="flex items-center flex-grow md:flex-grow-0 justify-between text-gray-500">
+                        <div className="flex items-center flex-grow md:flex-grow-0 justify-between text-gray-500 dark:text-gray-300">
                           <button
                             onClick={() => actions.decrementAmount({ product })}
-                            className="w-8 h-8 rounded-xl font-medium border hover:bg-gray-800 hover:text-gray-100"
+                            className="w-8 h-8 rounded-xl font-medium border dark:border-gray-500 dark:hover:bg-gray-600 hover:bg-gray-800 hover:text-gray-100"
                           >
                             {' '}
                             -{' '}
@@ -218,7 +219,7 @@ const TopupItems = ({ category, user }) => {
                             onClick={() =>
                               actions.addToCart({ product, category })
                             }
-                            className="w-8 h-8 rounded-xl font-medium border hover:bg-gray-800 hover:text-gray-100"
+                            className="w-8 h-8 rounded-xl font-medium border dark:border-gray-500 dark:hover:bg-gray-600 hover:bg-gray-800 hover:text-gray-100"
                           >
                             {' '}
                             +{' '}
@@ -226,7 +227,7 @@ const TopupItems = ({ category, user }) => {
                         </div>
                         <button
                           onClick={() => actions.removeFromCart(product)}
-                          className="hidden md:block p-1.5 bg-gray-200 hover:bg-red-500 text-gray-500 hover:text-gray-100 rounded-xl ml-auto"
+                          className="hidden md:block p-1.5 bg-gray-200 dark:bg-gray-600 dark:hover:bg-red-500 hover:bg-red-500 text-gray-500 hover:text-gray-100 dark:text-gray-300 dark:hover:text-gray-50 rounded-xl ml-auto"
                         >
                           <TrashIcon className="w-5 h-5 text-current" />
                         </button>

@@ -92,7 +92,7 @@ const Cart = () => {
           </div>
 
           {/* ORDER INFO */}
-          <div className="lg:flex-grow mt-8 lg:mt-0 lg:max-w-sm lg:sticky lg:top-[80px] lg:self-start border rounded-2xl divide-y">
+          <div className="lg:flex-grow mt-8 lg:mt-0 lg:max-w-sm lg:sticky lg:top-[80px] lg:self-start border dark:border-gray-700 rounded-2xl divide-y dark:divide-gray-700">
             <h2 className="text-2xl font-bold p-6 flex items-center justify-between">
               Order Info
               {updatingDB && (
@@ -106,7 +106,7 @@ const Cart = () => {
                 </div>
               )}
             </h2>
-            <div className="divide-y lg:max-h-[65vh] lg:overflow-y-auto">
+            <div className="divide-y dark:divide-gray-700 lg:max-h-[65vh] lg:overflow-y-auto">
               {/* REQUIREMENTS */}
               {order.categoryRequirements.length > 0 && (
                 <div className="p-6">
@@ -150,8 +150,8 @@ const Cart = () => {
                           })}
                         </div>
                         {(requirement.img || requirement.description) && (
-                          <details className="mt-4">
-                            <summary className="cursor-pointer text-gray-500">
+                          <details className="mt-4 text-gray-500 dark:text-gray-400">
+                            <summary className="cursor-pointer">
                               Details
                             </summary>
                             <div className="mt-4">
@@ -164,7 +164,7 @@ const Cart = () => {
                               )}
 
                               {requirement.description && (
-                                <p className="mt-3 pb-2 text-gray-500">
+                                <p className="mt-3 pb-2">
                                   {requirement.description}
                                 </p>
                               )}
@@ -260,7 +260,7 @@ const Cart = () => {
                   <button
                     onClick={() => payHandler({ products: cart, user })}
                     disabled={isAnyError || launching}
-                    className="w-full py-4 bg-green-500 hover:bg-green-400 transition-all font-semibold text-white rounded-2xl shadow-xl shadow-green-300 disabled:bg-gray-400/40 disabled:shadow-gray-200"
+                    className="w-full py-4 bg-green-500 hover:bg-green-400 transition-all font-semibold text-white rounded-2xl shadow-xl shadow-green-300 disabled:bg-gray-400/40 disabled:shadow-gray-200 dark:shadow-green-300/20"
                   >
                     Pay (Rp {order.total.toLocaleString()})
                   </button>
