@@ -26,18 +26,18 @@ const providerLogo = {
 
 const SignIn = ({ providers }: Props) => {
   return (
-    <Container title="SignIn" noNavbar>
+    <Container title="Sign In" noNavbar>
       <Wrapper className="py-20 text-center flex flex-col items-center max-w-xs md:max-w-4xl">
         <Link href="/">
-          <img src="/images/rausky-logo.png" alt="" />
+          <img src="/images/logo/rausky-logo.png" alt="" />
         </Link>
-        <h3 className="font-bold text-3xl">Sign In dulu bos</h3>
+        <h3 className="font-bold text-3xl">Sign In to Rausky Gamestore</h3>
         <div className="w-full mt-10 space-y-5 flex flex-col md:flex-row md:space-y-0 md:space-x-5">
           {Object.values(providers).map((provider) => {
             return (
               <button
                 key={provider.name}
-                className="w-full flex md:flex-col items-center justify-center font-medium p-4 md:p-8 border rounded-md transition-all hover:scale-105 active:scale-95 text-lg md:text-xl"
+                className="w-full flex md:flex-col items-center justify-center font-medium p-4 md:p-8 border dark:border-gray-700 dark:bg-gray-800 rounded-md transition-all hover:scale-105 active:scale-95 text-lg md:text-xl"
                 onClick={() => signIn(provider.id)}
               >
                 <img

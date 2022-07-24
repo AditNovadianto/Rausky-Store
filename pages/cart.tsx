@@ -5,19 +5,17 @@ import {
   CloudUploadIcon,
   ExclamationCircleIcon,
 } from '@heroicons/react/outline'
-import { useEffect } from 'react'
 import { useStateMachine } from 'little-state-machine'
 import Link from '../components/Link'
 import { addToCart, removeFromCart, decrementAmount } from '../lib/cartHandler'
-import request from '../lib/request'
 import RequirementField from '../components/RequirementField'
 import { signIn, useSession } from 'next-auth/react'
 import Skeleton from 'react-loading-skeleton'
 import ProductItem from '../components/ProductItem'
-import { useRouter } from 'next/router'
+import { GetServerSideProps } from 'next'
+import usePayHandler from '../hooks/usePayHandler'
 
 const Cart = () => {
-  const router = useRouter()
   const { data: session, status } = useSession()
   const user = session?.user
   const isLoggedIn = status != 'loading' && user
@@ -25,28 +23,6 @@ const Cart = () => {
     addToCart,
     removeFromCart,
     decrementAmount,
-    setOrderFinish: (state, payload) => {
-      return {
-        ...state,
-        orderFinish: payload,
-      }
-    },
-    clearOrder: (state) => {
-      request.delete('/carts/me')
-      return {
-        ...state,
-        cart: [],
-        order: {
-          ...state.order,
-          categoryRequirements: [],
-          missingRequirements: {},
-          subtotal: 0,
-          tax: 0,
-          discount: 0,
-          total: 0,
-        },
-      }
-    },
     setUser: (state, payload: { fieldName: string; fieldValue: string }) => {
       const newUser = { ...state.order.user }
       newUser[payload.fieldName] = payload.fieldValue
@@ -59,66 +35,9 @@ const Cart = () => {
       }
     },
   })
-  const { cart, order, updatedDB, updatingDB, orderFinish } = state
+  const { cart, order, updatedDB, updatingDB } = state
 
-  useEffect(() => {
-    let scriptTag = document.createElement('script')
-    scriptTag.type = 'text/javascript'
-    scriptTag.src = 'https://app.sandbox.midtrans.com/snap/snap.js'
-
-    const myMidtransClientKey = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY
-    scriptTag.setAttribute('data-client-key', myMidtransClientKey)
-
-    document.body.appendChild(scriptTag)
-    return () => {
-      document.body.removeChild(scriptTag)
-    }
-  }, [])
-
-  const checkout = async () => {
-    try {
-      const { data } = await request.post('/orders', {
-        products: cart.map((product) => ({
-          id: product.id,
-          amount: product.amount,
-        })),
-        requirements: order.requirements,
-        user: !user ? order.user : null,
-      })
-
-      // @ts-ignore
-      window.snap.pay(data.order.paymentToken, {
-        onPending: (result) => {
-          handleSuccessPayment({ result })
-        },
-        onClose: (result) => {
-          handleUnfinishPayment({ orderId: data.order.id })
-        },
-      })
-    } catch (err) {
-      console.log(err)
-    }
-  }
-
-  const handleSuccessPayment = async ({ result }) => {
-    const { data } = await request.put(`/orders/${result.order_id}`, {
-      paymentMethod: result.payment_type,
-      status: 'PAID',
-      paidAt: new Date(result.transaction_time).toISOString(),
-    })
-    actions.setOrderFinish(data.order)
-    actions.clearOrder()
-    router.push({
-      pathname: '/pay-finish',
-      query: {
-        orderId: data.order.id,
-      },
-    })
-  }
-
-  const handleUnfinishPayment = async ({ orderId }) => {
-    await request.delete(`/orders/${orderId}`)
-  }
+  const [payHandler, launching] = usePayHandler()
 
   const isFieldError = ({ requirement, field }) => {
     return order.missingRequirements[requirement.categorySlug]?.[field.value]
@@ -135,23 +54,18 @@ const Cart = () => {
           <div>
             <img
               className="w-[300px] h-[300px] mx-auto"
-              src="/images/empty-cart.svg"
+              src="/images/illustration/empty-cart.svg"
               alt="empty cart"
             />
-            <h2 className="font-bold text-3xl mt-1">
-              Keranjang kosong ni gan...
-            </h2>
+            <h2 className="font-bold text-3xl mt-1">Your cart is empty.</h2>
             <Link
               href="/"
               className="block mt-8 text-green-500 text-lg hover:underline font-medium"
             >
-              Balik ke halaman utama &rarr;
+              Back to home &rarr;
             </Link>
           </div>
           {/* TODO: tampilin rekomendasi produk */}
-          {/* <div>
-            <h2 className="text-2xl font-bold mb-4">Rekomendasi Produk</h2>
-          </div> */}
         </Wrapper>
       ) : (
         <Wrapper className="flex flex-col lg:flex-row justify-between lg:space-x-20">
@@ -175,7 +89,7 @@ const Cart = () => {
           </div>
 
           {/* ORDER INFO */}
-          <div className="lg:flex-grow mt-8 lg:mt-0 lg:max-w-sm lg:sticky lg:top-[80px] lg:self-start border rounded-2xl divide-y">
+          <div className="lg:flex-grow mt-8 lg:mt-0 lg:max-w-sm lg:sticky lg:top-[80px] lg:self-start border dark:border-gray-700 rounded-2xl dark:bg-gray-800 divide-y dark:divide-gray-700">
             <h2 className="text-2xl font-bold p-6 flex items-center justify-between">
               Order Info
               {updatingDB && (
@@ -189,7 +103,7 @@ const Cart = () => {
                 </div>
               )}
             </h2>
-            <div className="divide-y lg:max-h-[65vh] lg:overflow-y-auto">
+            <div className="divide-y dark:divide-gray-700 lg:max-h-[65vh] lg:overflow-y-auto">
               {/* REQUIREMENTS */}
               {order.categoryRequirements.length > 0 && (
                 <div className="p-6">
@@ -233,8 +147,8 @@ const Cart = () => {
                           })}
                         </div>
                         {(requirement.img || requirement.description) && (
-                          <details className="mt-4">
-                            <summary className="cursor-pointer text-gray-500">
+                          <details className="mt-4 text-gray-500 dark:text-gray-400">
+                            <summary className="cursor-pointer">
                               Details
                             </summary>
                             <div className="mt-4">
@@ -247,7 +161,7 @@ const Cart = () => {
                               )}
 
                               {requirement.description && (
-                                <p className="mt-3 pb-2 text-gray-500">
+                                <p className="mt-3 pb-2">
                                   {requirement.description}
                                 </p>
                               )}
@@ -332,7 +246,6 @@ const Cart = () => {
                   </div>
                 </div>
 
-                {/* TODO: handle missing requirements */}
                 <div className="my-8">
                   {isAnyError && (
                     <p className="mt-2 text-red-500 mb-3 font-medium flex items-center justify-center">
@@ -341,9 +254,9 @@ const Cart = () => {
                     </p>
                   )}
                   <button
-                    onClick={checkout}
-                    disabled={isAnyError}
-                    className="w-full py-4 bg-green-500 hover:bg-green-400 transition-all font-semibold text-white rounded-2xl shadow-xl shadow-green-300 disabled:bg-gray-400/40 disabled:shadow-gray-200"
+                    onClick={() => payHandler({ products: cart, user })}
+                    disabled={isAnyError || launching}
+                    className="w-full py-4 bg-green-500 hover:bg-green-400 transition-all font-semibold text-white rounded-2xl shadow-xl shadow-green-300 disabled:bg-gray-400/40 disabled:shadow-gray-200 dark:disabled:shadow-none dark:shadow-green-300/20"
                   >
                     Pay (Rp {order.total.toLocaleString()})
                   </button>
@@ -358,3 +271,19 @@ const Cart = () => {
 }
 
 export default Cart
+
+export const getServerSideProps: GetServerSideProps = async ({ query }) => {
+  const { order_id } = query
+  if (order_id) {
+    return {
+      redirect: {
+        destination: `/order?orderId=${order_id}`,
+        permanent: false,
+      },
+    }
+  }
+
+  return {
+    props: {},
+  }
+}

@@ -4,11 +4,12 @@ import { parseData } from '../../lib/utils'
 import { getSpecificCategory } from '../api/categories/[categoryId]'
 import TopupInfo from '../../components/topup/TopupInfo'
 import TopupItems from '../../components/topup/TopupItems'
-import { getSession } from 'next-auth/react'
 import { GetServerSideProps } from 'next'
+import { useSession } from 'next-auth/react'
 
-const Topup = ({ category, user }) => {
-  console.log(category)
+const Topup = ({ category }) => {
+  const { data, status } = useSession()
+  const user = data?.user
 
   return (
     <Container noTopMargin title={category.name}>
@@ -21,7 +22,7 @@ const Topup = ({ category, user }) => {
       />
       <Wrapper className="md:flex">
         <TopupInfo category={category} />
-        <TopupItems category={category} user={user} />
+        {status !== 'loading' && <TopupItems category={category} user={user} />}
       </Wrapper>
     </Container>
   )
@@ -29,13 +30,10 @@ const Topup = ({ category, user }) => {
 
 export default Topup
 
-export const getServerSideProps: GetServerSideProps = async ({
-  params,
-  req,
-}) => {
-  const session = await getSession({ req })
+export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const category = await getSpecificCategory({
     categorySlug: params.category as string,
+    includeProducts: true,
   })
 
   if (!category) {
@@ -45,6 +43,6 @@ export const getServerSideProps: GetServerSideProps = async ({
   }
 
   return {
-    props: parseData({ category, user: session?.user }),
+    props: parseData({ category }),
   }
 }

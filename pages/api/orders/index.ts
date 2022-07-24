@@ -137,7 +137,7 @@ export default app
           id: item.product.id,
           price: item.product.price,
           quantity: item.amount,
-          name: `${item.product.title} ${item.product.category.name}`,
+          name: item.product.title,
         })),
         {
           id: 'tax',
@@ -154,29 +154,40 @@ export default app
       if (userEmail) paymentData.customer_details.email = userEmail
     }
 
-    const { token, redirect_url } = await snap.createTransaction(paymentData)
+    try {
+      const { token, redirect_url } = await snap.createTransaction(paymentData)
 
-    let fullOrder = await prisma.order.update({
-      where: { id: order.id },
-      data: {
-        total,
-        tax,
-        paymentToken: token,
-        paymentUrl: redirect_url,
-        requirements,
-      },
-      include: {
-        user: true,
-        products: {
-          select: {
-            product: { include: { category: true } },
-          },
+      let fullOrder = await prisma.order.update({
+        where: { id: order.id },
+        data: {
+          total,
+          tax,
+          paymentToken: token,
+          paymentUrl: redirect_url,
+          requirements,
         },
-      },
-    })
+        include: {
+          user: true,
+          products: {
+            select: {
+              product: { include: { category: true } },
+            },
+          },
+          rating: true,
+        },
+      })
 
-    // @ts-ignore
-    fullOrder.products = fullOrder.products.map(({ product }) => product)
+      // @ts-ignore
+      fullOrder.products = fullOrder.products.map(({ product }) => product)
 
-    res.status(201).json({ order: fullOrder })
+      res.status(201).json({ order: fullOrder })
+    } catch (err) {
+      if (err.name == 'MidtransError') {
+        throw {
+          status: err.httpStatusCode,
+          message: err.ApiResponse.error_messages,
+        }
+      }
+      throw err
+    }
   })

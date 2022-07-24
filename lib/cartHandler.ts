@@ -2,9 +2,9 @@ import { GlobalState } from 'little-state-machine'
 import request from './request'
 
 export const getProductInCart = (product, cart) => {
-  const idx = cart.findIndex((item) => item.id == product.id)
+  const idx = cart?.findIndex((item) => item.id == product.id)
   const isProductInCart = idx >= 0
-  const productInCart = cart[idx]
+  const productInCart = cart?.[idx]
   return { isProductInCart, idx, productInCart }
 }
 

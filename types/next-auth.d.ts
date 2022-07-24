@@ -9,6 +9,17 @@ declare module 'next-auth' {
     user: {
       id?: string
       role?: Role
+      displayName?: string
     } & DefaultSession['user']
   }
+}
+
+export type User = {
+  id?: string
+  role?: Role
+  displayName?: string
+} & {
+  name?: string
+  email?: string
+  image?: string
 }

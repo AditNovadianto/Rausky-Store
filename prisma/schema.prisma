@@ -48,12 +48,14 @@ model VerificationToken {
 
 enum Role {
     USER
+    FAKE_ADMIN
     ADMIN
 }
 
 model User {
     id                String        @id @default(auto()) @map("_id") @db.ObjectId
     name              String?
+    displayName       String?
     email             String?       @unique
     emailVerified     DateTime?
     image             String?
@@ -61,7 +63,7 @@ model User {
     accounts          Account[]
     sessions          Session[]
     orders            Order[]
-    Product           Product[]
+    products          Product[]
     requirementFields UsersFields[]
     cart              Cart?
 }
@@ -134,11 +136,11 @@ model Product {
     stock         Int?               @default(0)
     categoryId    String?            @db.ObjectId
     moreInfo      Json?
-    userId        String             @db.ObjectId
+    userId        String?            @db.ObjectId
     subCategoryId String?            @db.ObjectId
     orders        ProductsOnOrders[]
     category      Category?          @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-    user          User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+    user          User?              @relation(fields: [userId], references: [id], onDelete: Cascade)
     subCategory   SubCategory?       @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
     createdAt     DateTime           @default(now())
     updatedAt     DateTime           @updatedAt
@@ -155,7 +157,6 @@ model ProductsOnOrders {
     order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }
 
-// TODO: refactor cart model buat nyimpen product categories
 model Cart {
     id       String @id @default(auto()) @map("_id") @db.ObjectId
     products Json[]
@@ -184,6 +185,17 @@ model Order {
     paidAt        DateTime?
     userId        String?            @db.ObjectId
     user          User?              @relation(fields: [userId], references: [id], onDelete: Cascade)
+    rating        Rating?
     createdAt     DateTime           @default(now())
     updatedAt     DateTime           @updatedAt
+}
+
+model Rating {
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    star      Int
+    comment   String?
+    orderId   String   @unique @db.ObjectId
+    order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }

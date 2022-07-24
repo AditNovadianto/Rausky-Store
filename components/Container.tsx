@@ -19,6 +19,7 @@ const Container: FC<Props> = ({ title, children, noNavbar, noTopMargin }) => {
         <title>{title ? `${title} - ${head.title}` : head.title}</title>
         {/* TODO: tambahin meta: description, dll */}
       </Head>
+
       {!noNavbar && <Navbar />}
       {!noTopMargin && <br />}
       {children}

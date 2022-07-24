@@ -10,7 +10,7 @@ const Badge = ({ children }) => {
   return (
     <div
       className={cn(
-        'absolute -top-1 -right-1 bg-green-500 text-white font-semibold text-[10px] w-[16px] h-[15px] rounded-full flex items-center justify-center transition-all ease-out duration-100',
+        'absolute top-1 right-1 bg-green-500 text-white font-semibold text-[10px] w-[16px] h-[15px] rounded-full flex items-center justify-center transition-all ease-out duration-100',
         membesar ? 'scale-100 opacity-1' : 'scale-0 opacity-0'
       )}
     >

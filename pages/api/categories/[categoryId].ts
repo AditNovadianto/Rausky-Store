@@ -3,42 +3,16 @@ import prisma from '../../../lib/prisma'
 
 export const getSpecificCategory = async ({
   categorySlug,
+  includeProducts,
 }: {
   categorySlug: string
-  userId?: string
+  includeProducts?: boolean
 }) => {
-  const category = await prisma.category.findUnique({
+  let query: CustomObject = {
     where: {
       slug: categorySlug,
     },
     include: {
-      products: {
-        orderBy: { price: 'asc' },
-        include: {
-          subCategory: { select: { name: true, slug: true } },
-          //   TODO: this is temp, update cart model terus apus ini
-          category: {
-            select: {
-              name: true,
-              slug: true,
-              logoImg: true,
-              requirement: {
-                include: {
-                  fields: {
-                    select: {
-                      placeholder: true,
-                      type: true,
-                      id: true,
-                      value: true,
-                      name: true,
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
       subCategories: true,
       requirement: {
         include: {
@@ -54,7 +28,39 @@ export const getSpecificCategory = async ({
         },
       },
     },
-  })
+  }
+
+  if (includeProducts) {
+    query.include.products = {
+      orderBy: { price: 'asc' },
+      include: {
+        subCategory: { select: { name: true, slug: true } },
+        category: {
+          select: {
+            name: true,
+            slug: true,
+            logoImg: true,
+            requirement: {
+              include: {
+                fields: {
+                  select: {
+                    placeholder: true,
+                    type: true,
+                    id: true,
+                    value: true,
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    }
+  }
+
+  //   @ts-ignore
+  const category = await prisma.category.findUnique(query)
 
   return category
 }
@@ -62,12 +68,15 @@ export const getSpecificCategory = async ({
 const app = apiHandler()
 
 export default app
-  // get specific category + among all products
+  // get specific category
   .get(async (req, res) => {
-    const { categoryId: categorySlug } = req.query as {
+    const { categoryId: categorySlug, includeProducts } = req.query as {
       [key: string]: string
     }
-    const category = await getSpecificCategory({ categorySlug })
+    const category = await getSpecificCategory({
+      categorySlug,
+      includeProducts: includeProducts == 'true' ? true : false,
+    })
     res.status(200).json({ category })
   })
   // edit category

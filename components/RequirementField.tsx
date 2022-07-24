@@ -63,8 +63,8 @@ const RequirementField = ({ field, categorySlug, user, error }: Props) => {
         className={cn(
           'input',
           error
-            ? 'border-red-300 focus:border-red-400'
-            : 'border-gray-300 focus:border-green-400'
+            ? 'border-red-300 focus:border-red-400  dark:border-red-500 dark:focus:border-red-500'
+            : 'focus:border-green-400 dark:focus:border-green-400'
         )}
         placeholder={field.placeholder}
         type={field.type}
