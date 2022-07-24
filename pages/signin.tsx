@@ -37,7 +37,7 @@ const SignIn = ({ providers }: Props) => {
             return (
               <button
                 key={provider.name}
-                className="w-full flex md:flex-col items-center justify-center font-medium p-4 md:p-8 border rounded-md transition-all hover:scale-105 active:scale-95 text-lg md:text-xl"
+                className="w-full flex md:flex-col items-center justify-center font-medium p-4 md:p-8 border dark:border-gray-700 dark:bg-gray-800 rounded-md transition-all hover:scale-105 active:scale-95 text-lg md:text-xl"
                 onClick={() => signIn(provider.id)}
               >
                 <img

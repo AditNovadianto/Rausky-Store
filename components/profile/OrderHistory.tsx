@@ -30,17 +30,17 @@ const OrderHistory = () => {
         orders.map((order) => {
           return (
             <div
-              className="block rounded-xl shadow-lg overflow-hidden"
+              className="block rounded-xl shadow-lg overflow-hidden dark:bg-gray-800 dark:border-gray-700"
               key={order.id}
             >
               {/* HEADER */}
-              <div className="px-5 py-3 border-b flex items-center justify-between">
+              <div className="px-5 py-3 border-b dark:border-b-gray-700 flex items-center justify-between">
                 <p className="text-sm text-gray-500 font-medium flex items-center">
                   <ClockIcon className="w-4 h-4 mr-1" />
                   {new Date(order.paidAt).toDateString()} at{' '}
                   {new Date(order.paidAt).toLocaleTimeString()}
                 </p>
-                <span className="text-xs bg-green-100 text-green-500 px-2 py-1 rounded-lg font-semibold flex items-center">
+                <span className="text-xs bg-green-100 dark:bg-green-500 dark:text-green-100 text-green-500 px-2 py-1 rounded-lg font-semibold flex items-center">
                   <CheckCircleIcon className="w-4 h-4 mr-1" />
                   {order.status}
                 </span>

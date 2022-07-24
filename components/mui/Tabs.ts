@@ -12,13 +12,6 @@ export const CustomTabs = styled(Tabs)({
 export const CustomTab = styled(Tab)({
   fontWeight: 500,
   fontFamily: 'inherit',
-  '&:hover': {
-    color: 'rgb(34, 197, 94)',
-    opacity: 1,
-  },
-  '&.Mui-selected': {
-    color: 'rgb(34, 197, 94)',
-  },
   '&.Mui-focusVisible': {
     backgroundColor: 'rgb(188, 255, 212)',
   },

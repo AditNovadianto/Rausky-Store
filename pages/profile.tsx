@@ -135,7 +135,7 @@ const Profile = ({ user }: Props) => {
               <a
                 href="/admin"
                 target="_blank"
-                className="block w-full md:max-w-[350px] mb-6 p-4 rounded-2xl border border-green-400 font-semibold bg-green-200 text-green-600 hover:bg-green-500 hover:text-white hover:shadow-xl hover:shadow-green-300 hover:-translate-y-1.5 transition-all"
+                className="block w-full md:max-w-[350px] mb-6 p-4 rounded-2xl border border-green-400 font-semibold bg-green-200 text-green-600 hover:bg-green-500 hover:text-white hover:shadow-xl hover:shadow-green-300 hover:-translate-y-1.5 transition-all dark:hover:shadow-green-300/10 dark:bg-green-500 dark:text-white"
               >
                 Go to Admin Dashboard &rarr;
               </a>
@@ -145,7 +145,7 @@ const Profile = ({ user }: Props) => {
               <h3 className="text-xl font-semibold">Edit Profile</h3>
               <div className="mt-3 space-y-3">
                 <label className="block">
-                  <span className="block text-gray-600 text-sm mb-1">
+                  <span className="block text-gray-500 text-sm mb-1">
                     Display Name
                   </span>
                   <input
