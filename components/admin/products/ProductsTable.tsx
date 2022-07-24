@@ -44,7 +44,6 @@ const ProductsTable = ({ setCategories, category }) => {
       renderCell: (params) => {
         return (
           <div className="flex space-x-4 text-gray-500">
-            {/* TODO: bikin edit product handler */}
             <button
               onClick={() => editHandler(params.row.id)}
               className="hover:text-green-500"

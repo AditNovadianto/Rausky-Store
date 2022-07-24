@@ -20,6 +20,7 @@ import TopupRequirements from './TopupRequirements'
 import { useRouter } from 'next/router'
 import { useUpdateEffect } from 'usehooks-ts'
 import { isObjectEmpty } from '../../lib/utils'
+import TopupItem from './TopupItem'
 
 const filterProductsBySubCategory = (subCategory, products) => {
   return subCategory
@@ -164,81 +165,17 @@ const TopupItems = ({ category, user }) => {
         <div className="mt-5">
           <p className="font-semibold text-lg">Pilih Item</p>
           <div className="mt-4 grid md:grid-cols-2 gap-4">
-            {products.map((product) => {
-              const { isProductInCart, productInCart } = getProductInCart(
-                product,
-                cart
-              )
-              return (
-                <div
-                  role={isProductInCart ? undefined : 'button'}
-                  key={product.id}
-                  onClick={() => {
-                    if (isProductInCart) return
-                    actions.addToCart({ product, category })
-                  }}
-                  id={product.title}
-                  className={cn(
-                    'px-4 py-3 border rounded-xl dark:bg-gray-700',
-                    isProductInCart
-                      ? 'border-green-400 dark:border-green-400'
-                      : 'hover:border-green-400 dark:hover:border-green-400 dark:border-gray-600'
-                  )}
-                >
-                  <div className="flex items-center">
-                    {product.img && (
-                      <img
-                        src={product.img}
-                        className="w-10 h-10 object-cover rounded-lg mb-1.5"
-                      />
-                    )}
-                    {isProductInCart && (
-                      <button
-                        onClick={() => actions.removeFromCart(product)}
-                        className="block md:hidden p-1.5 bg-gray-200 dark:bg-gray-600 dark:hover:bg-red-500 hover:bg-red-500 text-gray-500 hover:text-gray-100 dark:text-gray-300 dark:hover:text-gray-50 rounded-xl ml-auto"
-                      >
-                        <TrashIcon className="w-5 h-5 text-current" />
-                      </button>
-                    )}
-                  </div>
-                  <div>
-                    <p className="font-semibold">{product.title}</p>
-                    <p className="text-gray-500 dark:text-gray-300">
-                      Rp {product.price.toLocaleString()}
-                    </p>
-                    {isProductInCart && (
-                      <div className="flex items-center mt-3">
-                        <div className="flex items-center flex-grow md:flex-grow-0 justify-between text-gray-500 dark:text-gray-300">
-                          <button
-                            onClick={() => actions.decrementAmount({ product })}
-                            className="w-8 h-8 rounded-xl font-medium border dark:border-gray-500 dark:hover:bg-gray-600 hover:bg-gray-800 hover:text-gray-100"
-                          >
-                            {' '}
-                            -{' '}
-                          </button>
-                          <div className="px-5">{productInCart.amount}</div>
-                          <button
-                            onClick={() =>
-                              actions.addToCart({ product, category })
-                            }
-                            className="w-8 h-8 rounded-xl font-medium border dark:border-gray-500 dark:hover:bg-gray-600 hover:bg-gray-800 hover:text-gray-100"
-                          >
-                            {' '}
-                            +{' '}
-                          </button>
-                        </div>
-                        <button
-                          onClick={() => actions.removeFromCart(product)}
-                          className="hidden md:block p-1.5 bg-gray-200 dark:bg-gray-600 dark:hover:bg-red-500 hover:bg-red-500 text-gray-500 hover:text-gray-100 dark:text-gray-300 dark:hover:text-gray-50 rounded-xl ml-auto"
-                        >
-                          <TrashIcon className="w-5 h-5 text-current" />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )
-            })}
+            {products.map((product) => (
+              <TopupItem
+                key={product.id}
+                product={product}
+                category={category}
+                cart={cart}
+                onAddToCart={actions.addToCart}
+                onDecrementAmount={actions.decrementAmount}
+                onRemoveFromCart={actions.removeFromCart}
+              />
+            ))}
           </div>
         </div>
       </div>

@@ -15,7 +15,7 @@ const ContinuePayBtn = () => {
         <>
           <div className="pt-20"></div>
           <motion.div
-            className="fixed bottom-0 left-0 w-full pb-8 bg-white dark:bg-gray-900 md:bg-transparent md:dark:bg-transparent"
+            className="fixed bottom-0 left-0 w-full pb-8 bg-white dark:bg-gray-900 md:bg-transparent md:dark:bg-transparent pointer-events-none"
             initial={{
               y: '100%',
               opacity: 0,

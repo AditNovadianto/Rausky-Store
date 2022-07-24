@@ -310,6 +310,8 @@ const AddProductsModal = ({ open, onClose, category, setCategories }) => {
             }
           />
         ))}
+
+        {/* ADD PRODUCT BUTTON */}
         <button
           type="button"
           onClick={addHandler}

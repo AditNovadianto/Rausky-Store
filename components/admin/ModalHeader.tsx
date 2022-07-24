@@ -6,7 +6,7 @@ interface Props {
 
 const ModalHeader = ({ logo, title, rightMenu }: Props) => {
   return (
-    <header className="sticky top-0 z-[100] bg-white p-5 flex justify-between items-center shadow-sm">
+    <header className="sticky top-0 z-[100] bg-white dark:bg-gray-900 dark:border-b dark:border-b-gray-700 p-5 flex justify-between items-center shadow-sm">
       <div className="flex items-center space-x-3">
         {logo && <img src={logo} className="w-10 h-10 rounded-2xl" />}
         <h2 className="text-2xl font-bold">{title}</h2>

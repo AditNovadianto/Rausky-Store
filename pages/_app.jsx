@@ -15,6 +15,8 @@ import { setRequirements, setCart } from '../lib/cartHandler'
 import { Toaster } from 'react-hot-toast'
 import { AnimatePresence, motion } from 'framer-motion'
 import { SkeletonTheme } from 'react-loading-skeleton'
+import { createTheme, ThemeProvider } from '@mui/material'
+import { useMemo } from 'react'
 
 createStore(
   {
@@ -81,6 +83,12 @@ const MyComponent = ({ Component, pageProps }) => {
     actions.setGlobalTheme(html.classList.contains('dark') ? 'dark' : 'light')
   }, [])
 
+  const theme = useMemo(() => {
+    return createTheme({
+      palette: { mode: globalTheme },
+    })
+  }, [globalTheme])
+
   return (
     <>
       <NextNProgress color="#90EE90" options={{ showSpinner: false }} />
@@ -102,15 +110,17 @@ const MyComponent = ({ Component, pageProps }) => {
                 globalTheme === 'dark' ? 'rgb(55 65 81)' : 'rgb(243 244 246)'
               }
             >
-              <Component {...pageProps} />
+              <ThemeProvider theme={theme}>
+                <Component {...pageProps} />
+              </ThemeProvider>
             </SkeletonTheme>
           </motion.div>
         </div>
       </AnimatePresence>
 
-      {!['/cart', '/signin', '/order'].includes(router.route) && (
-        <ContinuePayBtn />
-      )}
+      {!['cart', 'signin', 'order', 'admin'].includes(
+        router.route.split('/')[1]
+      ) && <ContinuePayBtn />}
       <Toaster
         toastOptions={{
           className: 'dark:bg-gray-700 dark:text-gray-100',

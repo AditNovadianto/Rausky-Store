@@ -2,11 +2,24 @@ import { RefreshIcon, UploadIcon } from '@heroicons/react/outline'
 import { useState } from 'react'
 import { adminRequestHandler } from '../../../lib/admin'
 import request from '../../../lib/request'
-import { CustomObject } from '../../../types/globals'
 import Modal from '../../Modal'
 import ModalHeader from '../ModalHeader'
 import ModalHeaderButton from '../ModalHeaderButton'
 import Product from './Product'
+
+const initProduct = (product, category) => {
+  let currentProduct: CustomObject = {
+    title: product.title,
+    price: product.price,
+    stock: product.stock,
+  }
+
+  if (category.subCategories.length > 0) {
+    currentProduct.subCategory = category.subCategories[0].slug
+  }
+
+  return currentProduct
+}
 
 const EditProductModal = ({
   open,
@@ -15,11 +28,9 @@ const EditProductModal = ({
   product,
   category,
 }) => {
-  const [editedProduct, setEditedProduct] = useState<CustomObject>({
-    title: product.title,
-    price: product.price,
-    stock: product.stock,
-  })
+  const [editedProduct, setEditedProduct] = useState<CustomObject>(
+    initProduct(product, category)
+  )
 
   const onFieldChange = (field, value) => {
     setEditedProduct({

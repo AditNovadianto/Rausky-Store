@@ -1,4 +1,5 @@
 import { TrashIcon } from '@heroicons/react/outline'
+import TopupItem from '../../topup/TopupItem'
 
 interface Props {
   product: any
@@ -118,7 +119,8 @@ const Product = ({
           <span className="block text-sm text-gray-500 mb-1">Preview</span>
 
           {/* TODO: refactor, bikin komponen topup sendiri */}
-          <div className={'px-4 py-3 border rounded-xl hover:border-green-400'}>
+          <TopupItem category={category} product={product} preview />
+          {/* <div className={'px-4 py-3 border rounded-xl hover:border-green-400'}>
             <div className="flex items-center">
               {category.logoImg && (
                 <img
@@ -165,7 +167,7 @@ const Product = ({
                 </button>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
 
