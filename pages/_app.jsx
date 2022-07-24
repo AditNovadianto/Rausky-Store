@@ -18,6 +18,7 @@ import { SkeletonTheme } from 'react-loading-skeleton'
 
 createStore(
   {
+    globalTheme: 'device',
     cart: [],
     order: {
       user: {},
@@ -39,9 +40,7 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }) {
   return (
     <SessionProvider session={session}>
       <StateMachineProvider>
-        <SkeletonTheme>
-          <MyComponent Component={Component} pageProps={pageProps} />
-        </SkeletonTheme>
+        <MyComponent Component={Component} pageProps={pageProps} />
       </StateMachineProvider>
     </SessionProvider>
   )
@@ -51,10 +50,12 @@ export default MyApp
 
 const MyComponent = ({ Component, pageProps }) => {
   const router = useRouter()
-  const { actions } = useStateMachine({
+  const { state, actions } = useStateMachine({
     setRequirements,
     setCart,
+    setGlobalTheme: (state, payload) => ({ ...state, globalTheme: payload }),
   })
+  const { globalTheme } = state
 
   useEffect(() => {
     const setMyCart = async () => {
@@ -75,6 +76,9 @@ const MyComponent = ({ Component, pageProps }) => {
       await setMyCart()
     }
     getUserData()
+
+    const html = document.documentElement
+    actions.setGlobalTheme(html.classList.contains('dark') ? 'dark' : 'light')
   }, [])
 
   return (
@@ -90,7 +94,16 @@ const MyComponent = ({ Component, pageProps }) => {
             exit={{ y: 50, opacity: 0 }}
             id="page-transition-container"
           >
-            <Component {...pageProps} />
+            <SkeletonTheme
+              baseColor={
+                globalTheme === 'dark' ? 'rgb(31 41 55)' : 'rgb(229 231 235)'
+              }
+              highlightColor={
+                globalTheme === 'dark' ? 'rgb(55 65 81)' : 'rgb(243 244 246)'
+              }
+            >
+              <Component {...pageProps} />
+            </SkeletonTheme>
           </motion.div>
         </div>
       </AnimatePresence>

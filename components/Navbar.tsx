@@ -8,6 +8,8 @@ import Badge from './Badge'
 import { useRouter } from 'next/router'
 import {
   ArrowLeftIcon,
+  ChatAlt2Icon,
+  ChatIcon,
   DesktopComputerIcon,
   DotsVerticalIcon,
   HomeIcon,
@@ -29,6 +31,7 @@ import { User } from '../types/next-auth'
 import { useDebounce, useLocalStorage, useUpdateEffect } from 'usehooks-ts'
 import request from '../lib/request'
 import Modal from './Modal'
+import { socialMedia } from '../lib/data'
 
 type Theme = 'device' | 'light' | 'dark'
 
@@ -52,6 +55,9 @@ const themes: { name: Theme; Icon: any; label: string }[] = [
 
 const Navbar = () => {
   const { data: session, status } = useSession()
+  const { state, actions } = useStateMachine({
+    setGlobalTheme: (state, payload) => ({ ...state, globalTheme: payload }),
+  })
 
   const [currentTheme, setCurrentTheme] = useLocalStorage<Theme>(
     'currentTheme',
@@ -64,15 +70,16 @@ const Navbar = () => {
         window.matchMedia('(prefers-color-scheme: dark)').matches)
     ) {
       document.documentElement.classList.add('dark')
+      actions.setGlobalTheme('dark')
     } else {
       document.documentElement.classList.remove('dark')
+      actions.setGlobalTheme('light')
     }
   }, [currentTheme])
 
   const router = useRouter()
   const onMobile = useMediaQuery('(max-width: 640px)')
 
-  const { state } = useStateMachine()
   const { cart } = state
   const user = session?.user as User
   const totalItemsInCart = cart.length
@@ -158,13 +165,19 @@ const Navbar = () => {
         },
       })),
     },
+
     {
-      icon: 'https://cdn-icons-png.flaticon.com/512/25/25231.png',
-      label: 'Star Github',
-      onClick: () => {
-        window.open('https://github.com/AditNovadianto/Rausky-Store', '_blank')
-      },
+      icon: ChatIcon,
+      label: 'Contact Us',
+      more: socialMedia.map((social) => ({
+        label: social.name,
+        icon: social.img,
+        onClick: () => {
+          window.open(social.href, '_blank')
+        },
+      })),
     },
+
     {
       icon: MenuIcon,
       label: 'Other',
@@ -173,14 +186,25 @@ const Navbar = () => {
           icon: InformationCircleIcon,
           label: 'About Rausky',
           onClick: () => {
-            router.push('/about')
+            router.push('/blog/about-rausky')
           },
         },
         {
           icon: MailIcon,
           label: 'Give us Feedback',
+          onClick: () => {
+            alert('Giving feedback is still under development')
+          },
         },
       ],
+    },
+
+    {
+      icon: 'https://cdn-icons-png.flaticon.com/512/25/25231.png',
+      label: 'Star Github',
+      onClick: () => {
+        window.open('https://github.com/AditNovadianto/Rausky-Store', '_blank')
+      },
     },
   ]
 

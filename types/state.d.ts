@@ -3,6 +3,7 @@ import { Category, Order, Product, Rating, User } from '@prisma/client'
 
 declare module 'little-state-machine' {
   interface GlobalState {
+    globalTheme: 'dark' | 'light'
     cart: (Product & {
       amount: number
       category: Category
