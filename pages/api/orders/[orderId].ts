@@ -1,4 +1,5 @@
 import apiHandler from '../../../lib/apiHandler'
+import prisma from '../../../lib/prisma'
 
 const app = apiHandler()
 
