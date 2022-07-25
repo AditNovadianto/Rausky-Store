@@ -63,8 +63,11 @@ const usePayHandler = () => {
       // @ts-ignore
       window.snap.pay(paymentToken, {
         onPending: async (result) => {
+          toast.success('Success. Redirecting to order summary page...', {
+            id: toastId,
+          })
           const paidAt = new Date(result.transaction_time).toISOString()
-          const { data } = await request.put(`/orders/${result.order_id}`, {
+          await request.put(`/orders/${result.order_id}`, {
             paymentMethod: result.payment_type,
             status: 'PAID',
             paidAt,
@@ -87,10 +90,15 @@ const usePayHandler = () => {
         },
       })
     } catch (err) {
-      toast.error('Failed. Check console for details', { id: toastId })
+      let errMsg = ''
+      if (err?.data?.message) {
+        errMsg = err.data.message.join(',')
+      } else {
+        errMsg = 'Please retry.'
+      }
+      toast.error(`Failed. ${errMsg}`, { id: toastId })
       console.log(err)
     } finally {
-      toast.remove(toastId)
       setLaunching(false)
     }
   }
