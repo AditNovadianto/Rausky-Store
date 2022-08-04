@@ -14,11 +14,14 @@ import Skeleton from 'react-loading-skeleton'
 import ProductItem from '../components/ProductItem'
 import { GetServerSideProps } from 'next'
 import usePayHandler from '../hooks/usePayHandler'
+import { useState } from 'react'
+import toast from 'react-hot-toast'
 
 const Cart = () => {
   const { data: session, status } = useSession()
   const user = session?.user
   const isLoggedIn = status != 'loading' && user
+  const [promoCode, setPromoCode] = useState('')
   const { state, actions } = useStateMachine({
     addToCart,
     removeFromCart,
@@ -46,6 +49,17 @@ const Cart = () => {
     return Object.keys(errors).length > 0
   })
   const totalItemsInCart = cart.length
+
+  const promoCodeHandler = async () => {
+    if (!promoCode) return
+    let toastId: string
+    try {
+      toastId = toast.loading(`Checking validity of ${promoCode}`)
+      // TODO: bikin validate discount code
+    } catch (err) {
+      console.log(err)
+    }
+  }
 
   return (
     <Container title={`My Cart (${totalItemsInCart})`}>
@@ -224,6 +238,34 @@ const Cart = () => {
               {/* ORDER SUMMARY */}
               <div className="p-6">
                 <div className="space-y-2">
+                  {user ? (
+                    <div className="flex space-x-4 text-sm">
+                      <input
+                        type="text"
+                        className="input"
+                        placeholder="Promo Code"
+                        value={promoCode}
+                        onChange={(e) => setPromoCode(e.target.value)}
+                      />
+                      <button
+                        disabled={!promoCode}
+                        onClick={promoCodeHandler}
+                        className="bg-green-500 disabled:bg-gray-400 dark:disabled:bg-gray-600 text-white px-4 rounded-lg font-semibold hover:bg-green-400"
+                      >
+                        Apply
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="text-gray-500 text-sm">
+                      <button
+                        onClick={() => signIn()}
+                        className="text-green-500 hover:underline"
+                      >
+                        Sign In
+                      </button>{' '}
+                      to use Promo Code
+                    </div>
+                  )}
                   <div className="flex justify-between text-gray-500">
                     <p>Subtotal</p>
                     <p>Rp {order.subtotal.toLocaleString()}</p>
