@@ -7,21 +7,28 @@ import {
 } from '@heroicons/react/outline'
 import { useStateMachine } from 'little-state-machine'
 import Link from '../components/Link'
-import { addToCart, removeFromCart, decrementAmount } from '../lib/cartHandler'
+import {
+  addToCart,
+  removeFromCart,
+  decrementAmount,
+  countTotal,
+} from '../lib/cartHandler'
 import RequirementField from '../components/RequirementField'
 import { signIn, useSession } from 'next-auth/react'
 import Skeleton from 'react-loading-skeleton'
 import ProductItem from '../components/ProductItem'
 import { GetServerSideProps } from 'next'
 import usePayHandler from '../hooks/usePayHandler'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
+import request from '../lib/request'
 
 const Cart = () => {
   const { data: session, status } = useSession()
   const user = session?.user
   const isLoggedIn = status != 'loading' && user
   const [promoCode, setPromoCode] = useState('')
+  const [promoCodeApplied, setPromoCodeApplied] = useState(false)
   const { state, actions } = useStateMachine({
     addToCart,
     removeFromCart,
@@ -37,10 +44,30 @@ const Cart = () => {
         },
       }
     },
+    setOrderPromoCode: (state, payload) => {
+      const newOrder = {
+        ...state.order,
+        promoCode: payload.code,
+        discount: payload.discountPercent,
+      }
+      const { total } = countTotal(state.cart, newOrder)
+      newOrder.total = total
+      return {
+        ...state,
+        order: newOrder,
+      }
+    },
   })
   const { cart, order, updatedDB, updatingDB } = state
 
   const [payHandler, launching] = usePayHandler()
+
+  useEffect(() => {
+    if (order.promoCode) {
+      setPromoCode(order.promoCode)
+      setPromoCodeApplied(true)
+    }
+  }, [order])
 
   const isFieldError = ({ requirement, field }) => {
     return order.missingRequirements[requirement.categorySlug]?.[field.value]
@@ -55,9 +82,14 @@ const Cart = () => {
     let toastId: string
     try {
       toastId = toast.loading(`Checking validity of ${promoCode}`)
-      // TODO: bikin validate discount code
+      const { data } = await request.get(`/discountCodes/${promoCode}`)
+      toast.success(data.message, { id: toastId })
+      console.log({ data })
+      actions.setOrderPromoCode(data.promoCode)
+      setPromoCodeApplied(true)
     } catch (err) {
       console.log(err)
+      toast.error(err.data.message, { id: toastId })
     }
   }
 
@@ -244,11 +276,12 @@ const Cart = () => {
                         type="text"
                         className="input"
                         placeholder="Promo Code"
+                        disabled={promoCodeApplied}
                         value={promoCode}
                         onChange={(e) => setPromoCode(e.target.value)}
                       />
                       <button
-                        disabled={!promoCode}
+                        disabled={!promoCode || promoCodeApplied}
                         onClick={promoCodeHandler}
                         className="bg-green-500 disabled:bg-gray-400 dark:disabled:bg-gray-600 text-white px-4 rounded-lg font-semibold hover:bg-green-400"
                       >
@@ -278,8 +311,8 @@ const Cart = () => {
                   )}
                   {order.discount > 0 && (
                     <div className="flex justify-between text-gray-500">
-                      <p>Diskon</p>
-                      <p>Rp {order.discount.toLocaleString()}</p>
+                      <p>Discount</p>
+                      <p>{order.discount.toLocaleString()}%</p>
                     </div>
                   )}
                   <div className="flex justify-between text-xl font-semibold">

@@ -21,7 +21,9 @@ export const countTotal = (cart, order) => {
     return total
   }, 0)
 
-  const total = subtotal + order.tax - order.discount
+  const plusTax = subtotal + order.tax
+
+  const total = plusTax - (order.discount / 100) * plusTax
 
   return { total, subtotal }
 }

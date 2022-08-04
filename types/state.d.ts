@@ -17,6 +17,7 @@ declare module 'little-state-machine' {
       tax: number
       discount: number
       total: number
+      promoCode: string
     }
     updatingDB: boolean
     updatedDB: boolean

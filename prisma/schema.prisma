@@ -220,4 +220,5 @@ model UsersOnDiscountCodes {
     userId         String?       @db.ObjectId
     discountCode   DiscountCode? @relation(fields: [discountCodeId], references: [id])
     discountCodeId String?       @db.ObjectId
+    isUsed         Boolean?      @default(false)
 }
