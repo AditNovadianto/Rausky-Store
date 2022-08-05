@@ -72,6 +72,9 @@ app.put(checkAuth(), async (req, res) => {
 
   const promoData = await prisma.usersOnDiscountCodes.findFirst({
     where: {
+      discountCode: {
+        code: code as string,
+      },
       userId: req.user.id,
     },
     select: {
