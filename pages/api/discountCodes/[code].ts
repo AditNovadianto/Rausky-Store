@@ -13,16 +13,6 @@ app.get(checkAuth(), async (req, res) => {
     throw { status: 404, message: `Promo Code '${code}' is not available` }
   }
 
-  if (discountCode.quota === 0) {
-    throw { status: 404, message: `Promo Code '${code}' quota exhausted` }
-  }
-
-  // check if Promo code date still valid
-  const now = new Date()
-  if (discountCode.validUntil && now > discountCode.validUntil) {
-    throw { status: 403, message: `Promo Code '${code}' is no longer valid` }
-  }
-
   const promoData = await prisma.usersOnDiscountCodes.findFirst({
     where: {
       discountCodeId: discountCode.id,
@@ -41,6 +31,16 @@ app.get(checkAuth(), async (req, res) => {
       },
     })
     return
+  }
+
+  if (discountCode.quota === 0) {
+    throw { status: 404, message: `Promo Code '${code}' quota exhausted` }
+  }
+
+  // check if Promo code date still valid
+  const now = new Date()
+  if (discountCode.validUntil && now > discountCode.validUntil) {
+    throw { status: 403, message: `Promo Code '${code}' is no longer valid` }
   }
 
   const updatedPromoCode = await prisma.discountCode.update({
