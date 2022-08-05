@@ -22,6 +22,7 @@ import usePayHandler from '../hooks/usePayHandler'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import request from '../lib/request'
+import useIsMounted from '../hooks/useIsMounted'
 
 const Cart = () => {
   const { data: session, status } = useSession()
@@ -49,6 +50,7 @@ const Cart = () => {
   const { cart, order, updatedDB, updatingDB } = state
 
   const [payHandler, launching] = usePayHandler()
+  const isMounted = useIsMounted()
 
   useEffect(() => {
     if (order.promoCode) {
@@ -83,7 +85,7 @@ const Cart = () => {
 
   return (
     <Container title={`My Cart (${totalItemsInCart})`}>
-      {totalItemsInCart == 0 ? (
+      {isMounted && totalItemsInCart == 0 ? (
         <Wrapper className="flex flex-col text-center justify-center items-center space-y-10">
           <div>
             <img

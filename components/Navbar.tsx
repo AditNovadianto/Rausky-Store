@@ -8,7 +8,6 @@ import Badge from './Badge'
 import { useRouter } from 'next/router'
 import {
   ArrowLeftIcon,
-  ChatAlt2Icon,
   ChatIcon,
   DesktopComputerIcon,
   DotsVerticalIcon,
@@ -32,6 +31,7 @@ import { useDebounce, useLocalStorage, useUpdateEffect } from 'usehooks-ts'
 import request from '../lib/request'
 import Modal from './Modal'
 import { socialMedia } from '../lib/data'
+import useIsMounted from '../hooks/useIsMounted'
 
 type Theme = 'device' | 'light' | 'dark'
 
@@ -79,6 +79,7 @@ const Navbar = () => {
 
   const router = useRouter()
   const onMobile = useMediaQuery('(max-width: 640px)')
+  const isMounted = useIsMounted()
 
   const { cart } = state
   const user = session?.user as User
@@ -312,7 +313,9 @@ const Navbar = () => {
               href="/cart"
               className="relative flex-shrink-0 rounded-md p-2 hover:bg-gray-100 dark:hover:bg-gray-800"
             >
-              {totalItemsInCart > 0 && <Badge>{totalItemsInCart}</Badge>}
+              {isMounted && totalItemsInCart > 0 && (
+                <Badge>{totalItemsInCart}</Badge>
+              )}
 
               <img
                 src="/images/icon/bag.svg"
