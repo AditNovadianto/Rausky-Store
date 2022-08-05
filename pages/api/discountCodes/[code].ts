@@ -10,28 +10,31 @@ app.get(checkAuth(), async (req, res) => {
   })
 
   if (!discountCode) {
-    throw { status: 404, message: `Discount Code '${code}' is not available` }
+    throw { status: 404, message: `Promo Code '${code}' is not available` }
   }
 
   if (discountCode.quota === 0) {
-    throw { status: 404, message: `Discount Code '${code}' quota exhausted` }
+    throw { status: 404, message: `Promo Code '${code}' quota exhausted` }
   }
 
-  // check if discount code date still valid
+  // check if Promo code date still valid
   const now = new Date()
   if (discountCode.validUntil && now > discountCode.validUntil) {
-    throw { status: 403, message: `Discount Code '${code}' is no longer valid` }
+    throw { status: 403, message: `Promo Code '${code}' is no longer valid` }
   }
 
-  const isCodeUsed = await prisma.usersOnDiscountCodes.findFirst({
+  const promoData = await prisma.usersOnDiscountCodes.findFirst({
     where: {
       discountCodeId: discountCode.id,
       userId: req.user.id,
     },
   })
-  if (isCodeUsed) {
+  if (promoData) {
+    if (promoData.isUsed) {
+      throw { status: 400, message: `You already use '${code}'` }
+    }
     res.status(200).json({
-      message: `Discount Code '${code}' applied`,
+      message: `Promo Code '${code}' applied`,
       promoCode: {
         code: discountCode.code,
         discountPercent: discountCode.discountPercent,
@@ -59,9 +62,37 @@ app.get(checkAuth(), async (req, res) => {
   })
 
   res.status(200).json({
-    message: `Discount Code '${code}' applied`,
+    message: `Promo Code '${code}' applied`,
     promoCode: updatedPromoCode,
   })
+})
+
+app.put(checkAuth(), async (req, res) => {
+  const { code } = req.query
+
+  const promoData = await prisma.usersOnDiscountCodes.findFirst({
+    where: {
+      userId: req.user.id,
+    },
+    select: {
+      id: true,
+    },
+  })
+
+  if (!promoData) {
+    throw { status: 404, message: `Promo Code '${code}' is not available` }
+  }
+
+  await prisma.usersOnDiscountCodes.update({
+    where: {
+      id: promoData.id,
+    },
+    data: {
+      isUsed: true,
+    },
+  })
+
+  res.status(200).json({ message: 'Promo Code Updated' })
 })
 
 export default app

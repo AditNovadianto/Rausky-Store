@@ -14,7 +14,7 @@ let snap = new midtransClient.Snap({
 export default app
   // create new order
   .post(async (req, res) => {
-    const { products, requirements, user: reqUser } = req.body
+    const { products, requirements, user: reqUser, promoCode } = req.body
     if (!products || products.length == 0) {
       throw {
         status: 400,
@@ -67,9 +67,42 @@ export default app
       }
     }
 
+    let discountPercent = 0
+    // validate promoCode
+    if (user && promoCode) {
+      const promoData = await prisma.usersOnDiscountCodes.findFirst({
+        where: {
+          userId: user.id,
+          discountCode: {
+            code: promoCode,
+          },
+        },
+        select: {
+          id: true,
+          isUsed: true,
+          discountCode: {
+            select: {
+              discountPercent: true,
+            },
+          },
+        },
+      })
+
+      if (!promoData) {
+        throw { status: 404, message: `You are not using '${promoCode}'` }
+      }
+
+      if (promoData.isUsed) {
+        throw { status: 400, message: `You already use '${promoCode}'` }
+      }
+
+      discountPercent = promoData.discountCode.discountPercent
+    }
+
     // calculate total
-    let tax = 0
-    let total = subtotal + tax
+    const tax = 0
+    const plusTax = subtotal + tax
+    const total = plusTax - (discountPercent / 100) * plusTax
 
     // check requirements from req.body
     let invalidRequirements = []
@@ -140,13 +173,31 @@ export default app
           quantity: item.amount,
           name: item.product.title,
         })),
+      ],
+    }
+
+    if (tax > 0) {
+      paymentData.item_details = [
+        ...paymentData.item_details,
         {
           id: 'tax',
           price: tax,
           quantity: 1,
-          name: 'Pajak bos',
+          name: 'Tax',
         },
-      ],
+      ]
+    }
+
+    if (discountPercent > 0) {
+      paymentData.item_details = [
+        ...paymentData.item_details,
+        {
+          id: 'discount',
+          price: -((discountPercent / 100) * plusTax),
+          quantity: 1,
+          name: 'Discount',
+        },
+      ]
     }
 
     if (userName || userEmail) {

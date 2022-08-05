@@ -32,9 +32,17 @@ const ContinuePayBtn = () => {
             <Wrapper className="max-w-md">
               <Link
                 href="/cart"
-                className="block w-full -mt-4 py-4 text-center bg-green-500 hover:bg-green-400 transition-all font-semibold text-white rounded-2xl shadow-xl shadow-green-300/50 dark:shadow-green-300/10 pointer-events-auto"
+                className="w-full -mt-4 py-4 text-center bg-green-500 hover:bg-green-400 transition-all font-semibold text-white rounded-2xl shadow-xl shadow-green-300/50 dark:shadow-green-300/10 pointer-events-auto flex flex-col"
               >
-                Continue to payment (Rp {order.subtotal.toLocaleString()})
+                <span>
+                  Continue to payment (Rp {order.total.toLocaleString()})
+                </span>
+                {order.promoCode && (
+                  <span className="text-xs text-green-200">
+                    &apos;{order.promoCode}&apos; Applied ({order.discount}%
+                    OFF)
+                  </span>
+                )}
               </Link>
             </Wrapper>
           </motion.div>

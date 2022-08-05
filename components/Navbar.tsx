@@ -245,9 +245,7 @@ const Navbar = () => {
       label: 'Sign Out',
       onClick: async () => {
         // https://next-auth.js.org/getting-started/client#specifying-a-callbackurl-1
-        await signOut({
-          redirect: false, // no page reload
-        })
+        await signOut()
         if (router.route != '/') {
           router.push('/')
         }

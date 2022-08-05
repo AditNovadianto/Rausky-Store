@@ -1,4 +1,5 @@
 import { useStateMachine } from 'little-state-machine'
+import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -6,6 +7,7 @@ import request from '../lib/request'
 
 const usePayHandler = () => {
   const router = useRouter()
+  const { data: session } = useSession()
   const { state, actions } = useStateMachine({
     clearOrder: (state) => {
       request.delete('/carts/me')
@@ -20,6 +22,7 @@ const usePayHandler = () => {
           tax: 0,
           discount: 0,
           total: 0,
+          promoCode: '',
         },
       }
     },
@@ -53,6 +56,7 @@ const usePayHandler = () => {
           amount: product.amount,
         })),
         requirements: order.requirements,
+        promoCode: order.promoCode,
         user: !user ? order.user : null,
       })
 
@@ -72,6 +76,10 @@ const usePayHandler = () => {
             status: 'PAID',
             paidAt,
           })
+          if (session && order.discount > 0) {
+            // change discountCodes isUsed to true
+            request.put(`/discountCodes/${order.promoCode}`)
+          }
           actions.clearOrder()
 
           router.push({
@@ -87,12 +95,13 @@ const usePayHandler = () => {
         },
         onClose: () => {
           request.delete(`/orders/${newOrder.id}`)
+          toast.remove(toastId)
         },
       })
     } catch (err) {
       let errMsg = ''
       if (err?.data?.message) {
-        errMsg = err.data.message.join(',')
+        errMsg = err.data.message
       } else {
         errMsg = 'Please retry.'
       }

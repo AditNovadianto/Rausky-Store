@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { SessionProvider } from 'next-auth/react'
+import { SessionProvider, useSession } from 'next-auth/react'
 import NextNProgress from 'nextjs-progressbar'
 import '../styles/globals.css'
 import {
@@ -11,7 +11,7 @@ import ContinuePayBtn from '../components/ContinuePayBtn'
 import 'react-loading-skeleton/dist/skeleton.css'
 import { useRouter } from 'next/router'
 import request from '../lib/request'
-import { setRequirements, setCart } from '../lib/cartHandler'
+import { setRequirements, setCart, setOrderPromoCode } from '../lib/cartHandler'
 import { Toaster } from 'react-hot-toast'
 import { AnimatePresence, motion } from 'framer-motion'
 
@@ -49,9 +49,12 @@ export default MyApp
 
 const MyComponent = ({ Component, pageProps }) => {
   const router = useRouter()
+  const { data: session } = useSession()
+
   const { actions } = useStateMachine({
     setRequirements,
     setCart,
+    setOrderPromoCode,
     setGlobalTheme: (state, payload) => ({ ...state, globalTheme: payload }),
   })
 
@@ -78,6 +81,15 @@ const MyComponent = ({ Component, pageProps }) => {
     const html = document.documentElement
     actions.setGlobalTheme(html.classList.contains('dark') ? 'dark' : 'light')
   }, [])
+
+  useEffect(() => {
+    if (!session) {
+      actions.setOrderPromoCode({
+        code: '',
+        discountPercent: 0,
+      })
+    }
+  }, [session, actions])
 
   return (
     <>

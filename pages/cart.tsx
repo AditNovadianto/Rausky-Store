@@ -11,7 +11,7 @@ import {
   addToCart,
   removeFromCart,
   decrementAmount,
-  countTotal,
+  setOrderPromoCode,
 } from '../lib/cartHandler'
 import RequirementField from '../components/RequirementField'
 import { signIn, useSession } from 'next-auth/react'
@@ -44,19 +44,7 @@ const Cart = () => {
         },
       }
     },
-    setOrderPromoCode: (state, payload) => {
-      const newOrder = {
-        ...state.order,
-        promoCode: payload.code,
-        discount: payload.discountPercent,
-      }
-      const { total } = countTotal(state.cart, newOrder)
-      newOrder.total = total
-      return {
-        ...state,
-        order: newOrder,
-      }
-    },
+    setOrderPromoCode,
   })
   const { cart, order, updatedDB, updatingDB } = state
 
@@ -285,7 +273,7 @@ const Cart = () => {
                         onClick={promoCodeHandler}
                         className="bg-green-500 disabled:bg-gray-400 dark:disabled:bg-gray-600 text-white px-4 rounded-lg font-semibold hover:bg-green-400"
                       >
-                        Apply
+                        {promoCodeApplied ? 'Applied' : 'Apply'}
                       </button>
                     </div>
                   ) : (

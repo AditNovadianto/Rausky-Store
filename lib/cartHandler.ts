@@ -291,3 +291,17 @@ export const setCart = (state: GlobalState, payload): GlobalState => {
     },
   }
 }
+
+export const setOrderPromoCode = (state, payload) => {
+  const newOrder = {
+    ...state.order,
+    promoCode: payload.code,
+    discount: payload.discountPercent,
+  }
+  const { total } = countTotal(state.cart, newOrder)
+  newOrder.total = total
+  return {
+    ...state,
+    order: newOrder,
+  }
+}
