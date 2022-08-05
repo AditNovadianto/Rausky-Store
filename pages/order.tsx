@@ -280,14 +280,23 @@ const Order = () => {
                   {/* ORDER SUMMARY */}
                   <div className="flex-[2] p-4 pb-8 print:pb-4 border dark:border-gray-700 rounded-2xl">
                     <h3 className="font-semibold text-xl">Summary</h3>
-                    <div className="mt-2 flex justify-between text-gray-500">
-                      <p>Pajak</p>
-                      <p>Rp {finishedOrder.tax?.toLocaleString()}</p>
-                    </div>
-                    <div className="mt-2 flex justify-between text-gray-500">
-                      <p>Diskon</p>
-                      <p>Rp {finishedOrder.discount?.toLocaleString()}</p>
-                    </div>
+                    {finishedOrder.promoCode && (
+                      <p className="text-sm text-green-500">
+                        Promo Code &apos;{finishedOrder.promoCode}&apos; applied
+                      </p>
+                    )}
+                    {finishedOrder.tax > 0 && (
+                      <div className="mt-2 flex justify-between text-gray-500">
+                        <p>Tax</p>
+                        <p>Rp {finishedOrder.tax?.toLocaleString()}</p>
+                      </div>
+                    )}
+                    {finishedOrder.discount > 0 && (
+                      <div className="mt-2 flex justify-between text-gray-500">
+                        <p>Discount</p>
+                        <p>{finishedOrder.discount?.toLocaleString()}%</p>
+                      </div>
+                    )}
                     <div className="flex mt-4 p-4 print:p-0 rounded-2xl justify-between text-xl font-semibold bg-green-500 text-white print:text-black print:shadow-none shadow-xl shadow-green-300 dark:shadow-green-300/10">
                       <p className="">Total</p>
                       <p>Rp {finishedOrder.total?.toLocaleString()}</p>

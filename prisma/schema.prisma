@@ -187,6 +187,8 @@ model Order {
     userId        String?            @db.ObjectId
     user          User?              @relation(fields: [userId], references: [id], onDelete: Cascade)
     rating        Rating?
+    // TODO: change this to reference DiscountCode model
+    promoCode     String?
     createdAt     DateTime           @default(now())
     updatedAt     DateTime           @updatedAt
 }

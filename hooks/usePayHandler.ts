@@ -75,6 +75,8 @@ const usePayHandler = () => {
             paymentMethod: result.payment_type,
             status: 'PAID',
             paidAt,
+            discount: order.discount,
+            promoCode: order.promoCode,
           })
           if (session && order.discount > 0) {
             // change discountCodes isUsed to true

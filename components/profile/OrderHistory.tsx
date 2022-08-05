@@ -1,4 +1,8 @@
-import { CheckCircleIcon, ClockIcon } from '@heroicons/react/outline'
+import {
+  CheckCircleIcon,
+  ClockIcon,
+  TicketIcon,
+} from '@heroicons/react/outline'
 import Skeleton from 'react-loading-skeleton'
 import Link from '../Link'
 import ProductItem from '../ProductItem'
@@ -63,6 +67,12 @@ const OrderHistory = () => {
                     <h3 className="font-semibold text-green-500">
                       Rp {order.total.toLocaleString()}
                     </h3>
+                    {order.promoCode && (
+                      <span className="ml-5 flex items-center text-green-500">
+                        <TicketIcon className="w-5 h-5 mr-1" />
+                        {order.promoCode}
+                      </span>
+                    )}
                   </div>
                   {order.rating && (
                     <div className="flex items-center">

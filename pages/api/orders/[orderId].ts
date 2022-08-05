@@ -27,7 +27,7 @@ export default app
     res.status(200).json({ order })
   })
   .put(async (req, res) => {
-    const { paymentMethod, status, paidAt } = req.body
+    const { paymentMethod, status, paidAt, discount, promoCode } = req.body
 
     const where = { id: req.query.orderId as string }
 
@@ -54,6 +54,8 @@ export default app
           paymentMethod,
           status,
           paidAt,
+          discount,
+          promoCode,
         },
         include,
       })
