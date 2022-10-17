@@ -49,6 +49,9 @@ const Container: FC<Props> = ({ title, children, noNavbar, noTopMargin }) => {
           content="#1 Online Topup store. We provide the best experience to fulfill your entertainment needs."
         />
         <meta property="twitter:image" content="/images/logo/overview.jpg" />
+
+        {/* Dicoding */}
+        <meta name="dicoding:email" content="bhremada.fka@gmail.com" />
       </Head>
 
       {!noNavbar && <Navbar />}
